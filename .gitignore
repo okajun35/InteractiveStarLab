@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.verify-bundle.mjs
+.env
+.env.*
+!.env.example
+*:Zone.Identifier
