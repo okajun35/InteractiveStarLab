@@ -18,7 +18,7 @@ const input: SkySnapshotMetadataInput = {
   displayOptions: { stars: true, starNames: true, constellationLines: true, constellationNames: true },
   width: 800,
   height: 600,
-  heading: "南 180°",
+  heading: "S 180°",
 };
 
 const metadata = createSkySnapshotMetadata(input, {

@@ -56,7 +56,6 @@ export function buildGuideTargets(mission: ObservationMission): ObservationGuide
       index: index + 1,
       starId: target.starId,
       name: star?.name ?? target.starId,
-      nameJa: star?.nameJa,
       magnitude: target.predictedMagnitude,
       altitude: target.predictedAltitude,
       azimuth: target.predictedAzimuth,

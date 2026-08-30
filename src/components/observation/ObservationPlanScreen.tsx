@@ -99,11 +99,11 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
         <div className="workflow-hero">
           <div>
             <span className="en">Observation planner</span>
-            <h1>観測計画をつくる</h1>
-            <p>今夜見つけられそうな星を選び、観測Missionを準備します。</p>
+            <h1>Create an observation plan</h1>
+            <p>Choose stars you may find tonight and prepare an Observation Mission.</p>
           </div>
           <button type="button" onClick={onOpenSky}>
-            <span className="en">Sky</span> 星空を見る
+            Sky
           </button>
         </div>
 
@@ -114,7 +114,7 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
               <div className="workflow-card-heading">
                 <div>
                   <span className="en">Observation time</span>
-                  <h2 id="date-time-title">観測日時</h2>
+                  <h2 id="date-time-title">Observation date and time</h2>
                 </div>
                 <span className="step-badge">2</span>
               </div>
@@ -124,11 +124,11 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
               <div className="workflow-card-heading">
                 <div>
                   <span className="en">Maximum magnitude</span>
-                  <h2 id="magnitude-title">明るさの上限</h2>
+                  <h2 id="magnitude-title">Magnitude limit</h2>
                 </div>
                 <span className="step-badge">3</span>
               </div>
-              <div className="magnitude-choice" role="group" aria-label="観測候補の最大等級">
+              <div className="magnitude-choice" role="group" aria-label="Maximum magnitude for candidates">
                 {MAX_MAGNITUDE_OPTIONS.map((value) => (
                   <button
                     key={value}
@@ -137,11 +137,11 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
                     aria-pressed={maxMagnitude === value}
                     onClick={() => setMaxMagnitude(value)}
                   >
-                    {value}等星まで
+                    Up to magnitude {value}
                   </button>
                 ))}
               </div>
-              <p className="workflow-note">初期値は1〜2等星相当です。数値が小さいほど明るい星だけを対象にします。</p>
+              <p className="workflow-note">The default is magnitude 1–2. Lower values select only brighter stars.</p>
             </section>
           </div>
 
@@ -153,10 +153,10 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
                 setSelectedIds((previous) => toggleTargetSelection(previous, starId))
               }
             />
-            <section className="mission-create-card" aria-label="Mission作成">
+            <section className="mission-create-card" aria-label="Create Mission">
               <div>
                 <span className="mission-create-count">{selectedCandidates.length} / 5</span>
-                <span>件の星をMissionに追加</span>
+                <span>stars added to Mission</span>
               </div>
               <button
                 type="button"
@@ -164,16 +164,16 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
                 disabled={Boolean(siteErrors) || selectedCandidates.length === 0 || saving || cloudIdentityLoading}
                 onClick={handleCreateMission}
               >
-                {saving ? "保存中…" : "Missionを作成"}
+                {saving ? "Saving…" : "Create Mission"}
               </button>
             </section>
-            {cloudConfigured && cloudIdentityLoading && <p className="workflow-note">Cloud接続を準備中です。接続準備が完了するとMissionを作成できます。</p>}
-            {cloudConfigured && !cloudIdentityLoading && !cloudAuthenticated && <p className="workflow-note">Cloudへ接続できないため、この端末ではローカル保存を続けます。</p>}
-            {cloudIdentityError && <p className="cloud-error" role="alert">{cloudIdentityError} ローカル保存は利用できます。</p>}
+            {cloudConfigured && cloudIdentityLoading && <p className="workflow-note">Preparing the cloud connection. You can create the Mission when it is ready.</p>}
+            {cloudConfigured && !cloudIdentityLoading && !cloudAuthenticated && <p className="workflow-note">Cloud is unavailable, so this device will continue using local storage.</p>}
+            {cloudIdentityError && <p className="cloud-error" role="alert">{cloudIdentityError} Local storage remains available.</p>}
             {cloudError && <p className="cloud-error" role="alert">{cloudError}</p>}
             {createdMissionId && (
               <div className="workflow-success" role="status">
-                Missionを作成しました（ID: {createdMissionId}）。次のステップで観測結果を入力できます。
+                Mission created (ID: {createdMissionId}). You can enter observations in the next step.
               </div>
             )}
           </div>
@@ -185,16 +185,16 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
 
 function validateSite(site: ObservationSite): SiteEditorErrors | null {
   const errors: SiteEditorErrors = {};
-  if (!site.name.trim()) errors.name = "地点名を入力してください";
+  if (!site.name.trim()) errors.name = "Enter a site name";
   if (!Number.isFinite(site.latitude)) {
-    errors.latitude = "緯度は数値を入力してください";
+    errors.latitude = "Latitude must be a number";
   } else if (site.latitude < -90 || site.latitude > 90) {
-    errors.latitude = "緯度は -90〜90 の範囲で入力してください";
+    errors.latitude = "Latitude must be between -90 and 90";
   }
   if (!Number.isFinite(site.longitude)) {
-    errors.longitude = "経度は数値を入力してください";
+    errors.longitude = "Longitude must be a number";
   } else if (site.longitude < -180 || site.longitude > 180) {
-    errors.longitude = "経度は -180〜180 の範囲で入力してください";
+    errors.longitude = "Longitude must be between -180 and 180";
   }
   return Object.keys(errors).length > 0 ? errors : null;
 }

@@ -138,7 +138,6 @@ export function buildSkyView(
       {
         constellationId: c.id,
         name: c.name,
-        nameJa: c.nameJa,
         brightestStarName: best.name,
         x,
         y,
@@ -161,7 +160,7 @@ export function buildSkyView(
 }
 
 export function formatHeading(azimuthDeg: number): string {
-  const names = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
+  const names = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   const idx = Math.round(((azimuthDeg % 360) / 45)) % 8;
   return `${names[idx]} ${Math.round(azimuthDeg)}°`;
 }
@@ -187,7 +186,6 @@ export interface SceneLine {
 export interface SceneLabel {
   constellationId: string;
   name: string;
-  nameJa?: string;
   brightestStarName?: string;
   x: number;
   y: number;

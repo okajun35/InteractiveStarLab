@@ -24,20 +24,20 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
       <div className="workflow-card-heading">
         <div>
           <span className="en">Observation site</span>
-          <h2 id="site-editor-title">観測地点</h2>
+          <h2 id="site-editor-title">Observation site</h2>
         </div>
         <span className="step-badge">1</span>
       </div>
 
       <label className="workflow-field">
         <span className="workflow-field-label">
-          <span className="en">Name</span> 地点名
+          Name
         </span>
         <input
           type="text"
           value={site.name}
           onChange={(event) => onChange({ name: event.target.value })}
-          placeholder="例：自宅ベランダ"
+          placeholder="e.g. Home balcony"
           className={errors.name ? "invalid" : undefined}
         />
         {errors.name && <span className="workflow-error">{errors.name}</span>}
@@ -46,7 +46,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
       <div className="workflow-field-row">
         <label className="workflow-field">
           <span className="workflow-field-label">
-            <span className="en">Latitude</span> 緯度
+            Latitude
           </span>
           <input
             type="number"
@@ -63,7 +63,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
         </label>
         <label className="workflow-field">
           <span className="workflow-field-label">
-            <span className="en">Longitude</span> 経度
+            Longitude
           </span>
           <input
             type="number"
@@ -82,7 +82,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
 
       <label className="workflow-field">
         <span className="workflow-field-label">
-          <span className="en">Presets</span> 場所プリセット
+          Presets
         </span>
         <select
           className="place-select"
@@ -92,23 +92,23 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
             if (!place) return;
             onChange({
               id: place.id,
-              name: `${place.en} ${place.ja}`,
+              name: place.name,
               latitude: place.latitude,
               longitude: place.longitude,
             });
           }}
         >
-          <option value="custom">カスタム（手入力）</option>
+          <option value="custom">Custom location</option>
           {PLACE_PRESETS.map((place) => (
             <option key={place.id} value={place.id}>
-              {place.en} {place.ja}
+              {place.name}
             </option>
           ))}
         </select>
       </label>
 
       <p className="workflow-note">
-        緯度・経度は星の高度と方位の計算に使います。現在地の取得に失敗しても、ここへ手入力できます。
+        Latitude and longitude determine star altitude and azimuth. You can enter them manually if location access fails.
       </p>
     </section>
   );

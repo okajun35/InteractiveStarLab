@@ -30,12 +30,12 @@ export function ObservationResultsScreen({
     return (
       <main className="workflow-page">
         <div className="workflow-container workflow-empty-page">
-          <section className="workflow-card workflow-empty-card" aria-label="結果なし">
+          <section className="workflow-card workflow-empty-card" aria-label="No observation results">
             <span className="en">Observation results</span>
-            <h1>観測結果がありません</h1>
-            <p>Missionを実行して、観測結果を保存してください。</p>
+            <h1>No observation results</h1>
+            <p>Run a Mission and save your observation results.</p>
             <button type="button" className="primary" onClick={onOpenPlan}>
-              Planへ移動
+              Go to Plan
             </button>
           </section>
         </div>
@@ -52,18 +52,18 @@ export function ObservationResultsScreen({
         <div className="workflow-hero">
           <div>
             <span className="en">Observation results</span>
-            <h1>観測結果を振り返る</h1>
-            <p>予測と実際の観測を並べて、違いを確認します。</p>
+            <h1>Review observation results</h1>
+            <p>Compare the prediction with what you actually observed.</p>
           </div>
           <div className="workflow-hero-actions">
-            <button type="button" onClick={onOpenHistory}>履歴</button>
+            <button type="button" onClick={onOpenHistory}>History</button>
             <button type="button" onClick={onOpenSky}>
-              <span className="en">Sky</span> 星空を見る
+              Sky
             </button>
           </div>
         </div>
 
-        <section className="mission-overview results-overview" aria-label="観測記録情報">
+        <section className="mission-overview results-overview" aria-label="Observation record information">
           <div>
             <span className="en">Site</span>
             <strong>{record.siteSnapshot.name}</strong>
@@ -89,7 +89,7 @@ export function ObservationResultsScreen({
           <div className="workflow-card-heading">
             <div>
               <span className="en">Star by star</span>
-              <h2 id="results-detail-title">星ごとの結果</h2>
+              <h2 id="results-detail-title">Results by star</h2>
             </div>
           </div>
           <div className="result-star-list">
@@ -99,8 +99,7 @@ export function ObservationResultsScreen({
                 <ResultStarCard
                   key={target.starId}
                   target={target}
-                  name={star?.nameJa ?? star?.name ?? target.starId}
-                  englishName={star?.nameJa ? star.name : undefined}
+                  name={star?.name ?? target.starId}
                   status={resultsById.get(target.starId) ?? "unsure"}
                 />
               );
@@ -109,8 +108,8 @@ export function ObservationResultsScreen({
         </section>
 
         <div className="results-actions">
-          <button type="button" onClick={onOpenPlan}>新しいMissionを作成</button>
-          <button type="button" className="primary" onClick={onOpenHistory}>履歴を見る</button>
+          <button type="button" onClick={onOpenPlan}>Create a new Mission</button>
+          <button type="button" className="primary" onClick={onOpenHistory}>View history</button>
         </div>
       </div>
     </main>
@@ -120,7 +119,7 @@ export function ObservationResultsScreen({
 function formatDateTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("ja-JP", {
+  return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);

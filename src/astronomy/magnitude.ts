@@ -3,27 +3,19 @@ import type { LightPollution } from "../types/astronomy";
 export type MagnitudeLayer = "first" | "second" | "third" | "fourth" | "faint";
 
 export const MAGNITUDE_LAYERS = [
-  { id: "first", name: "1等星", min: Number.NEGATIVE_INFINITY, max: 1 },
-  { id: "second", name: "2等星", min: 1, max: 2 },
-  { id: "third", name: "3等星", min: 2, max: 3 },
-  { id: "fourth", name: "4等星", min: 3, max: 4 },
-  { id: "faint", name: "5等星以上", min: 4, max: 6.5 },
+  { id: "first", name: "First magnitude", min: Number.NEGATIVE_INFINITY, max: 1 },
+  { id: "second", name: "Second magnitude", min: 1, max: 2 },
+  { id: "third", name: "Third magnitude", min: 2, max: 3 },
+  { id: "fourth", name: "Fourth magnitude", min: 3, max: 4 },
+  { id: "faint", name: "Fifth magnitude and fainter", min: 4, max: 6.5 },
 ] as const satisfies ReadonlyArray<{ id: MagnitudeLayer; name: string; min: number; max: number }>;
 
-export const LAYER_LABEL_JA: Record<MagnitudeLayer, string> = {
-  first: "1等星",
-  second: "2等星",
-  third: "3等星",
-  fourth: "4等星",
-  faint: "5等星以上",
-};
-
-export const LIGHT_POLLUTION_LABELS: Record<LightPollution, { en: string; ja: string }> = {
-  "city-center": { en: "City", ja: "市中心" },
-  urban: { en: "Urban", ja: "市街地" },
-  suburban: { en: "Suburban", ja: "郊外" },
-  "dark-sky": { en: "Dark Sky", ja: "星空観測地" },
-  perfect: { en: "Perfect", ja: "完全な暗夜" },
+export const LIGHT_POLLUTION_LABELS: Record<LightPollution, string> = {
+  "city-center": "City",
+  urban: "Urban",
+  suburban: "Suburban",
+  "dark-sky": "Dark Sky",
+  perfect: "Perfect",
 };
 
 const LIGHT_POLLUTION_LIMITS: Record<LightPollution, number> = {
@@ -37,9 +29,9 @@ const LIGHT_POLLUTION_LIMITS: Record<LightPollution, number> = {
 export const LIMITING_MAGNITUDE_RANGE = { min: 1, max: 6.5, step: 0.1 } as const;
 export const OBSERVER_SENSITIVITY_RANGE = { min: -0.5, max: 0.5, step: 0.05 } as const;
 export const OBSERVER_SENSITIVITY_LABELS = {
-  dull: { en: "Dull", ja: "低い" },
-  typical: { en: "Typical", ja: "標準" },
-  sharp: { en: "Sharp", ja: "高い" },
+  dull: "Dull",
+  typical: "Typical",
+  sharp: "Sharp",
 } as const;
 
 export function layerOf(magnitude: number): MagnitudeLayer {

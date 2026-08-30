@@ -95,8 +95,8 @@ function localParts(date: Date, tz: string): [number, number] {
   const basis2: TimeBasis = "same-utc-instant";
   check("C5: 'same-utc-instant' is a valid TimeBasis", basis2 === "same-utc-instant");
   check("C5: labels exist for both bases",
-    Boolean(TIME_BASIS_LABELS["same-local-time"].en) && Boolean(TIME_BASIS_LABELS["same-utc-instant"].en),
-    `${TIME_BASIS_LABELS["same-local-time"].en} / ${TIME_BASIS_LABELS["same-utc-instant"].en}`);
+    Boolean(TIME_BASIS_LABELS["same-local-time"]) && Boolean(TIME_BASIS_LABELS["same-utc-instant"]),
+    `${TIME_BASIS_LABELS["same-local-time"]} / ${TIME_BASIS_LABELS["same-utc-instant"]}`);
 }
 
 if (failures > 0) {

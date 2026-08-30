@@ -23,9 +23,9 @@ export function ComparePanel() {
   return (
     <fieldset className="panel-group">
       <legend>
-        <span className="en">Before / After</span> 比較モード
+        Before / After
       </legend>
-      <div className="seg-group cols-3" role="group" aria-label="比較の種類">
+      <div className="seg-group cols-3" role="group" aria-label="Comparison type">
         {kinds.map((k) => (
           <button
             key={k.id}
@@ -41,10 +41,10 @@ export function ComparePanel() {
       </div>
       {compare?.kind === "location" && (
         <div className="field">
-          <span className="field-label">
-            <span className="en">Time Basis</span> 時刻の揃え方
+        <span className="field-label">
+            Time basis
           </span>
-          <div className="seg-group" role="group" aria-label="時刻の揃え方">
+          <div className="seg-group" role="group" aria-label="Time basis">
             {(Object.keys(TIME_BASIS_LABELS) as TimeBasis[]).map((k) => (
               <button
                 key={k}
@@ -53,22 +53,21 @@ export function ComparePanel() {
                 // setTimeBasis atomically re-applies the active location compare.
                 onClick={() => setTimeBasis(k)}
               >
-                {TIME_BASIS_LABELS[k].en}
-                <span className="seg-sub">{TIME_BASIS_LABELS[k].ja}</span>
+                {TIME_BASIS_LABELS[k]}
               </button>
             ))}
           </div>
           <p className="panel-note">
             {timeBasis === "same-local-time"
-              ? "両側とも同じ「現地時刻」の空を見比べます（§27）。"
-              : "両側とも同じ「瞬間（UTC）」の空を見比べます。"}
+              ? "Compare the sky at the same local time on both sides (§27)."
+              : "Compare the sky at the same UTC instant on both sides."}
           </p>
         </div>
       )}
       {compare && (
         <p className="panel-note">
-          {compare.baseLabel} と {compare.changedLabel} を左/右で比較中です。
-          日時・方角・FOV は両方で揃えています（§22）。
+          Comparing {compare.baseLabel} and {compare.changedLabel} side by side.
+          Date, direction, and field of view are matched on both sides (§22).
         </p>
       )}
     </fieldset>

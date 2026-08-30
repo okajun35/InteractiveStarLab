@@ -17,7 +17,6 @@ export type ObservationStatus = "visible" | "not_visible" | "unsure";
 export interface ObservationCandidate {
   starId: string;
   name: string;
-  nameJa?: string;
   magnitude: number;
   altitude: number;
   azimuth: number;

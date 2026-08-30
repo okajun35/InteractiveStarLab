@@ -152,8 +152,8 @@ check(
 
   const ids = new Set(EXPERIMENTS.map((e) => e.id));
   check("L6: exactly 4 experiments", EXPERIMENTS.length === 4 && ids.size === 4, [...ids].join(","));
-  check("L6: every experiment defines guess+correct+explain", EXPERIMENTS.every((e) =>
-    e.guesses.length >= 2 && e.correctGuess >= 0 && e.correctGuess < e.guesses.length && e.explainJa.length > 10));
+  check("L6: every experiment defines guess+correct+explanation", EXPERIMENTS.every((e) =>
+    e.guesses.length >= 2 && e.correctGuess >= 0 && e.correctGuess < e.guesses.length && e.explanation.length > 10));
 
   const day = EXPERIMENTS.find((e) => e.id === "daylight")!;
   const r = day.apply(obs, baseSim);

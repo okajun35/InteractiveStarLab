@@ -1,10 +1,10 @@
 import { useStarViewer } from "../state/context";
 
 const CARDINALS: Array<{ key: string; azimuth: number; label: string }> = [
-  { key: "N", azimuth: 0, label: "北" },
-  { key: "E", azimuth: 90, label: "東" },
-  { key: "S", azimuth: 180, label: "南" },
-  { key: "W", azimuth: 270, label: "西" },
+  { key: "N", azimuth: 0, label: "North" },
+  { key: "E", azimuth: 90, label: "East" },
+  { key: "S", azimuth: 180, label: "South" },
+  { key: "W", azimuth: 270, label: "West" },
 ];
 
 export function DirectionControl() {
@@ -13,13 +13,13 @@ export function DirectionControl() {
   return (
     <div className="field">
       <span className="field-label">
-        <span className="en">Direction</span> 方位角
+        Direction
         <span className="field-value">
           {Math.round(settings.azimuth)}° {cardinalName(settings.azimuth)}
         </span>
       </span>
 
-      <div className="compass" role="group" aria-label="主要方位">
+      <div className="compass" role="group" aria-label="Cardinal directions">
         {CARDINALS.map((c) => (
           <button
             key={c.key}
@@ -50,7 +50,7 @@ export function DirectionControl() {
 }
 
 function cardinalName(azimuth: number): string {
-  const names = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
+  const names = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   const idx = Math.round(((azimuth % 360) / 45)) % 8;
   return names[idx] ?? "";
 }

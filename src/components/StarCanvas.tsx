@@ -185,8 +185,8 @@ export function StarCanvas({
           type="button"
           className="snapshot-btn"
           onClick={takeSnapshot}
-          title="星空のスナップショットをPNG保存"
-          aria-label="星空のスナップショットをPNGで保存"
+          title="Save a sky snapshot as PNG"
+          aria-label="Save sky snapshot as PNG"
         >
           <svg
             width="16"
@@ -202,24 +202,22 @@ export function StarCanvas({
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
             <circle cx="12" cy="13" r="4" />
           </svg>
-          <span className="en">Snapshot</span> スナップショット
+          Snapshot
         </button>
       )}
       <div className="canvas-hud" aria-hidden="true">
         <span className="canvas-hud-heading">
           {scene.heading}
-          {label && timeLabel ? <span className="canvas-hud-time"> 現地 {timeLabel}</span> : ""}
+          {label && timeLabel ? <span className="canvas-hud-time"> Local {timeLabel}</span> : ""}
           {!label && sim.daylightMode === "real" ? (
             <span className="canvas-hud-stage">
               {" "}
-              {TWILIGHT_LABELS[scene.twilightStage].ja}
-              {" "}
-              <span className="en">{TWILIGHT_LABELS[scene.twilightStage].en}</span>
+              <span>{TWILIGHT_LABELS[scene.twilightStage]}</span>
             </span>
           ) : ""}
         </span>
         <span className="canvas-hud-count">
-          {label ? "" : `見える ${scene.visibleCount} / 視野内 ${scene.inViewCount}`}
+          {label ? "" : `Visible ${scene.visibleCount} / In view ${scene.inViewCount}`}
         </span>
       </div>
     </div>

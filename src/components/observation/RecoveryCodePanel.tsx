@@ -26,18 +26,18 @@ export function RecoveryCodePanel({ recoveryCode, clearRecoveryCode }: RecoveryC
       <div className="workflow-card-heading">
         <div>
           <span className="en">Mission recovery code</span>
-          <h2 id="recovery-code-title">復元コードを保管してください</h2>
+          <h2 id="recovery-code-title">Store your Recovery Code</h2>
         </div>
       </div>
-      <p>別の端末でこのMissionを復元するためのコードです。画面を閉じると再表示できません。</p>
-      <div className="recovery-code-value" aria-label="Mission復元コード">
+      <p>Use this code to restore the Mission on another device. It will not be shown again after this panel is closed.</p>
+      <div className="recovery-code-value" aria-label="Mission Recovery Code">
         <code>{recoveryCode}</code>
-        <button type="button" onClick={() => void copyCode()}>コピー</button>
+        <button type="button" onClick={() => void copyCode()}>Copy</button>
       </div>
-      {copyState === "copied" && <p className="recovery-code-status" role="status">復元コードをコピーしました。</p>}
-      {copyState === "failed" && <p className="cloud-error" role="alert">コピーできませんでした。コードを安全な場所へ手動で保存してください。</p>}
-      <p className="workflow-note">このコードを知っている人はMissionを閲覧・更新できます。共有には注意してください。</p>
-      <button type="button" className="recovery-code-dismiss" onClick={clearRecoveryCode}>確認して閉じる</button>
+      {copyState === "copied" && <p className="recovery-code-status" role="status">Recovery Code copied.</p>}
+      {copyState === "failed" && <p className="cloud-error" role="alert">Could not copy the code. Save it manually in a secure place.</p>}
+      <p className="workflow-note">Anyone with this code can view and update the Mission. Share it carefully.</p>
+      <button type="button" className="recovery-code-dismiss" onClick={clearRecoveryCode}>Acknowledge and close</button>
     </section>
   );
 }
@@ -54,7 +54,7 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
 
   const submit = () => {
     if (normalizeRecoveryCode(recoveryCodeInput) === null) {
-      setError("復元コードが正しくないか、利用できません。");
+      setError("This Recovery Code is invalid or unavailable.");
       return;
     }
     setRestoring(true);
@@ -72,12 +72,12 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
       <div className="workflow-card-heading">
         <div>
           <span className="en">Restore a Mission</span>
-          <h2 id="restore-mission-title">復元コードからMissionを復元</h2>
+          <h2 id="restore-mission-title">Restore Mission with a Recovery Code</h2>
         </div>
       </div>
-      <p>別端末で発行した復元コードを入力すると、そのMissionだけを履歴へ追加できます。</p>
+      <p>Enter a Recovery Code issued on another device to add that Mission to your history.</p>
       <div className="recovery-restore-form">
-        <label htmlFor="mission-recovery-code">復元コード</label>
+        <label htmlFor="mission-recovery-code">Recovery Code</label>
         <div className="recovery-restore-input-row">
           <input
             id="mission-recovery-code"
@@ -92,7 +92,7 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
             spellCheck={false}
           />
           <button type="button" className="primary" disabled={restoring || recoveryCodeInput.trim() === ""} onClick={submit}>
-            {restoring ? "復元中…" : "Missionを復元"}
+            {restoring ? "Restoring…" : "Restore Mission"}
           </button>
         </div>
       </div>
@@ -103,8 +103,8 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
 
 function recoveryErrorMessage(error: unknown): string {
   if (error instanceof CloudApplicationError) {
-    if (error.code === "RESTORE_CODE_INVALID") return "復元コードが正しくないか、利用できません。";
-    if (error.code === "CLOUD_NOT_CONFIGURED") return "Cloud保存が設定されていないため復元できません。";
+    if (error.code === "RESTORE_CODE_INVALID") return "This Recovery Code is invalid or unavailable.";
+    if (error.code === "CLOUD_NOT_CONFIGURED") return "Mission restoration is unavailable because cloud storage is not configured.";
   }
-  return "Missionを復元できませんでした。時間をおいて再試行してください。";
+  return "Could not restore the Mission. Please try again later.";
 }

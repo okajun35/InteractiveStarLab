@@ -32,12 +32,12 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
     return (
       <main className="workflow-page">
         <div className="workflow-container workflow-empty-page">
-          <section className="workflow-card workflow-empty-card" aria-label="Missionなし">
+          <section className="workflow-card workflow-empty-card" aria-label="No active Mission">
             <span className="en">Observation mission</span>
-            <h1>観測ミッションがありません</h1>
-            <p>先に観測候補を選んでMissionを作成してください。</p>
+            <h1>No active Mission</h1>
+            <p>Select observation candidates and create a Mission first.</p>
             <button type="button" className="primary" onClick={onOpenPlan}>
-              Planへ移動
+              Go to Plan
             </button>
           </section>
         </div>
@@ -67,18 +67,18 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
         <div className="workflow-hero">
           <div>
             <span className="en">Observation run</span>
-            <h1>観測結果を記録する</h1>
-            <p>空を見上げて、星ごとに実際の見え方を選択してください。</p>
+            <h1>Record observations</h1>
+            <p>Look up at the sky and choose how each star actually appears.</p>
           </div>
           <button type="button" onClick={onOpenPlan}>
-            <span className="en">Plan</span> 計画へ戻る
+            Back to Plan
           </button>
           <button type="button" className="primary" onClick={onOpenGuide}>
-            {hasGuide ? "観測ガイドを表示" : "観測ガイドを作る"}
+            {hasGuide ? "View observation guide" : "Create observation guide"}
           </button>
         </div>
 
-        <section className="mission-overview" aria-label="Mission情報">
+        <section className="mission-overview" aria-label="Mission information">
           <div>
             <span className="en">Mission</span>
             <strong>{mission.id}</strong>
@@ -102,26 +102,25 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
           <div className="workflow-card-heading">
             <div>
               <span className="en">Mission targets</span>
-              <h2 id="observe-targets-title">観測対象</h2>
+              <h2 id="observe-targets-title">Mission targets</h2>
             </div>
-            <span className="selection-count">{completed} / {mission.targets.length} 入力済み</span>
+            <span className="selection-count">{completed} / {mission.targets.length} entered</span>
           </div>
 
           <div className="observation-target-list">
             {mission.targets.map((target) => {
               const star = STAR_BY_ID.get(target.starId);
-              const name = star?.nameJa ?? star?.name ?? target.starId;
+              const name = star?.name ?? target.starId;
               return (
                 <article key={target.starId} className="observation-target-card">
                   <div className="observation-target-header">
                     <div>
                       <h3>{name}</h3>
-                      {star?.nameJa && <span className="candidate-name-en">{star.name}</span>}
                     </div>
-                    <span className="target-prediction">予測：見える</span>
+                    <span className="target-prediction">Prediction: Visible</span>
                   </div>
                   <p className="candidate-stats">
-                    等級 {target.predictedMagnitude.toFixed(2)} · 高度 {Math.round(target.predictedAltitude)}° · 方位 {Math.round(target.predictedAzimuth)}°
+                    Mag {target.predictedMagnitude.toFixed(2)} · Alt {Math.round(target.predictedAltitude)}° · Az {Math.round(target.predictedAzimuth)}°
                   </p>
                   <ObservationStatusInput
                     starId={name}
@@ -138,13 +137,13 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
 
         <div className="observe-actions">
           <p className="workflow-note">
-            すべての対象を入力すると観測結果を保存できます。「わからない」も観測結果として記録されます。
+            Enter a status for every target to save the observation. Unsure is also recorded as an observation result.
           </p>
           <button type="button" className="primary observe-save-btn" disabled={!isComplete || saving || cloudIdentityLoading} onClick={handleSave}>
-            {saving ? "保存中…" : "観測結果を保存"}
+            {saving ? "Saving…" : "Save observation results"}
           </button>
-          {cloudIdentityLoading && <p className="workflow-note">Cloud接続を準備中です。接続準備が完了すると保存できます。</p>}
-          {!cloudAuthenticated && !cloudIdentityLoading && <p className="workflow-note">Cloud未接続時は、この端末のローカルへ保存されます。</p>}
+          {cloudIdentityLoading && <p className="workflow-note">Preparing the cloud connection. You can save when it is ready.</p>}
+          {!cloudAuthenticated && !cloudIdentityLoading && <p className="workflow-note">Without a cloud connection, results are saved locally on this device.</p>}
           {cloudError && <p className="cloud-error" role="alert">{cloudError}</p>}
         </div>
       </div>
@@ -155,7 +154,7 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
 function formatDateTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("ja-JP", {
+  return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);

@@ -22,7 +22,6 @@ function targetMapStar(
   return withGuidePoint({
     starId: target.starId,
     name: star?.name ?? target.starId,
-    nameJa: star?.nameJa,
     magnitude: target.predictedMagnitude,
     altitude: target.predictedAltitude,
     azimuth: target.predictedAzimuth,
@@ -34,7 +33,6 @@ function referenceMapStar(star: ReturnType<typeof horizontalStars>[number]): Gui
   return withGuidePoint({
     starId: star.id,
     name: star.name,
-    nameJa: star.nameJa,
     magnitude: star.magnitude,
     altitude: star.altitude,
     azimuth: star.azimuth,

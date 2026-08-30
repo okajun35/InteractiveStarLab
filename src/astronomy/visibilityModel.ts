@@ -43,11 +43,11 @@ export function evaluateStar(
   return { state: "visible" };
 }
 
-export function reasonLabelJa(
+export function reasonLabel(
   reason: HideReason,
   daylightMode: SimulationSettings["daylightMode"],
 ): string {
-  if (reason === "below-horizon") return "地平線の下";
-  if (reason === "daylight") return daylightMode === "removed" ? "空の明るさ" : "昼・薄暮の明るさ";
-  return "光害・限界等級";
+  if (reason === "below-horizon") return "Below horizon";
+  if (reason === "daylight") return daylightMode === "removed" ? "Sky brightness" : "Daylight or twilight";
+  return "Light pollution or magnitude limit";
 }

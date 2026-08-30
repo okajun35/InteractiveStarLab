@@ -24,11 +24,11 @@ export function ObservationGuideScreen({ guide, onOpenObserve, onGeneratePdf }: 
     return (
       <main className="workflow-page">
         <div className="workflow-container workflow-empty-page">
-          <section className="workflow-card workflow-empty-card" aria-label="観測ガイドなし">
+          <section className="workflow-card workflow-empty-card" aria-label="No observation guide">
             <span className="en">Observation guide</span>
-            <h1>観測ガイドがありません</h1>
-            <p>先にMissionを作成してから観測ガイドを準備してください。</p>
-            <button type="button" className="primary" onClick={onOpenObserve}>観測画面へ戻る</button>
+            <h1>No observation guide</h1>
+            <p>Create a Mission first, then prepare an observation guide.</p>
+            <button type="button" className="primary" onClick={onOpenObserve}>Back to Observe</button>
           </section>
         </div>
       </main>
@@ -39,18 +39,18 @@ export function ObservationGuideScreen({ guide, onOpenObserve, onGeneratePdf }: 
   const generatePdf = async () => {
     try {
       const result = await onGeneratePdf();
-      setPdfStatus(result ? `保存しました: ${result.fileName}` : "PDFを生成できませんでした");
+      setPdfStatus(result ? `Saved: ${result.fileName}` : "Could not generate the PDF");
     } catch {
-      setPdfStatus("PDFを生成できませんでした");
+      setPdfStatus("Could not generate the PDF");
     }
   };
   return (
     <main className="guide-page">
       <div className="guide-actions screen-only">
-        <button type="button" className="primary" onClick={() => void generatePdf()}>PDFを直接保存</button>
-        <button type="button" className="primary" onClick={printGuide}>印刷 / PDF保存</button>
-        <button type="button" onClick={onOpenObserve}>観測画面へ戻る</button>
-        <span>「PDFを直接保存」は印刷ダイアログを使わずに保存します。</span>
+        <button type="button" className="primary" onClick={() => void generatePdf()}>Save PDF directly</button>
+        <button type="button" className="primary" onClick={printGuide}>Print / save PDF</button>
+        <button type="button" onClick={onOpenObserve}>Back to Observe</button>
+        <span>Direct PDF saving does not open the print dialog.</span>
         {pdfStatus && <span role="status">{pdfStatus}</span>}
       </div>
       <article className="observation-guide" aria-label="Observation Guide">
@@ -68,7 +68,7 @@ export function ObservationGuideScreen({ guide, onOpenObserve, onGeneratePdf }: 
         <section className="guide-snapshot-section" aria-labelledby="guide-snapshot-title">
           <div className="guide-section-heading">
             <span className="en">Mission sky snapshot</span>
-            <h2 id="guide-snapshot-title">Mission日時の星空</h2>
+            <h2 id="guide-snapshot-title">Mission sky at the observation time</h2>
           </div>
           <MissionSkySnapshot snapshot={guide.skySnapshot} />
         </section>

@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthState | null>(null);
 
 function friendlyAuthError(error: unknown): string {
   if (error instanceof Error && error.message.trim()) return error.message;
-  return "Cloud接続に失敗しました。この端末ではローカル保存を続けます。";
+  return "Cloud connection failed. Local storage will continue on this device.";
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

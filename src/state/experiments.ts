@@ -16,47 +16,44 @@ import { lightPollutionLimit } from "../astronomy/magnitude";
  */
 export interface ExperimentDef {
   id: "daylight" | "city-lights" | "plus-six-hours" | "sydney";
-  en: string;
-  ja: string;
+  title: string;
   /** Guided guess options (spec §29). */
-  guessQuestionJa: string;
+  guessQuestion: string;
   guesses: string[];
   correctGuess: number;
   apply: (
     obs: ObservationSettings,
     sim: SimulationSettings,
   ) => { observation: ObservationSettings; simulation: SimulationSettings };
-  explainJa: string;
+  explanation: string;
 }
 
 export const EXPERIMENTS: ExperimentDef[] = [
   {
     id: "daylight",
-    en: "What if the daytime sky were dark?",
-    ja: "昼の空を暗くしたら？",
-    guessQuestionJa: "昼の空を暗くしたらどうなると思う？",
+    title: "What if the daytime sky were dark?",
+    guessQuestion: "What do you think would happen if the daytime sky were dark?",
     guesses: [
-      "星がたくさん現れる",
-      "何も変わらない",
-      "星の位置が夜の位置に移動する",
+      "Many more stars would appear",
+      "Nothing would change",
+      "The stars would move to their nighttime positions",
     ],
     correctGuess: 0,
     apply: (obs, sim) => ({
       observation: obs,
       simulation: { ...sim, daylightMode: "removed" },
     }),
-    explainJa: `星は昼間にも存在しています。昼間に見えにくいのは、太陽光が大気中で散乱して空が明るくなるためです。
-今回、時刻はそのままです。星を夜の位置へ移動したわけではありません。`,
+    explanation: `Stars are still present during the day. They are harder to see because sunlight scatters in the atmosphere and brightens the sky.
+The time stays the same; the stars do not move to nighttime positions.`,
   },
   {
     id: "city-lights",
-    en: "What if all city lights went out?",
-    ja: "街の明かりが全部消えたら？",
-    guessQuestionJa: "街の明かりが全部消えたらどうなると思う？",
+    title: "What if all city lights went out?",
+    guessQuestion: "What do you think would happen if all city lights went out?",
     guesses: [
-      "見える星の数が大きく増える",
-      "見える星の数は変わらない",
-      "星の位置が変わる",
+      "The number of visible stars would increase greatly",
+      "The number of visible stars would not change",
+      "The stars would change position",
     ],
     correctGuess: 0,
     apply: (obs, sim) => ({
@@ -67,19 +64,18 @@ export const EXPERIMENTS: ExperimentDef[] = [
         limitingMagnitude: lightPollutionLimit("perfect"),
       },
     }),
-    explainJa: `街の明かり（光害）は空全体を明るくして、暗い星を隠しています。
-光害を消すと、同じ時刻・同じ場所でも見える星の数が大きく増えます。
-星の位置は変わりません。空が暗くなるだけです。`,
+    explanation: `City lights (light pollution) brighten the entire sky and hide faint stars.
+Removing light pollution greatly increases the number of visible stars at the same time and place.
+The stars do not move; only the sky becomes darker.`,
   },
   {
     id: "plus-six-hours",
-    en: "What will the sky look like 6 hours later?",
-    ja: "6時間後の空は？",
-    guessQuestionJa: "6時間後に星空はどうなると思う？",
+    title: "What will the sky look like 6 hours later?",
+    guessQuestion: "What do you think the sky will look like six hours later?",
     guesses: [
-      "星がゆっくり動いている",
-      "星の配置がほぼ同じである",
-      "星の明るさが変わる",
+      "The stars will have moved slowly",
+      "The star pattern will be almost the same",
+      "The star brightness will change",
     ],
     correctGuess: 0,
     apply: (obs, sim) => ({
@@ -89,19 +85,18 @@ export const EXPERIMENTS: ExperimentDef[] = [
       },
       simulation: sim,
     }),
-    explainJa: `地球の自転によって、星はゆっくりと動いています。
-6時間で星座がはっきりと移動していることに注目してください。
-星の等級（明るさ）は変わりません。`,
+    explanation: `Earth's rotation makes the stars appear to move slowly.
+After six hours, notice how clearly the constellations have shifted.
+The stars' magnitudes (brightness) do not change.`,
   },
   {
     id: "sydney",
-    en: "What if you looked from Sydney?",
-    ja: "シドニーから見たら？",
-    guessQuestionJa: "南半球のシドニーから見たらどうなると思う？",
+    title: "What if you looked from Sydney?",
+    guessQuestion: "What do you think the sky would look like from Sydney in the Southern Hemisphere?",
     guesses: [
-      "見える星座が変わる（南の空の星座が現れる）",
-      "全く同じ星空に見える",
-      "星が全て消える",
+      "The visible constellations would change",
+      "The sky would look exactly the same",
+      "All the stars would disappear",
     ],
     correctGuess: 0,
     apply: (obs, sim) => ({
@@ -111,8 +106,8 @@ export const EXPERIMENTS: ExperimentDef[] = [
       },
       simulation: sim,
     }),
-    explainJa: `場所が変わると、地平線の位置も変わり、見える星座が変わります。
-南半球からは、アルマゾクズなどの南天の星座が見えます。
-同じ時刻（現地時刻）の空でも、北半球と共通の星座だけが見えるわけではありません。`,
+    explanation: `Changing location changes the horizon and therefore the visible constellations.
+From the Southern Hemisphere, southern constellations become visible.
+Even at the same local time, the sky is not limited to constellations shared with the Northern Hemisphere.`,
   },
 ];

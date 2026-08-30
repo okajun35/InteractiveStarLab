@@ -1,11 +1,11 @@
 export type TwilightStage = "day" | "civil" | "nautical" | "astronomical" | "night";
 
-export const TWILIGHT_LABELS: Record<TwilightStage, { en: string; ja: string }> = {
-  day: { en: "Day", ja: "昼" },
-  civil: { en: "Civil Twilight", ja: "民用薄暮" },
-  nautical: { en: "Nautical Twilight", ja: "航海薄暮" },
-  astronomical: { en: "Astronomical Twilight", ja: "天文薄暮" },
-  night: { en: "Night", ja: "夜" },
+export const TWILIGHT_LABELS: Record<TwilightStage, string> = {
+  day: "Day",
+  civil: "Civil Twilight",
+  nautical: "Nautical Twilight",
+  astronomical: "Astronomical Twilight",
+  night: "Night",
 };
 
 export function twilightStage(sunAltitude: number): TwilightStage {

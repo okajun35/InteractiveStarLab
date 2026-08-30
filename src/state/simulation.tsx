@@ -99,7 +99,7 @@ export interface SimulationState {
   /** True when limitingMagnitude differs from the active preset value. */
   customLimitingMagnitude: boolean;
 
-  /** Observer sensitivity, -0.5..+0.5 mag (spec §20 別モデル). 0 = typical. */
+  /** Observer sensitivity, -0.5..+0.5 mag (spec §20 separate model). 0 = typical. */
   observerSensitivity: number;
   setObserverSensitivity: (v: number) => void;
 
@@ -265,7 +265,7 @@ export function SimulationProvider({
   const [compare, setCompare] = useState<SimulationState["compare"]>(null);
 
   // Time basis for the location compare (§27 Advanced).
-  // Default: same local wall-clock time (§27「同じ現地時刻」).
+  // Default: same local wall-clock time (§27).
   const [timeBasis, setTimeBasisState] = useState<TimeBasis>("same-local-time");
 
   /** Build the location compare panel for the given basis (spec §27). */
@@ -280,8 +280,8 @@ export function SimulationProvider({
       kind: "location" as const,
       baseSimulation: { ...settings },
       changedSimulation: { ...settings },
-      baseLabel: "Tokyo 東京",
-      changedLabel: "Sydney シドニー",
+      baseLabel: "Tokyo",
+      changedLabel: "Sydney",
       baseObservationOverride: {
         latitude: tokyo.latitude,
         longitude: tokyo.longitude,
@@ -318,8 +318,8 @@ export function SimulationProvider({
             kind,
             baseSimulation: { ...settings, daylightMode: "real" },
             changedSimulation: { ...settings, daylightMode: "removed" },
-            baseLabel: "REAL 昼空",
-            changedLabel: "REMOVED 空だけ暗く",
+            baseLabel: "REAL daylight",
+            changedLabel: "REMOVED daylight",
           });
           break;
         case "light-pollution":
@@ -335,8 +335,8 @@ export function SimulationProvider({
               lightPollution: "dark-sky",
               limitingMagnitude: lightPollutionLimit("dark-sky"),
             },
-            baseLabel: "City 市中心",
-            changedLabel: "Dark Sky 星空観測地",
+            baseLabel: "City",
+            changedLabel: "Dark Sky",
           });
           break;
         case "location":

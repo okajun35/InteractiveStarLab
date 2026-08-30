@@ -20,11 +20,11 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
         <div className="workflow-hero">
           <div>
             <span className="en">Observation history</span>
-            <h1>観測履歴</h1>
-            <p>過去のMissionと観測結果を確認できます。</p>
+            <h1>Observation history</h1>
+            <p>Review past Missions and observation results.</p>
           </div>
           <button type="button" className="primary" onClick={onOpenPlan}>
-            新しいMission
+            New Mission
           </button>
         </div>
 
@@ -34,14 +34,14 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
         />
 
         {sortedRecords.length === 0 ? (
-          <section className="workflow-card workflow-empty-card history-empty" aria-label="履歴なし">
+          <section className="workflow-card workflow-empty-card history-empty" aria-label="No observation history">
             <span className="en">No observation history</span>
-            <h2>まだ観測履歴がありません</h2>
-            <p>Planから星を選んで、最初の観測を記録しましょう。</p>
-            <button type="button" className="primary" onClick={onOpenPlan}>Planへ移動</button>
+            <h2>No observation history yet</h2>
+            <p>Select stars in Plan to record your first observation.</p>
+            <button type="button" className="primary" onClick={onOpenPlan}>Go to Plan</button>
           </section>
         ) : (
-          <section className="history-list" aria-label="観測履歴一覧">
+          <section className="history-list" aria-label="Observation history list">
             {sortedRecords.map((record) => {
               const summary = compareObservationRecord(record);
               return (
@@ -77,7 +77,7 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
 function formatDateTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("ja-JP", {
+  return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);

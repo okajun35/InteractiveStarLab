@@ -19,7 +19,7 @@ export function ResultStarCard({
   const isUnsure = status === "unsure";
   const stateClass = isUnsure ? "result-uncertain" : isMatch ? "result-match" : "result-mismatch";
   const statusLabel =
-    status === "visible" ? "見えた" : status === "not_visible" ? "見えなかった" : "わからない";
+    status === "visible" ? "Visible" : status === "not_visible" ? "Not Visible" : "Unsure";
 
   return (
     <article className={`result-star-card ${stateClass}`}>
@@ -30,14 +30,14 @@ export function ResultStarCard({
         </div>
         <span className="result-state">
           {isUnsure ? "?" : isMatch ? "✓" : "!"}
-          <span>{isUnsure ? "未確定" : isMatch ? "一致" : "不一致"}</span>
+          <span>{isUnsure ? "Undetermined" : isMatch ? "Match" : "Mismatch"}</span>
         </span>
       </div>
       <div className="result-star-details">
         <div>
           <span className="en">Prediction</span>
           <strong>{target.predictedVisible ? "Visible" : "Not Visible"}</strong>
-          <small>高度 {Math.round(target.predictedAltitude)}° · 方位 {Math.round(target.predictedAzimuth)}°</small>
+          <small>Alt {Math.round(target.predictedAltitude)}° · Az {Math.round(target.predictedAzimuth)}°</small>
         </div>
         <div>
           <span className="en">Observation</span>
@@ -47,7 +47,7 @@ export function ResultStarCard({
       {target.predictedVisible && status === "not_visible" && (
         <div className="possible-reasons">
           <strong>Possible reasons</strong>
-          <span>雲、光害、遮蔽物、観測方向、目の状態などの可能性があります。</span>
+          <span>Clouds, light pollution, obstructions, viewing direction, or eye fatigue may be factors.</span>
         </div>
       )}
     </article>

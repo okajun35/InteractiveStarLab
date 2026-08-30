@@ -15,7 +15,6 @@ export interface ObservationGuideTarget {
   index: number;
   starId: string;
   name: string;
-  nameJa?: string;
   magnitude: number;
   altitude: number;
   azimuth: number;
@@ -27,7 +26,6 @@ export interface ObservationGuideTarget {
 export interface GuideMapStar {
   starId: string;
   name: string;
-  nameJa?: string;
   magnitude: number;
   altitude: number;
   azimuth: number;

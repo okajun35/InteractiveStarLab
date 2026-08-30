@@ -41,7 +41,7 @@ export function TimeControl() {
   return (
     <div className="field time-control">
       <span className="field-label">
-        <span className="en">Date / Time</span> 日時
+        Date and time
       </span>
       <input
         type="datetime-local"
@@ -55,13 +55,13 @@ export function TimeControl() {
         }}
       />
       <div className="btn-row">
-        <button type="button" onClick={() => shift(-6)} title="6時間前">
+        <button type="button" onClick={() => shift(-6)} title="6 hours earlier">
           −6h
         </button>
-        <button type="button" onClick={() => shift(-3)} title="3時間前">
+        <button type="button" onClick={() => shift(-3)} title="3 hours earlier">
           −3h
         </button>
-        <button type="button" onClick={() => shift(-1)} title="1時間前">
+        <button type="button" onClick={() => shift(-1)} title="1 hour earlier">
           −1h
         </button>
         <button
@@ -74,13 +74,13 @@ export function TimeControl() {
         >
           NOW {h}:{String(m).padStart(2, "0")}
         </button>
-        <button type="button" onClick={() => shift(1)} title="1時間後">
+        <button type="button" onClick={() => shift(1)} title="1 hour later">
           +1h
         </button>
-        <button type="button" onClick={() => shift(3)} title="3時間後">
+        <button type="button" onClick={() => shift(3)} title="3 hours later">
           +3h
         </button>
-        <button type="button" onClick={() => shift(6)} title="6時間後">
+        <button type="button" onClick={() => shift(6)} title="6 hours later">
           +6h
         </button>
       </div>
@@ -89,11 +89,11 @@ export function TimeControl() {
           type="button"
           className={playing ? "primary" : undefined}
           onClick={() => setPlaying((p) => !p)}
-          title="1秒間に1時間を進めて星の移動を観察（§24）"
+          title="Advance one simulated hour per second to observe star motion (§24)"
         >
-          {playing ? "❚❚ Pause 停止" : "▶ Play 再生 (1h/s)"}
+          {playing ? "❚❚ Pause" : "▶ Play (1h/s)"}
         </button>
-        {playing && <span className="panel-note play-note">時間を再生中…</span>}
+        {playing && <span className="panel-note play-note">Playing time…</span>}
       </div>
     </div>
   );

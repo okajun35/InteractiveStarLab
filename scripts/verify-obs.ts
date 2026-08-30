@@ -1,6 +1,6 @@
-// Observer Sensitivity (spec §20 将来: 別モデルとしての視認性補正).
-// 視力値(0.5/1.0/2.0)ではなく、-0.5..+0.5等級の感受性補正を
-// limitingMagnitude に加算する教育用近似モデル。
+// Observer Sensitivity (spec §20: a separate visibility model).
+// This educational approximation adds a -0.5..+0.5 magnitude adjustment
+// to limitingMagnitude, rather than using visual-acuity values.
 // Run: node scripts/run-verify.cjs verify-obs.ts
 import { horizontalStars } from "../src/astronomy/coordinates";
 import { STARS } from "../src/astronomy/stars";
@@ -24,7 +24,7 @@ const NIGHT_22_00 = new Date(Date.UTC(2026, 7, 27, 13, 0, 0)); // 22:00 JST
 const baseNight = { ...TOKYO, datetime: NIGHT_22_00, azimuth: 180, altitude: 30, fieldOfView: 120 };
 
 const allOn: StarLayerState = { first: true, second: true, third: true, fourth: true, faint: true };
-// カタログ最大4.95等（170星）。境界帯を跨ぐため基準limit=4.5を使う。
+// The catalog reaches magnitude 4.95 (170 stars). Use limit=4.5 to cross the boundary band.
 const BASE_LIMIT = 4.5;
 
 function evalStar(s: HorizontalStar, sensitivity?: number, limit = BASE_LIMIT) {
@@ -52,7 +52,7 @@ function count(sensitivity?: number): number {
   return stars.filter((s) => evalStar(s, sensitivity).state === "visible").length;
 }
 
-// ---- O1: 感受性UP(+0.5) → 基準では見えない4.5-5.1帯が見える ----
+// ---- O1: sensitivity UP (+0.5) reveals the 4.5–5.1 band hidden at baseline ----
 {
   const base = count(0);
   const sharp = count(OBSERVER_SENSITIVITY_RANGE.max);
@@ -64,7 +64,7 @@ function count(sensitivity?: number): number {
     `${sharpBand}/${aboveBand.length}`);
 }
 
-// ---- O2: 感受性DOWN(-0.5) → 基準で見える4.0-4.5帯が消える ----
+// ---- O2: sensitivity DOWN (-0.5) hides the 4.0–4.5 band visible at baseline ----
 {
   const base = count(0);
   const dull = count(OBSERVER_SENSITIVITY_RANGE.min);
@@ -76,7 +76,7 @@ function count(sensitivity?: number): number {
     `${dullStillVisible}/${nearLimitBand.length} still visible`);
 }
 
-// ---- O3: 感受性0/未設定は現状と一致(既存挙動への回帰ガード) ----
+// ---- O3: sensitivity 0/unset matches current behavior (regression guard) ----
 {
   const zero = count(0);
   const unset = count(undefined);
@@ -98,7 +98,7 @@ function count(sensitivity?: number): number {
   check("O3: effective limit unchanged when unset", effectiveLimitingMagnitude(BASE_LIMIT, undefined) === BASE_LIMIT, String(effectiveLimitingMagnitude(BASE_LIMIT, undefined)));
 }
 
-// ---- O4: 理由の整合・範囲・クランプ ----
+// ---- O4: reason consistency, range, and clamping ----
 {
   check("O4: hidden reason stays light-pollution (threshold-shift model)",
     aboveBand.length > 0 && evalStar(aboveBand[0], OBSERVER_SENSITIVITY_RANGE.min).state === "hidden"

@@ -19,94 +19,23 @@ const starNamesSource = path.join(
 const hipSource = path.join(sourceDir, "hipparcos-line-stars.v0.15.0.tsv");
 
 const constellationMeta = {
-  Aql: ["Aquila", "わし座"],
-  And: ["Andromeda", "アンドロメダ座"],
-  Scl: ["Sculptor", "ちょうこくしつ座"],
-  Ara: ["Ara", "さいだん座"],
-  Lib: ["Libra", "てんびん座"],
-  Cet: ["Cetus", "くじら座"],
-  Ari: ["Aries", "おひつじ座"],
-  Sct: ["Scutum", "たて座"],
-  Pyx: ["Pyxis", "らしんばん座"],
-  Boo: ["Boötes", "うしかい座"],
-  Cae: ["Caelum", "ちょうこくぐ座"],
-  Cha: ["Chamaeleon", "カメレオン座"],
-  Cnc: ["Cancer", "かに座"],
-  Cap: ["Capricornus", "やぎ座"],
-  Car: ["Carina", "りゅうこつ座"],
-  Cas: ["Cassiopeia", "カシオペヤ座"],
-  Cen: ["Centaurus", "ケンタウルス座"],
-  Cep: ["Cepheus", "ケフェウス座"],
-  Com: ["Coma Berenices", "かみのけ座"],
-  Cvn: ["Canes Venatici", "りょうけん座"],
-  Aur: ["Auriga", "ぎょしゃ座"],
-  Col: ["Columba", "はと座"],
-  Cir: ["Circinus", "コンパス座"],
-  Crt: ["Crater", "コップ座"],
-  CrA: ["Corona Australis", "みなみのかんむり座"],
-  CrB: ["Corona Borealis", "かんむり座"],
-  Crv: ["Corvus", "からす座"],
-  Cru: ["Crux", "みなみじゅうじ座"],
-  Cyg: ["Cygnus", "はくちょう座"],
-  Del: ["Delphinus", "いるか座"],
-  Dor: ["Dorado", "かじき座"],
-  Dra: ["Draco", "りゅう座"],
-  Nor: ["Norma", "じょうぎ座"],
-  Eri: ["Eridanus", "エリダヌス座"],
-  Sge: ["Sagitta", "や座"],
-  For: ["Fornax", "ろ座"],
-  Gem: ["Gemini", "ふたご座"],
-  Cam: ["Camelopardalis", "きりん座"],
-  CMa: ["Canis Major", "おおいぬ座"],
-  UMa: ["Ursa Major", "おおぐま座"],
-  Gru: ["Grus", "つる座"],
-  Her: ["Hercules", "ヘルクレス座"],
-  Hor: ["Horologium", "とけい座"],
-  Hya: ["Hydra", "うみへび座"],
-  Hyi: ["Hydrus", "みずへび座"],
-  Ind: ["Indus", "インディアン座"],
-  Lac: ["Lacerta", "とかげ座"],
-  Mon: ["Monoceros", "いっかくじゅう座"],
-  Lep: ["Lepus", "うさぎ座"],
-  Leo: ["Leo", "しし座"],
-  Lup: ["Lupus", "おおかみ座"],
-  Lyn: ["Lynx", "やまねこ座"],
-  Lyr: ["Lyra", "こと座"],
-  Ant: ["Antlia", "ポンプ座"],
-  Mic: ["Microscopium", "けんびきょう座"],
-  Mus: ["Musca", "はえ座"],
-  Oct: ["Octans", "はちぶんぎ座"],
-  Aps: ["Apus", "ふうちょう座"],
-  Oph: ["Ophiuchus", "へびつかい座"],
-  Ori: ["Orion", "オリオン座"],
-  Pav: ["Pavo", "くじゃく座"],
-  Peg: ["Pegasus", "ペガスス座"],
-  Pic: ["Pictor", "がか座"],
-  Per: ["Perseus", "ペルセウス座"],
-  Equ: ["Equuleus", "こうま座"],
-  CMi: ["Canis Minor", "こいぬ座"],
-  LMi: ["Leo Minor", "こじし座"],
-  Vul: ["Vulpecula", "こぎつね座"],
-  UMi: ["Ursa Minor", "こぐま座"],
-  Phe: ["Phoenix", "ほうおう座"],
-  Psc: ["Pisces", "うお座"],
-  PsA: ["Piscis Austrinus", "みなみのうお座"],
-  Vol: ["Volans", "とびうお座"],
-  Pup: ["Puppis", "とも座"],
-  Ret: ["Reticulum", "レチクル座"],
-  Sgr: ["Sagittarius", "いて座"],
-  Sco: ["Scorpius", "さそり座"],
-  Ser: ["Serpens", "へび座"],
-  Sex: ["Sextans", "ろくぶんぎ座"],
-  Men: ["Mensa", "テーブルさん座"],
-  Tau: ["Taurus", "おうし座"],
-  Tel: ["Telescopium", "ぼうえんきょう座"],
-  Tuc: ["Tucana", "きょしちょう座"],
-  Tri: ["Triangulum", "さんかく座"],
-  Tra: ["Triangulum Australe", "みなみのさんかく座"],
-  Aqr: ["Aquarius", "みずがめ座"],
-  Vir: ["Virgo", "おとめ座"],
-  Vel: ["Vela", "ほ座"],
+  Aql: ["Aquila"], And: ["Andromeda"], Scl: ["Sculptor"], Ara: ["Ara"], Lib: ["Libra"],
+  Cet: ["Cetus"], Ari: ["Aries"], Sct: ["Scutum"], Pyx: ["Pyxis"], Boo: ["Boötes"],
+  Cae: ["Caelum"], Cha: ["Chamaeleon"], Cnc: ["Cancer"], Cap: ["Capricornus"], Car: ["Carina"],
+  Cas: ["Cassiopeia"], Cen: ["Centaurus"], Cep: ["Cepheus"], Com: ["Coma Berenices"], Cvn: ["Canes Venatici"],
+  Aur: ["Auriga"], Col: ["Columba"], Cir: ["Circinus"], Crt: ["Crater"], CrA: ["Corona Australis"],
+  CrB: ["Corona Borealis"], Crv: ["Corvus"], Cru: ["Crux"], Cyg: ["Cygnus"], Del: ["Delphinus"],
+  Dor: ["Dorado"], Dra: ["Draco"], Nor: ["Norma"], Eri: ["Eridanus"], Sge: ["Sagitta"], For: ["Fornax"],
+  Gem: ["Gemini"], Cam: ["Camelopardalis"], CMa: ["Canis Major"], UMa: ["Ursa Major"], Gru: ["Grus"],
+  Her: ["Hercules"], Hor: ["Horologium"], Hya: ["Hydra"], Hyi: ["Hydrus"], Ind: ["Indus"], Lac: ["Lacerta"],
+  Mon: ["Monoceros"], Lep: ["Lepus"], Leo: ["Leo"], Lup: ["Lupus"], Lyn: ["Lynx"], Lyr: ["Lyra"],
+  Ant: ["Antlia"], Mic: ["Microscopium"], Mus: ["Musca"], Oct: ["Octans"], Aps: ["Apus"], Oph: ["Ophiuchus"],
+  Ori: ["Orion"], Pav: ["Pavo"], Peg: ["Pegasus"], Pic: ["Pictor"], Per: ["Perseus"], Equ: ["Equuleus"],
+  CMi: ["Canis Minor"], LMi: ["Leo Minor"], Vul: ["Vulpecula"], UMi: ["Ursa Minor"], Phe: ["Phoenix"],
+  Psc: ["Pisces"], PsA: ["Piscis Austrinus"], Vol: ["Volans"], Pup: ["Puppis"], Ret: ["Reticulum"],
+  Sgr: ["Sagittarius"], Sco: ["Scorpius"], Ser: ["Serpens"], Sex: ["Sextans"], Men: ["Mensa"], Tau: ["Taurus"],
+  Tel: ["Telescopium"], Tuc: ["Tucana"], Tri: ["Triangulum"], Tra: ["Triangulum Australe"], Aqr: ["Aquarius"],
+  Vir: ["Virgo"], Vel: ["Vela"],
 };
 
 function parseRa(value) {
@@ -174,15 +103,6 @@ const hipRows = parseHipparcos();
 const currentStars = JSON.parse(
   fs.readFileSync(path.join(dataDir, "stars.json"), "utf8"),
 );
-const currentConstellations = JSON.parse(
-  fs.readFileSync(path.join(dataDir, "constellations.json"), "utf8"),
-);
-const descriptionsById = new Map(
-  currentConstellations
-    .filter((constellation) => constellation.descriptionJa)
-    .map((constellation) => [constellation.id, constellation.descriptionJa]),
-);
-
 const hipToConstellation = new Map();
 for (const { code, hips } of constellationsSource) {
   for (const hip of hips) {
@@ -191,7 +111,12 @@ for (const { code, hips } of constellationsSource) {
   }
 }
 
-const currentById = new Map(currentStars.map((star) => [star.id, { ...star }]));
+const currentById = new Map(
+  currentStars.map((star) => [
+    star.id,
+    Object.fromEntries(Object.entries(star).filter(([key]) => !key.endsWith("Ja"))),
+  ]),
+);
 const nameToCurrentId = new Map();
 const sourceNameToHip = new Map(
   [...starNames].map(([hip, name]) => [name.toLowerCase(), hip]),
@@ -232,10 +157,7 @@ const constellations = constellationsSource.map(({ code, hips }) => {
   return {
     id,
     name: constellationMeta[code][0],
-    nameJa: constellationMeta[code][1],
-    ...(descriptionsById.has(id)
-      ? { descriptionJa: descriptionsById.get(id) }
-      : {}),
+    description: `${constellationMeta[code][0]} is one of the 88 modern constellations.`,
     lines: Array.from({ length: hips.length / 2 }, (_, index) => [
       hipToId.get(hips[index * 2]),
       hipToId.get(hips[index * 2 + 1]),

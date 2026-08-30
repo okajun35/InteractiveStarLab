@@ -2,8 +2,7 @@
   {
     "id": "AQL",
     "name": "Aquila",
-    "nameJa": "わし座",
-    "descriptionJa": "明るい恒星、アルトアルトを背に乗せた鷲。",
+    "description": "Aquila is one of the 88 modern constellations.",
     "lines": [
       [
         "alshain",
@@ -42,8 +41,7 @@
   {
     "id": "AND",
     "name": "Andromeda",
-    "nameJa": "アンドロメダ座",
-    "descriptionJa": "アンドロメダ銀河を含む、鎖のような形の星座。",
+    "description": "Andromeda is one of the 88 modern constellations.",
     "lines": [
       [
         "alpheratz",
@@ -70,7 +68,7 @@
   {
     "id": "SCL",
     "name": "Sculptor",
-    "nameJa": "ちょうこくしつ座",
+    "description": "Sculptor is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-116231",
@@ -89,7 +87,7 @@
   {
     "id": "ARA",
     "name": "Ara",
-    "nameJa": "さいだん座",
+    "description": "Ara is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-88714",
@@ -124,7 +122,7 @@
   {
     "id": "LIB",
     "name": "Libra",
-    "nameJa": "てんびん座",
+    "description": "Libra is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-77853",
@@ -151,8 +149,7 @@
   {
     "id": "CET",
     "name": "Cetus",
-    "nameJa": "くじら座",
-    "descriptionJa": "南天に広がる大きな魚の形。",
+    "description": "Cetus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-10324",
@@ -239,8 +236,7 @@
   {
     "id": "ARI",
     "name": "Aries",
-    "nameJa": "おひつじ座",
-    "descriptionJa": "春の空に小さい三角のような牡羊の顔。",
+    "description": "Aries is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-13209",
@@ -259,7 +255,7 @@
   {
     "id": "SCT",
     "name": "Scutum",
-    "nameJa": "たて座",
+    "description": "Scutum is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-92175",
@@ -286,7 +282,7 @@
   {
     "id": "PYX",
     "name": "Pyxis",
-    "nameJa": "らしんばん座",
+    "description": "Pyxis is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-42515",
@@ -301,8 +297,7 @@
   {
     "id": "BOO",
     "name": "Boötes",
-    "nameJa": "うしかい座",
-    "descriptionJa": "最も明るい恒星の一つ、アルクトゥールスを含む。",
+    "description": "Boötes is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-71795",
@@ -345,7 +340,7 @@
   {
     "id": "CAE",
     "name": "Caelum",
-    "nameJa": "ちょうこくぐ座",
+    "description": "Caelum is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-21060",
@@ -360,7 +355,7 @@
   {
     "id": "CHA",
     "name": "Chamaeleon",
-    "nameJa": "カメレオン座",
+    "description": "Chamaeleon is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-40702",
@@ -375,8 +370,7 @@
   {
     "id": "CNC",
     "name": "Cancer",
-    "nameJa": "かに座",
-    "descriptionJa": "春の空の小さな蟹(かに)の形。",
+    "description": "Cancer is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-43103",
@@ -403,7 +397,7 @@
   {
     "id": "CAP",
     "name": "Capricornus",
-    "nameJa": "やぎ座",
+    "description": "Capricornus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-100064",
@@ -446,8 +440,7 @@
   {
     "id": "CAR",
     "name": "Carina",
-    "nameJa": "りゅうこつ座",
-    "descriptionJa": "船のキール。カノープスを含む南天の明るい星の塊。",
+    "description": "Carina is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-45238",
@@ -510,8 +503,7 @@
   {
     "id": "CAS",
     "name": "Cassiopeia",
-    "nameJa": "カシオペヤ座",
-    "descriptionJa": "W(またはM)の字に見える。北の空で終夜空が回る星座。",
+    "description": "Cassiopeia is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-8886",
@@ -534,8 +526,7 @@
   {
     "id": "CEN",
     "name": "Centaurus",
-    "nameJa": "ケンタウルス座",
-    "descriptionJa": "南天で、ケンタウルス座α(北東)とβが含まれる。",
+    "description": "Centaurus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-71683",
@@ -606,8 +597,7 @@
   {
     "id": "CEP",
     "name": "Cepheus",
-    "nameJa": "ケフェウス座",
-    "descriptionJa": "天の川沿い。カシオペイアと北極星の間に位置する王の星座。",
+    "description": "Cepheus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-109492",
@@ -638,7 +628,7 @@
   {
     "id": "COM",
     "name": "Coma Berenices",
-    "nameJa": "かみのけ座",
+    "description": "Coma Berenices is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-64241",
@@ -653,7 +643,7 @@
   {
     "id": "CVN",
     "name": "Canes Venatici",
-    "nameJa": "りょうけん座",
+    "description": "Canes Venatici is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-61317",
@@ -664,8 +654,7 @@
   {
     "id": "AUR",
     "name": "Auriga",
-    "nameJa": "ぎょしゃ座",
-    "descriptionJa": "五つの星が五角形を作る御者の星座。",
+    "description": "Auriga is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-28380",
@@ -696,7 +685,7 @@
   {
     "id": "COL",
     "name": "Columba",
-    "nameJa": "はと座",
+    "description": "Columba is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-30277",
@@ -727,7 +716,7 @@
   {
     "id": "CIR",
     "name": "Circinus",
-    "nameJa": "コンパス座",
+    "description": "Circinus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-71908",
@@ -742,7 +731,7 @@
   {
     "id": "CRT",
     "name": "Crater",
-    "nameJa": "コップ座",
+    "description": "Crater is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-53740",
@@ -785,7 +774,7 @@
   {
     "id": "CRA",
     "name": "Corona Australis",
-    "nameJa": "みなみのかんむり座",
+    "description": "Corona Australis is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-91875",
@@ -828,8 +817,7 @@
   {
     "id": "CRB",
     "name": "Corona Borealis",
-    "nameJa": "かんむり座",
-    "descriptionJa": "北の空の冠(かんむり)の形の一列。",
+    "description": "Corona Borealis is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-76127",
@@ -860,7 +848,7 @@
   {
     "id": "CRV",
     "name": "Corvus",
-    "nameJa": "からす座",
+    "description": "Corvus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-61174",
@@ -891,8 +879,7 @@
   {
     "id": "CRU",
     "name": "Crux",
-    "nameJa": "みなみじゅうじ座",
-    "descriptionJa": "十字の形。南の空の象徴。",
+    "description": "Crux is one of the 88 modern constellations.",
     "lines": [
       [
         "gacrux",
@@ -907,8 +894,7 @@
   {
     "id": "CYG",
     "name": "Cygnus",
-    "nameJa": "はくちょう座",
-    "descriptionJa": "天の川を横切る北の十字(ハートの形)。",
+    "description": "Cygnus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-94779",
@@ -951,7 +937,7 @@
   {
     "id": "DEL",
     "name": "Delphinus",
-    "nameJa": "いるか座",
+    "description": "Delphinus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-101421",
@@ -978,7 +964,7 @@
   {
     "id": "DOR",
     "name": "Dorado",
-    "nameJa": "かじき座",
+    "description": "Dorado is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-27100",
@@ -1005,8 +991,7 @@
   {
     "id": "DRA",
     "name": "Draco",
-    "nameJa": "りゅう座",
-    "descriptionJa": "北極星の周りを渦巻きながら回る、長い蛇の尾のような星座。",
+    "description": "Draco is one of the 88 modern constellations.",
     "lines": [
       [
         "xi_dra",
@@ -1073,7 +1058,7 @@
   {
     "id": "NOR",
     "name": "Norma",
-    "nameJa": "じょうぎ座",
+    "description": "Norma is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-79509",
@@ -1100,8 +1085,7 @@
   {
     "id": "ERI",
     "name": "Eridanus",
-    "nameJa": "エリダヌス座",
-    "descriptionJa": "地平線に沿って長く流れる川の形。",
+    "description": "Eridanus is one of the 88 modern constellations.",
     "lines": [
       [
         "achernar",
@@ -1216,7 +1200,7 @@
   {
     "id": "SGE",
     "name": "Sagitta",
-    "nameJa": "や座",
+    "description": "Sagitta is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-96837",
@@ -1239,7 +1223,7 @@
   {
     "id": "FOR",
     "name": "Fornax",
-    "nameJa": "ろ座",
+    "description": "Fornax is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-13147",
@@ -1250,8 +1234,7 @@
   {
     "id": "GEM",
     "name": "Gemini",
-    "nameJa": "ふたご座",
-    "descriptionJa": "カストルとポラックスの2つの星が肩の位置にある双子の星座。",
+    "description": "Gemini is one of the 88 modern constellations.",
     "lines": [
       [
         "alhena",
@@ -1322,7 +1305,7 @@
   {
     "id": "CAM",
     "name": "Camelopardalis",
-    "nameJa": "きりん座",
+    "description": "Camelopardalis is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-16228",
@@ -1349,8 +1332,7 @@
   {
     "id": "CMA",
     "name": "Canis Major",
-    "nameJa": "おおいぬ座",
-    "descriptionJa": "全天で最も明るいシリウスを含む大犬座。",
+    "description": "Canis Major is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-33160",
@@ -1425,8 +1407,7 @@
   {
     "id": "UMA",
     "name": "Ursa Major",
-    "nameJa": "おおぐま座",
-    "descriptionJa": "北斗七星を含む大カサ。北斗七星が北極星を指し示す。",
+    "description": "Ursa Major is one of the 88 modern constellations.",
     "lines": [
       [
         "alkaid",
@@ -1509,8 +1490,7 @@
   {
     "id": "GRU",
     "name": "Grus",
-    "nameJa": "つる座",
-    "descriptionJa": "南天にある大きな白鳥(鶴)の形。",
+    "description": "Grus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-114131",
@@ -1553,7 +1533,7 @@
   {
     "id": "HER",
     "name": "Hercules",
-    "nameJa": "ヘルクレス座",
+    "description": "Hercules is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-86414",
@@ -1632,7 +1612,7 @@
   {
     "id": "HOR",
     "name": "Horologium",
-    "nameJa": "とけい座",
+    "description": "Horologium is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-19747",
@@ -1647,8 +1627,7 @@
   {
     "id": "HYA",
     "name": "Hydra",
-    "nameJa": "うみへび座",
-    "descriptionJa": "全天で一番長い星座、蛇のような長い尾。",
+    "description": "Hydra is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-42799",
@@ -1727,7 +1706,7 @@
   {
     "id": "HYI",
     "name": "Hydrus",
-    "nameJa": "みずへび座",
+    "description": "Hydrus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-2021",
@@ -1750,7 +1729,7 @@
   {
     "id": "IND",
     "name": "Indus",
-    "nameJa": "インディアン座",
+    "description": "Indus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-105319",
@@ -1769,7 +1748,7 @@
   {
     "id": "LAC",
     "name": "Lacerta",
-    "nameJa": "とかげ座",
+    "description": "Lacerta is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-109937",
@@ -1800,7 +1779,7 @@
   {
     "id": "MON",
     "name": "Monoceros",
-    "nameJa": "いっかくじゅう座",
+    "description": "Monoceros is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-29651",
@@ -1831,7 +1810,7 @@
   {
     "id": "LEP",
     "name": "Lepus",
-    "nameJa": "うさぎ座",
+    "description": "Lepus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-28910",
@@ -1894,8 +1873,7 @@
   {
     "id": "LEO",
     "name": "Leo",
-    "nameJa": "しし座",
-    "descriptionJa": "たてがみ(スライス)の形が特徴の雄しし。",
+    "description": "Leo is one of the 88 modern constellations.",
     "lines": [
       [
         "denebola",
@@ -1942,7 +1920,7 @@
   {
     "id": "LUP",
     "name": "Lupus",
-    "nameJa": "おおかみ座",
+    "description": "Lupus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-77634",
@@ -2001,7 +1979,7 @@
   {
     "id": "LYN",
     "name": "Lynx",
-    "nameJa": "やまねこ座",
+    "description": "Lynx is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-45860",
@@ -2036,8 +2014,7 @@
   {
     "id": "LYR",
     "name": "Lyra",
-    "nameJa": "こと座",
-    "descriptionJa": "ベガを中心に置く小さな星座。",
+    "description": "Lyra is one of the 88 modern constellations.",
     "lines": [
       [
         "vega",
@@ -2064,7 +2041,7 @@
   {
     "id": "ANT",
     "name": "Antlia",
-    "nameJa": "ポンプ座",
+    "description": "Antlia is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-51172",
@@ -2075,7 +2052,7 @@
   {
     "id": "MIC",
     "name": "Microscopium",
-    "nameJa": "けんびきょう座",
+    "description": "Microscopium is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-105140",
@@ -2090,7 +2067,7 @@
   {
     "id": "MUS",
     "name": "Musca",
-    "nameJa": "はえ座",
+    "description": "Musca is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-62322",
@@ -2113,7 +2090,7 @@
   {
     "id": "OCT",
     "name": "Octans",
-    "nameJa": "はちぶんぎ座",
+    "description": "Octans is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-107089",
@@ -2132,7 +2109,7 @@
   {
     "id": "APS",
     "name": "Apus",
-    "nameJa": "ふうちょう座",
+    "description": "Apus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-72370",
@@ -2147,7 +2124,7 @@
   {
     "id": "OPH",
     "name": "Ophiuchus",
-    "nameJa": "へびつかい座",
+    "description": "Ophiuchus is one of the 88 modern constellations.",
     "lines": [
       [
         "rasalhague",
@@ -2182,8 +2159,7 @@
   {
     "id": "ORI",
     "name": "Orion",
-    "nameJa": "オリオン座",
-    "descriptionJa": "冬の大三角を構成。ベテルゲュゼとリゲルが有名。",
+    "description": "Orion is one of the 88 modern constellations.",
     "lines": [
       [
         "alnitak",
@@ -2274,8 +2250,7 @@
   {
     "id": "PAV",
     "name": "Pavo",
-    "nameJa": "くじゃく座",
-    "descriptionJa": "南天の白い鳥(孔雀)の形。",
+    "description": "Pavo is one of the 88 modern constellations.",
     "lines": [
       [
         "peacock",
@@ -2334,8 +2309,7 @@
   {
     "id": "PEG",
     "name": "Pegasus",
-    "nameJa": "ペガスス座",
-    "descriptionJa": "大乗鞍(大いなしし)が特徴の飛馬座。",
+    "description": "Pegasus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-1067",
@@ -2398,7 +2372,7 @@
   {
     "id": "PIC",
     "name": "Pictor",
-    "nameJa": "がか座",
+    "description": "Pictor is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-32607",
@@ -2413,8 +2387,7 @@
   {
     "id": "PER",
     "name": "Perseus",
-    "nameJa": "ペルセウス座",
-    "descriptionJa": "変光星アルゴルが目にある英雄ペルセウスの像。",
+    "description": "Perseus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-17448",
@@ -2461,7 +2434,7 @@
   {
     "id": "EQU",
     "name": "Equuleus",
-    "nameJa": "こうま座",
+    "description": "Equuleus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-104521",
@@ -2484,8 +2457,7 @@
   {
     "id": "CMI",
     "name": "Canis Minor",
-    "nameJa": "こいぬ座",
-    "descriptionJa": "全天で最も明るい恒星シリウスを含む小さな星座。",
+    "description": "Canis Minor is one of the 88 modern constellations.",
     "lines": [
       [
         "procyon",
@@ -2496,7 +2468,7 @@
   {
     "id": "LMI",
     "name": "Leo Minor",
-    "nameJa": "こじし座",
+    "description": "Leo Minor is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-53229",
@@ -2519,7 +2491,7 @@
   {
     "id": "VUL",
     "name": "Vulpecula",
-    "nameJa": "こぎつね座",
+    "description": "Vulpecula is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-95771",
@@ -2530,8 +2502,7 @@
   {
     "id": "UMI",
     "name": "Ursa Minor",
-    "nameJa": "こぐま座",
-    "descriptionJa": "北の空でしっぽの先に北極星(ポリラリス)がある。",
+    "description": "Ursa Minor is one of the 88 modern constellations.",
     "lines": [
       [
         "polaris",
@@ -2566,7 +2537,7 @@
   {
     "id": "PHE",
     "name": "Phoenix",
-    "nameJa": "ほうおう座",
+    "description": "Phoenix is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-5348",
@@ -2617,8 +2588,7 @@
   {
     "id": "PSC",
     "name": "Pisces",
-    "nameJa": "うお座",
-    "descriptionJa": "糸で繋がれた2匹の魚の形。",
+    "description": "Pisces is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-4889",
@@ -2701,8 +2671,7 @@
   {
     "id": "PSA",
     "name": "Piscis Austrinus",
-    "nameJa": "みなみのうお座",
-    "descriptionJa": "南天の魚座。",
+    "description": "Piscis Austrinus is one of the 88 modern constellations.",
     "lines": [
       [
         "fomalhaut",
@@ -2733,7 +2702,7 @@
   {
     "id": "VOL",
     "name": "Volans",
-    "nameJa": "とびうお座",
+    "description": "Volans is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-37504",
@@ -2768,7 +2737,7 @@
   {
     "id": "PUP",
     "name": "Puppis",
-    "nameJa": "とも座",
+    "description": "Puppis is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-39757",
@@ -2803,7 +2772,7 @@
   {
     "id": "RET",
     "name": "Reticulum",
-    "nameJa": "レチクル座",
+    "description": "Reticulum is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-19780",
@@ -2826,8 +2795,7 @@
   {
     "id": "SGR",
     "name": "Sagittarius",
-    "nameJa": "いて座",
-    "descriptionJa": "射手座(の形)の矢、天の川の本流。",
+    "description": "Sagittarius is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-89931",
@@ -2930,8 +2898,7 @@
   {
     "id": "SCO",
     "name": "Scorpius",
-    "nameJa": "さそり座",
-    "descriptionJa": "赤い星アンタレスが心臓部にある蝎の形。",
+    "description": "Scorpius is one of the 88 modern constellations.",
     "lines": [
       [
         "shaula",
@@ -2986,7 +2953,7 @@
   {
     "id": "SER",
     "name": "Serpens",
-    "nameJa": "へび座",
+    "description": "Serpens is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-77516",
@@ -3037,7 +3004,7 @@
   {
     "id": "SEX",
     "name": "Sextans",
-    "nameJa": "ろくぶんぎ座",
+    "description": "Sextans is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-51437",
@@ -3048,7 +3015,7 @@
   {
     "id": "MEN",
     "name": "Mensa",
-    "nameJa": "テーブルさん座",
+    "description": "Mensa is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-25918",
@@ -3059,8 +3026,7 @@
   {
     "id": "TAU",
     "name": "Taurus",
-    "nameJa": "おうし座",
-    "descriptionJa": "頭部の位置にすばる星団が収まる牡牛の星座。",
+    "description": "Taurus is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-25428",
@@ -3115,7 +3081,7 @@
   {
     "id": "TEL",
     "name": "Telescopium",
-    "nameJa": "ぼうえんきょう座",
+    "description": "Telescopium is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-90568",
@@ -3126,7 +3092,7 @@
   {
     "id": "TUC",
     "name": "Tucana",
-    "nameJa": "きょしちょう座",
+    "description": "Tucana is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-110130",
@@ -3145,7 +3111,7 @@
   {
     "id": "TRI",
     "name": "Triangulum",
-    "nameJa": "さんかく座",
+    "description": "Triangulum is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-10559",
@@ -3164,7 +3130,7 @@
   {
     "id": "TRA",
     "name": "Triangulum Australe",
-    "nameJa": "みなみのさんかく座",
+    "description": "Triangulum Australe is one of the 88 modern constellations.",
     "lines": [
       [
         "atria",
@@ -3183,8 +3149,7 @@
   {
     "id": "AQR",
     "name": "Aquarius",
-    "nameJa": "みずがめ座",
-    "descriptionJa": "水差しを持つ水の星座。",
+    "description": "Aquarius is one of the 88 modern constellations.",
     "lines": [
       [
         "sadalsuud",
@@ -3247,8 +3212,7 @@
   {
     "id": "VIR",
     "name": "Virgo",
-    "nameJa": "おとめ座",
-    "descriptionJa": "秋の空に明るいスぺカを含む乙女。",
+    "description": "Virgo is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-57380",
@@ -3303,7 +3267,7 @@
   {
     "id": "VEL",
     "name": "Vela",
-    "nameJa": "ほ座",
+    "description": "Vela is one of the 88 modern constellations.",
     "lines": [
       [
         "hip-39953",

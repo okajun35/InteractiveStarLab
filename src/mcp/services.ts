@@ -95,7 +95,6 @@ export function predictVisibleStars(
   const stars: PredictedStarToolResult[] = candidates.slice(0, limit).map((star) => ({
     starId: star.starId,
     name: star.name,
-    nameJa: star.nameJa,
     magnitude: star.magnitude,
     altitude: star.altitude,
     azimuth: star.azimuth,
@@ -155,7 +154,6 @@ export function observationRecordToToolResult(
       return {
         starId: target.starId,
         name: star?.name ?? target.starId,
-        nameJa: star?.nameJa,
         prediction: target.predictedVisible ? "visible" : "not_visible",
         observation: statusById.get(target.starId) ?? "unsure",
         predictedAltitude: target.predictedAltitude,
@@ -181,7 +179,6 @@ export function compareObservationRecordDetailed(
     return {
       starId: target.starId,
       name: star?.name ?? target.starId,
-      nameJa: star?.nameJa,
       prediction: target.predictedVisible ? "visible" : "not_visible",
       observation,
       match,
@@ -207,7 +204,6 @@ function sceneStarToToolResult(sceneStar: SkyScene["stars"][number]): CurrentSky
   return {
     starId: sceneStar.star.id,
     name: sceneStar.star.name,
-    nameJa: sceneStar.star.nameJa,
     magnitude: sceneStar.star.magnitude,
     altitude: sceneStar.star.altitude,
     azimuth: sceneStar.star.azimuth,

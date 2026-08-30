@@ -1,116 +1,91 @@
-# Interactive star Lab
+# Interactive Star Lab
 
-ブラウザ上で現在地・日時・視線方向を指定し、星空をインタラクティブに確認できる星空ビューアです。
-Stellariumの公式データをもとに、88星座の星座線を表示します。
+Interactive Star Lab is an educational sky viewer for exploring how location, date and time, direction, daylight, light pollution, and observer sensitivity change what we can see. It includes the 88 modern constellations, 674 constellation lines, and 752 stars from the checked-in Stellarium-derived catalogs.
 
-## Features
+## Highlights
 
-- 東京など任意の緯度・経度から見える星空を表示
-- 日時を変更して星の動きを確認
-- 方位・高度・視野角を操作して空を探索
-- 星名・星座線・星座名の表示切り替え
-- 星をクリックして詳細を確認
-- 星空表示をPNGとして保存
-- 明るさ別の星レイヤーを切り替え
-- 昼夜・薄明・光害・観測者感度を変えた見え方のシミュレーション
-- 見えない星の表示と、非表示理由（地平線・昼光・光害など）の確認
-- 東京・札幌・那覇・シンガポールなどの場所プリセット
-- What-if実験（昼光を除去、光害を減らす、時刻を進める、シドニーと比較）
-- 星空のBefore / After比較と、現地時刻をそろえた場所比較
-- 88星座、674本の星座線、752個の恒星データを収録
+- Explore the sky from any latitude and longitude.
+- Change observation date and time, direction, altitude, and field of view.
+- Toggle stars, star names, constellation lines, and constellation names.
+- Inspect individual stars and the Sun.
+- Simulate daylight, twilight, light pollution, and observer sensitivity.
+- Run What-if experiments and compare before/after sky views.
+- Create Observation Missions with immutable creation-time predictions.
+- Record Visible, Not Visible, or Unsure results and compare them with predictions.
+- Restore a Mission on another device with a one-time Recovery Code.
+- Save deterministic sky Snapshots and generate printable Observation Guides and PDFs.
+- Expose sky controls, Missions, results, Snapshots, and Guides through WebMCP.
 
-## Requirements
+## Local setup
 
-- Node.js 18以上
-- npm
-
-Pythonは使用していません。Pythonの仮想環境（venv）は不要です。
-
-## Setup
+Requirements: Node.js 18 or newer and npm.
 
 ```bash
 npm ci
-```
-
-### Optional cloud persistence
-
-Mission、観測結果、Missionに紐づく実際のSky Canvas PNGをSupabaseへ保存する場合は、Viteの公開環境変数を設定します。
-
-```text
-VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=<publishable-or-anon-key>
-```
-
-`service_role` keyはブラウザへ設定しないでください。Supabase SQL Editorで
-[`supabase/migrations/20260829000000_cloud_observation_missions.sql`](supabase/migrations/20260829000000_cloud_observation_missions.sql)
-と後続のmigrationを適用し、Authentication > Providers > Anonymous Sign-Insを有効にしてください。Email / Passwordのログイン画面はありません。アプリが匿名セッションを内部で自動作成し、Mission作成時に一度だけ復元コードを表示します。設定がない環境やCloud接続に失敗した場合は、従来どおりLocalStorage / IndexedDBモードで起動します。
-
-復元コードはHistory画面の「復元コードからMissionを復元」へ入力できます。復元コードの平文はSupabaseへ保存せず、Mission作成後の画面に一度だけ表示します。Mission IDだけでは別端末から復元できません。
-
-Codex Desktopのビルトインブラウザでのクラウド観測フローは次のとおりです。
-
-1. Agentで`create_observation_plan`を実行し、作成画面に表示された復元コードを安全な場所へ保存する。
-2. 返された`missionId`の日時・地点をSky画面へ設定し、`capture_sky_snapshot({ missionId })`を実行する。
-3. ビルトインブラウザのObserve画面でVisible / Not Visible / Unsureを入力して保存する。
-4. 別端末ではHistory画面またはWebMCPの`restore_observation_mission`へ復元コードを渡す。
-5. Agentで`get_observation_results({ missionId })`または`get_sky_snapshot_metadata({ snapshotId })`を実行する。
-
-Snapshot PNGはprivate Storageへ不変保存され、必要な時だけ短時間のsigned URLが発行されます。Observation Guide PDFは保存済みMissionの固定予測からブラウザ内で直接生成します。
-
-## Development
-
-開発サーバーを起動します。
-
-```bash
 npm run dev
 ```
 
-起動後、表示されたURL（通常は <http://localhost:5173/>）をブラウザで開いてください。
+Open the URL printed by Vite, usually <http://localhost:5173/>.
 
-## Quality checks
+## Optional Supabase persistence
+
+Set these Vite public environment variables to persist Missions, observation results, and Mission-linked sky Snapshots in Supabase:
+
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-or-publishable-key
+```
+
+Apply the migrations in [`supabase/migrations`](supabase/migrations), enable Anonymous Sign-Ins in Supabase Authentication, and configure the Vercel environment variables for each deployed environment. The application creates an anonymous session automatically. When a Mission is created, its Recovery Code is shown once and can later be entered in History or passed to the `restore_observation_mission` WebMCP tool.
+
+Recovery Codes are not stored in plaintext. A Mission ID alone cannot restore a Mission from another device. If Supabase is unavailable or not configured, the application continues in local LocalStorage / IndexedDB mode.
+
+Never put a Supabase `service_role` key in browser code or Vercel client-side environment variables.
+
+## WebMCP demo flow
+
+1. Call `create_observation_plan` to select visible stars and create a Mission. Store the one-time Recovery Code securely.
+2. Set the returned Mission date and site in Sky, then call `capture_sky_snapshot({ missionId })`.
+3. In Observe, record Visible, Not Visible, or Unsure for each target.
+4. Call `get_observation_results({ missionId })` to retrieve the latest results and prediction comparison.
+5. Call `get_sky_snapshot_metadata({ snapshotId })` when a short-lived signed URL is needed, or call the Guide tool to generate a PDF.
+
+## Verification
 
 ```bash
 npm run build
 npm run verify
-```
-
-`build` はTypeScriptの型チェックと本番ビルドを行い、`verify` は天体位置・表示範囲・データ整合性に加えて、明るさ・昼夜・薄明・場所比較・星座線を検証します。
-
-Playwrightが利用可能な環境では、レイアウトを含むブラウザチェックも実行できます。
-
-```bash
 npm run verify:layout
 ```
 
-## Constellation data
+`build` runs strict TypeScript checks and the production Vite build. `verify` runs deterministic astronomy, observation, Guide, Snapshot, cloud, and WebMCP checks. `verify:layout` runs the optional browser layout walkthrough when Playwright and Chromium are available. The verification suite includes an English-only scan over tracked files and `dist/`.
 
-アプリ用データは以下にあります。
+## Catalogs and regeneration
 
-- `src/data/constellations.json`: 88星座の星座線と日本語名
-- `src/data/stars.json`: 星の座標・等級・名称
-- `data-source/stellarium-western-constellationship.v0.15.0.txt`: Stellarium Western skyculture v0.15.0の星座線
-- `data-source/stellarium-western-star-names.v0.15.0.txt`: StellariumのHIP番号と星名の対応
-- `data-source/hipparcos-line-stars.v0.15.0.tsv`: CDS/VizieR Hipparcos Main Catalogueから取得した線端点の座標・V等級
+- `src/data/constellations.json`: English constellation names, descriptions, and line endpoints.
+- `src/data/stars.json`: star coordinates, magnitudes, names, and constellation memberships.
+- `data-source/stellarium-western-constellationship.v0.15.0.txt`: Stellarium Western skyculture v0.15.0 constellation lines.
+- `data-source/stellarium-western-star-names.v0.15.0.txt`: Stellarium HIP identifiers and star names.
+- `data-source/hipparcos-line-stars.v0.15.0.tsv`: Hipparcos line-endpoint coordinates and V magnitudes.
 
-元データからアプリ用JSONを再生成する場合は、次を実行します。
+Regenerate the checked-in application catalogs with:
 
 ```bash
 npm run import:constellations
 ```
 
-## Project structure
+## Project layout
 
 ```text
-src/
-  astronomy/       天体位置計算・投影・表示判定
-  components/      星空キャンバスと操作パネル
-  data/            アプリが読み込む星・星座データ
-  state/            表示設定と観測状態
-scripts/            検証・データ変換スクリプト
-data-source/        取得元データ
+src/                 React application and domain logic
+  astronomy/         Coordinates, projection, visibility, and twilight
+  components/        Sky canvas and workflow screens
+  data/              English star and constellation catalogs
+  guides/            Observation Guide and PDF generation
+  mcp/               WebMCP contracts and tools
+  observation/       Mission and observation workflows
+  state/              React providers and application state
+scripts/             Verification and catalog generation scripts
+data-source/         Checked-in source catalogs
+supabase/migrations/ Database schema and RLS migrations
 ```
-
-## Data sources
-
-- [Stellarium](https://github.com/Stellarium/stellarium), tag `v0.15.0`
-- [CDS/VizieR Hipparcos Main Catalogue (I/239)](https://cdsarc.cds.unistra.fr/ftp/cats/I/239/ReadMe)

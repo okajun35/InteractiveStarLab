@@ -14,15 +14,15 @@ export function ObservationPanel() {
   );
 
   return (
-    <section className="panel" aria-label="観察条件">
+    <section className="panel" aria-label="Observation settings">
       <h2 className="panel-title">
-        <span className="en">Location</span> 観測地点
+        Location
       </h2>
 
       <div className="field-row">
         <label className="field">
           <span className="field-label">
-            <span className="en">Latitude</span> 緯度
+            Latitude
           </span>
           <input
             type="number"
@@ -38,7 +38,7 @@ export function ObservationPanel() {
         </label>
         <label className="field">
           <span className="field-label">
-            <span className="en">Longitude</span> 経度
+            Longitude
           </span>
           <input
             type="number"
@@ -60,7 +60,7 @@ export function ObservationPanel() {
 
       <div className="field">
         <span className="field-label">
-          <span className="en">Place presets</span> 場所プリセット
+          Place presets
         </span>
         <select
           className="place-select"
@@ -71,11 +71,11 @@ export function ObservationPanel() {
           }}
         >
           <option value="custom" disabled>
-            カスタム（手入力）
+            Custom location
           </option>
           {PLACE_PRESETS.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.en} {p.ja}
+              {p.name}
             </option>
           ))}
         </select>
@@ -87,7 +87,7 @@ export function ObservationPanel() {
 
       <div className="field">
         <span className="field-label">
-          <span className="en">Altitude</span> 仰角
+          Altitude
           <span className="field-value">{Math.round(settings.altitude)}°</span>
         </span>
         <input
@@ -103,7 +103,7 @@ export function ObservationPanel() {
 
       <div className="field">
         <span className="field-label">
-          <span className="en">Field of view</span> 視野角
+          Field of view
           <span className="field-value">{Math.round(settings.fieldOfView)}°</span>
         </span>
         <input

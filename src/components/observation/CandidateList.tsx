@@ -15,18 +15,18 @@ export function CandidateList({ candidates, selectedIds, onToggle }: CandidateLi
       <div className="workflow-card-heading">
         <div>
           <span className="en">Visible candidates</span>
-          <h2 id="candidate-list-title">観測候補</h2>
+          <h2 id="candidate-list-title">Observation candidates</h2>
         </div>
-        <span className="selection-count">{selectedIds.length} / 5 選択</span>
+        <span className="selection-count">{selectedIds.length} / 5 selected</span>
       </div>
 
       {candidates.length === 0 ? (
         <div className="workflow-empty">
-          <p>条件に合う星がありません。</p>
-          <p className="workflow-note">日時、地点、または最大等級を変更してください。</p>
+          <p>No stars match these conditions.</p>
+          <p className="workflow-note">Try changing the date, site, or magnitude limit.</p>
         </div>
       ) : (
-        <div className="candidate-list" role="list" aria-label="観測候補星">
+        <div className="candidate-list" role="list" aria-label="Observation candidates">
           {candidates.map((candidate) => {
             const isSelected = selected.has(candidate.starId);
             return (
@@ -39,11 +39,10 @@ export function CandidateList({ candidates, selectedIds, onToggle }: CandidateLi
                 />
                 <span className="candidate-main">
                   <span className="candidate-name">
-                    {candidate.nameJa ?? candidate.name}
-                    {candidate.nameJa && <span className="candidate-name-en">{candidate.name}</span>}
+                    {candidate.name}
                   </span>
                   <span className="candidate-stats">
-                    Mag {candidate.magnitude.toFixed(2)} · 高度 {Math.round(candidate.altitude)}° · 方位 {Math.round(candidate.azimuth)}°
+                    Mag {candidate.magnitude.toFixed(2)} · Alt {Math.round(candidate.altitude)}° · Az {Math.round(candidate.azimuth)}°
                   </span>
                 </span>
               </label>

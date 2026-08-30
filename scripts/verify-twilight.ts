@@ -1,4 +1,4 @@
-// Twilight tiers (spec §41 将来: Civil/Nautical/Astronomical + §42 background).
+// Twilight tiers (spec §41 future: Civil/Nautical/Astronomical + §42 background).
 // Real-mode daylight suppression becomes gradual: each twilight tier allows
 // only brighter stars (educational approximation).
 //   sun alt > 0      day          → no stars
@@ -113,9 +113,9 @@ function visibleAt(sunAlt: number, starMag: number, mode: "real" | "removed" = "
 // ---- T5: labels + background phase mapping (regression, §41-§42) ------
 {
   const stages = ["day", "civil", "nautical", "astronomical", "night"] as const;
-  check("T5: every stage has en+ja labels",
-    stages.every((k) => Boolean(TWILIGHT_LABELS[k].en && TWILIGHT_LABELS[k].ja)),
-    stages.map((k) => TWILIGHT_LABELS[k].ja).join("/"));
+  check("T5: every stage has English labels",
+    stages.every((k) => Boolean(TWILIGHT_LABELS[k])),
+    stages.map((k) => TWILIGHT_LABELS[k]).join("/"));
   // skyPhase (background, §42) must still collapse to day/twilight/night.
   check("T5: skyPhase mapping unchanged: day/day/twilight/twilight/night",
     skyPhase(5) === "day" &&

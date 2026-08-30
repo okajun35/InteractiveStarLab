@@ -9,7 +9,7 @@ export function MissionSkySnapshot({ snapshot }: { snapshot: MissionSkySnapshotM
         className="guide-sky-map"
         viewBox={`0 0 ${snapshot.width} ${snapshot.height}`}
         role="img"
-        aria-label="Mission日時の全天星図"
+        aria-label="All-sky chart for the Mission date and time"
       >
         <rect x="0" y="0" width={snapshot.width} height={snapshot.height} className="guide-sky-background" />
         <circle cx="500" cy="500" r={GUIDE_HORIZON_RADIUS} className="guide-sky-horizon" />
@@ -52,15 +52,14 @@ export function MissionSkySnapshot({ snapshot }: { snapshot: MissionSkySnapshotM
                   {star.targetIndex}
                 </text>
                 <text x={star.x} y={star.y - radius - 8} textAnchor="middle" className="guide-sky-target-label">
-                  {star.nameJa ?? star.name}
+                  {star.name}
                 </text>
               </g>
             );
           })}
         </g>
       </svg>
-      <figcaption>星図を頭上に掲げ、観測する方角を下側に向けてください。<span className="en">Hold the chart overhead and place the direction you face at the bottom.</span></figcaption>
+      <figcaption>Hold the chart overhead and place the direction you face at the bottom.</figcaption>
     </figure>
   );
 }
-

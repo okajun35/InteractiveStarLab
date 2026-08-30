@@ -21,13 +21,13 @@ export function MagnitudeLayers() {
   return (
     <fieldset className="panel-group">
       <legend>
-        <span className="en">Stars by Brightness</span> 等級レイヤー
+        Stars by brightness
         <span className="panel-group-actions">
           <button type="button" onClick={() => enableAll(true)}>
-            全体ON
+            Enable all
           </button>
           <button type="button" onClick={() => enableAll(false)}>
-            全体OFF
+            Disable all
           </button>
         </span>
       </legend>
@@ -49,7 +49,7 @@ export function MagnitudeLayers() {
         </label>
       ))}
       <p className="panel-note">
-        数字は現在の視野内の星の数です。暗い星をONにすると一気に増えます。
+        Counts show stars currently in the field of view. Enabling faint stars can increase the count quickly.
       </p>
     </fieldset>
   );

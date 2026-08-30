@@ -11,8 +11,7 @@
   --ok: #4ade80;
   --star: #ffffff;
   --const-line: rgba(148, 163, 184, 0.45);
-  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP",
-    "Yu Gothic UI", Meiryo, system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.5;
 }
@@ -469,7 +468,7 @@ button.primary {
   color: var(--ok);
 }
 
-button[aria-label="閉じる"] {
+button[aria-label="Close"] {
   line-height: 1;
   font-size: 1rem;
   padding: 4px 9px;

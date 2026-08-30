@@ -41,17 +41,17 @@ export function fieldErrors(settings: ObservationSettings): FieldErrors | null {
   ): void => {
     const { min, max } = LIMITS[key];
     if (!Number.isFinite(value)) {
-      errors[key] = `${label}は数値を入力してください`;
+      errors[key] = `${label} must be a number`;
       return;
     }
     if (value < min || value > max) {
-      errors[key] = `${label}は ${min}〜${max} の範囲で入力してください`;
+      errors[key] = `${label} must be between ${min} and ${max}`;
     }
   };
-  check("latitude", settings.latitude, "緯度");
-  check("longitude", settings.longitude, "経度");
-  check("azimuth", settings.azimuth, "方位角");
-  check("altitude", settings.altitude, "仰角");
-  check("fieldOfView", settings.fieldOfView, "視野角");
+  check("latitude", settings.latitude, "Latitude");
+  check("longitude", settings.longitude, "Longitude");
+  check("azimuth", settings.azimuth, "Azimuth");
+  check("altitude", settings.altitude, "Altitude");
+  check("fieldOfView", settings.fieldOfView, "Field of view");
   return Object.keys(errors).length > 0 ? errors : null;
 }

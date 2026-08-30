@@ -1,8 +1,8 @@
-// Constellation line/label hidden-following, option B (alpha fade; 要設計判断→B採用、
-// progress.md 2026-08-28)。星のvisibility状態に星座線・星座名のalphaを従わせる:
-//   星の状態重み  visible=1, hidden=0.5, disabled=0
-//   星座線        factor = wA × wB   (1 / 0.5 / 0.25 / 0)
-//   星座名        factor = 平均重み、下限 0.2（教育上の位置づけを維持）
+// Constellation line/label hidden-following, option B (alpha fade).
+// Constellation line and label alpha follows star visibility:
+//   star weights: visible=1, hidden=0.5, disabled=0
+//   line factor: wA × wB (1 / 0.5 / 0.25 / 0)
+//   label factor: average weight, with a 0.2 floor
 // Run: node scripts/run-verify.cjs verify-constell.ts
 import { horizontalStars } from "../src/astronomy/coordinates";
 import { STARS, CONSTELLATIONS } from "../src/astronomy/stars";

@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { useStarViewer } from "../state/context";
-import { useSimulation, LIGHT_POLLUTION_LABELS } from "../state/simulation";
+import { useSimulation } from "../state/simulation";
 import { createContext } from "../astronomy/observer";
 import { sunPosition } from "../astronomy/sun";
-import { evaluateStar, reasonLabelJa } from "../astronomy/visibilityModel";
-import { LAYER_LABEL_JA, layerOf } from "../astronomy/magnitude";
+import { evaluateStar, reasonLabel } from "../astronomy/visibilityModel";
+import { MAGNITUDE_LAYERS, LIGHT_POLLUTION_LABELS, layerOf } from "../astronomy/magnitude";
 import { CONSTELLATIONS, STARS } from "../astronomy/stars";
 
 export function ObjectInfo() {
@@ -22,16 +22,16 @@ export function ObjectInfo() {
 
   if (selectedSun) {
     return (
-      <section className="object-info" aria-label="選択天体">
+      <section className="object-info" aria-label="Selected object">
         <div className="object-info-head">
           <div className="object-name">
-            <span className="object-name-main">太陽 Sun</span>
-            <span className="object-name-sub">恒星（G2V）</span>
+            <span className="object-name-main">Sun</span>
+            <span className="object-name-sub">Star (G2V)</span>
           </div>
           <button
             type="button"
             onClick={() => selectSun(false)}
-            aria-label="閉じる"
+            aria-label="Close"
           >
             ×
           </button>
@@ -39,13 +39,13 @@ export function ObjectInfo() {
         <dl>
           <div>
             <dt>
-              <span className="en">Altitude</span> 高度
+              Altitude
             </dt>
             <dd>{sun ? `${sun.altitude.toFixed(1)}°` : "—"}</dd>
           </div>
           <div>
             <dt>
-              <span className="en">Azimuth</span> 方位
+              Azimuth
             </dt>
             <dd>{sun ? `${sun.azimuth.toFixed(1)}°` : "—"}</dd>
           </div>
@@ -53,8 +53,8 @@ export function ObjectInfo() {
         {sun && (
           <p className="object-info-hint">
             {sun.altitude > 0
-              ? "太陽は地平線の上です。昼間で、星は明るさに負けて見えにくくなります。"
-              : "太陽は地平線の下です。夜空なら恒星が見える時間帯です。"}
+              ? "The Sun is above the horizon. Daylight makes stars harder to see."
+              : "The Sun is below the horizon, so stars may be visible in the night sky."}
           </p>
         )}
       </section>
@@ -63,15 +63,13 @@ export function ObjectInfo() {
 
   if (!selectedStar) {
     return (
-      <section className="object-info empty" aria-label="選択天体">
-        <span className="en">Selected object</span> — 星をクリックすると詳細を表示します
+      <section className="object-info empty" aria-label="Selected object">
+        Select a star to view its details
       </section>
     );
   }
 
   const pos = horizontal.find((s) => s.id === selectedStar.id);
-  const starJa = selectedStar.nameJa;
-  const starEn = selectedStar.name;
 
   const status = pos
     ? evaluateStar(pos, layers, sim, sun?.altitude ?? -90)
@@ -89,43 +87,42 @@ export function ObjectInfo() {
   const brightest = constellationStars.slice().sort((a, b) => a.magnitude - b.magnitude)[0];
 
   return (
-    <section className="object-info" aria-label="選択天体">
+    <section className="object-info" aria-label="Selected object">
       <div className="object-info-head">
         <div className="object-name">
-          <span className="object-name-main">{starJa ?? starEn}</span>
-          <span className="object-name-sub">{starJa ? starEn : undefined}</span>
+          <span className="object-name-main">{selectedStar.name}</span>
         </div>
-        <button type="button" onClick={() => selectStar(null)} aria-label="閉じる">
+        <button type="button" onClick={() => selectStar(null)} aria-label="Close">
           ×
         </button>
       </div>
       <dl>
         <div>
           <dt>
-            <span className="en">Magnitude</span> 等級
+            Magnitude
           </dt>
           <dd>{selectedStar.magnitude.toFixed(2)}</dd>
         </div>
         <div>
           <dt>
-            <span className="en">Brightness Group</span> 等級グループ
+            Brightness group
           </dt>
-          <dd>{LAYER_LABEL_JA[layerOf(selectedStar.magnitude)]}</dd>
+          <dd>{MAGNITUDE_LAYERS.find((layer) => layer.id === layerOf(selectedStar.magnitude))?.name}</dd>
         </div>
         <div>
           <dt>
-            <span className="en">Constellation</span> 星座
+            Constellation
           </dt>
           <dd>
             {constellation
-              ? `${constellation.name} ${constellation.nameJa ?? ""}`
+              ? constellation.name
               : selectedStar.constellation ?? "—"}
           </dd>
         </div>
         {pos && (
           <div>
             <dt>
-              <span className="en">Exists</span> 存在（地平線上）
+              Exists above horizon
             </dt>
             <dd>{pos.altitude >= 0 ? "Yes" : "No"}</dd>
           </div>
@@ -133,7 +130,7 @@ export function ObjectInfo() {
         {pos && (
           <div>
             <dt>
-              <span className="en">Visible</span> シミュレーションで
+              Visible in simulation
             </dt>
             <dd className={status.state === "visible" ? "vis-ok" : "vis-hidden"}>
               {status.state === "visible" ? "Yes" : "No"}
@@ -143,22 +140,22 @@ export function ObjectInfo() {
         {pos && status.state === "hidden" && (
           <div>
             <dt>
-              <span className="en">Reason</span> 理由
+              Reason
             </dt>
-            <dd>{reasonLabelJa(status.reason, sim.daylightMode)}</dd>
+            <dd>{reasonLabel(status.reason, sim.daylightMode)}</dd>
           </div>
         )}
         {pos && (
           <>
             <div>
               <dt>
-                <span className="en">Altitude</span> 高度
+              Altitude
               </dt>
               <dd>{pos.altitude.toFixed(1)}°</dd>
             </div>
             <div>
               <dt>
-                <span className="en">Azimuth</span> 方位
+              Azimuth
               </dt>
               <dd>{pos.azimuth.toFixed(1)}°</dd>
             </div>
@@ -169,22 +166,20 @@ export function ObjectInfo() {
       {constellation && (
         <aside className="constellation-card">
           <h3>
-            {constellation.name} {constellation.nameJa}
+            {constellation.name}
           </h3>
           {brightest && (
             <p>
-              <span className="en">Brightest Star</span> 最明星：
-              {brightest.nameJa ?? brightest.name}（{brightest.magnitude.toFixed(1)}等）
+              Brightest star: {brightest.name} (mag {brightest.magnitude.toFixed(1)})
             </p>
           )}
-          <p>{constellation.descriptionJa ?? "（解説なし）"}</p>
+          <p>{constellation.description ?? "No description available."}</p>
         </aside>
       )}
 
       <p className="object-info-hint">
-        光害：{LIGHT_POLLUTION_LABELS[sim.lightPollution].ja}（limit ≈{" "}
-        {sim.limitingMagnitude.toFixed(1)}）／昼間モード：
-        {sim.daylightMode === "real" ? "REAL（昼空）" : "REMOVED（空だけ暗く）"}
+        Light pollution: {LIGHT_POLLUTION_LABELS[sim.lightPollution]} (limit ≈{" "}
+        {sim.limitingMagnitude.toFixed(1)}) / Daylight mode: {sim.daylightMode === "real" ? "REAL" : "REMOVED"}
       </p>
     </section>
   );

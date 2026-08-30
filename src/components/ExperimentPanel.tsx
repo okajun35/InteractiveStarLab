@@ -54,7 +54,7 @@ export function ExperimentPanel() {
     return (
       <fieldset className="panel-group experiment-active">
         <legend>
-          <span className="en">Experiment</span> 実験中：{active.ja}
+          Experiment: {active.title}
         </legend>
 
         {experimentGuess && (
@@ -63,19 +63,19 @@ export function ExperimentPanel() {
               experimentGuess.correct ? "exp-guess-result ok" : "exp-guess-result no"
             }
           >
-            あなたの予想：{active.guesses[experimentGuess.picked]}
-            {experimentGuess.correct ? "（予想通り）" : "（今回は違いました）"}
+            Your guess: {active.guesses[experimentGuess.picked]}
+            {experimentGuess.correct ? " (correct)" : " (not this time)"}
           </p>
         )}
 
-        <p className="exp-explain">{active.explainJa}</p>
+        <p className="exp-explain">{active.explanation}</p>
 
         <button type="button" className="primary" onClick={closeExperiment}>
-          実験を閉じてもとの状態へ戻す
+          Close experiment and restore previous state
         </button>
         <p className="panel-note">
-          実験の結果（星の見え方）はこのままだと観察し続けます。
-          観測条件（日時・場所・レイヤー・光害）は左のパネルから変えられます。
+          The experiment result remains active until you close it. You can change
+          the date, location, layers, and light pollution in the panels to the left.
         </p>
       </fieldset>
     );
@@ -84,7 +84,7 @@ export function ExperimentPanel() {
   return (
     <fieldset className="panel-group">
       <legend>
-        <span className="en">What-If Experiments</span> もしも実験
+        What-if experiments
       </legend>
 
       {EXPERIMENTS.map((def) => {
@@ -97,14 +97,14 @@ export function ExperimentPanel() {
               onClick={() => setOpenId(open ? null : def.id)}
               aria-expanded={open}
             >
-              {def.ja}
+              {def.title}
               <span className="exp-arrow" aria-hidden="true">
                 {open ? "−" : "+"}
               </span>
             </button>
             {open && (
               <div className="exp-detail">
-                <p className="exp-guess-q">{def.guessQuestionJa}</p>
+                <p className="exp-guess-q">{def.guessQuestion}</p>
                 {def.guesses.map((g, i) => (
                   <label key={i} className="exp-guess">
                     <input
@@ -123,7 +123,7 @@ export function ExperimentPanel() {
                   className="primary"
                   onClick={() => applyExperiment(def)}
                 >
-                  実験する
+                  Run experiment
                 </button>
               </div>
             )}

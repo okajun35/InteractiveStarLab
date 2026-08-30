@@ -150,26 +150,20 @@ export function drawStar(
 function drawStarLabel(ctx: CanvasRenderingContext2D, star: SceneStar): void {
   const r = starRadius(star.star.magnitude);
   ctx.fillStyle = "rgba(226, 232, 240, 0.9)";
-  ctx.font = "12px 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif";
-  const name = star.star.nameJa ?? star.star.name;
-  ctx.fillText(name, star.x, star.y - r - 8);
+  ctx.font = "12px sans-serif";
+  ctx.fillText(star.star.name, star.x, star.y - r - 8);
 }
 
 function drawConstellationLabel(
   ctx: CanvasRenderingContext2D,
-  label: { name: string; nameJa?: string; x: number; y: number; factor?: number },
+  label: { name: string; x: number; y: number; factor?: number },
 ): void {
   // Option B: label alpha follows member visibility (floor 0.2 keeps the
   // name as an educational anchor even when all members are disabled).
   const f = label.factor ?? 1;
   ctx.fillStyle = `rgba(148, 163, 184, ${0.8 * f})`;
-  ctx.font = "600 11px 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif";
+  ctx.font = "600 11px sans-serif";
   ctx.fillText(label.name, label.x, label.y);
-  if (label.nameJa) {
-    ctx.fillStyle = `rgba(148, 163, 184, ${0.55 * f})`;
-    ctx.font = "10px 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif";
-    ctx.fillText(label.nameJa, label.x, label.y + 13);
-  }
 }
 
 export function drawSun(

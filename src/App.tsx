@@ -75,7 +75,7 @@ function SkyArea() {
   if (width <= 0 || height <= 0) {
     return (
       <div className="app-canvas" ref={ref}>
-        <div className="app-canvas-placeholder">読み込み中…</div>
+        <div className="app-canvas-placeholder">Loading…</div>
       </div>
     );
   }
@@ -202,12 +202,12 @@ function AppShell() {
       <header className="app-header">
         <div className="app-header-topline">
           <h1>
-            <span className="en">Interactive star Lab</span> インタラクティブ星空ラボ
+            <span className="en">Interactive Star Lab</span>
             <span className="app-header-sub">
-              <span className="en">Explore the sky</span> — 空の条件を変えて観察する
+              <span className="en">Explore the sky</span> — Change the conditions and observe
             </span>
           </h1>
-          <nav className="app-nav" aria-label="アプリケーション">
+          <nav className="app-nav" aria-label="Application">
             <div className="app-nav-primary">
               {PRIMARY_NAV_ITEMS.map((item) => (
                 <button
@@ -217,7 +217,7 @@ function AppShell() {
                   onClick={() => navigate(item.view)}
                   key={item.view}
                 >
-                  <span className="en">{item.english}</span> {item.japanese}
+                  {item.label}
                 </button>
               ))}
             </div>
@@ -230,10 +230,10 @@ function AppShell() {
                 aria-expanded={recordsOpen}
                 onClick={() => setRecordsOpen((open) => !open)}
               >
-                <span className="en">Records</span> 記録 <span className="app-nav-chevron" aria-hidden="true">⌄</span>
+                Records <span className="app-nav-chevron" aria-hidden="true">⌄</span>
               </button>
               {recordsOpen && (
-                <div className="app-nav-menu" role="menu" aria-label="記録">
+                <div className="app-nav-menu" role="menu" aria-label="Records">
                   {RECORD_NAV_ITEMS.map((item) => (
                     <button
                       type="button"
@@ -243,7 +243,7 @@ function AppShell() {
                       onClick={() => navigate(item.view)}
                       key={item.view}
                     >
-                      <span className="en">{item.english}</span> {item.japanese}
+                      {item.label}
                     </button>
                   ))}
                 </div>

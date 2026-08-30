@@ -2,7 +2,7 @@ import type { HorizontalStar } from "../types/astronomy";
 import type { ObservationCandidate } from "../types/observation";
 
 export interface BuildObservationCandidatesInput {
-  horizontalStars: Array<Pick<HorizontalStar, "id" | "name" | "nameJa" | "magnitude" | "altitude" | "azimuth">>;
+  horizontalStars: Array<Pick<HorizontalStar, "id" | "name" | "magnitude" | "altitude" | "azimuth">>;
   maxMagnitude: number;
 }
 
@@ -26,7 +26,6 @@ export function buildObservationCandidates({
     .map((star) => ({
       starId: star.id,
       name: star.name,
-      nameJa: star.nameJa,
       magnitude: star.magnitude,
       altitude: star.altitude,
       azimuth: star.azimuth,

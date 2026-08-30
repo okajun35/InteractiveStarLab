@@ -5,19 +5,18 @@ export function DisplayOptions() {
 
   const items: Array<{
     key: keyof typeof options;
-    en: string;
-    ja: string;
+    label: string;
   }> = [
-    { key: "stars", en: "Stars", ja: "星" },
-    { key: "starNames", en: "Star Names", ja: "星名" },
-    { key: "constellationLines", en: "Constellation Lines", ja: "星座線" },
-    { key: "constellationNames", en: "Constellation Names", ja: "星座名" },
+    { key: "stars", label: "Stars" },
+    { key: "starNames", label: "Star Names" },
+    { key: "constellationLines", label: "Constellation Lines" },
+    { key: "constellationNames", label: "Constellation Names" },
   ];
 
   return (
     <fieldset className="display-options">
       <legend>
-        <span className="en">Display</span> 表示切替
+        Display
       </legend>
       {items.map((item) => (
         <label key={item.key} className="display-option">
@@ -26,8 +25,7 @@ export function DisplayOptions() {
             checked={options[item.key]}
             onChange={(e) => updateOptions({ [item.key]: e.target.checked })}
           />
-          <span className="en">{item.en}</span>
-          <span>{item.ja}</span>
+          <span>{item.label}</span>
         </label>
       ))}
     </fieldset>

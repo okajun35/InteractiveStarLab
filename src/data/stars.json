@@ -2,7 +2,6 @@
   {
     "id": "sirius",
     "name": "Sirius",
-    "nameJa": "シリウス",
     "ra": 6.7525,
     "dec": -16.7164,
     "magnitude": -1.46,
@@ -11,7 +10,6 @@
   {
     "id": "arcturus",
     "name": "Arcturus",
-    "nameJa": "アルクトゥールス",
     "ra": 14.261,
     "dec": 19.1825,
     "magnitude": -0.05,
@@ -20,7 +18,6 @@
   {
     "id": "vega",
     "name": "Vega",
-    "nameJa": "ベガ",
     "ra": 18.6156,
     "dec": 38.7836,
     "magnitude": 0.03,
@@ -29,7 +26,6 @@
   {
     "id": "capella",
     "name": "Capella",
-    "nameJa": "カペラ",
     "ra": 5.2782,
     "dec": 45.9981,
     "magnitude": 0.08,
@@ -38,7 +34,6 @@
   {
     "id": "rigel",
     "name": "Rigel",
-    "nameJa": "リゲル",
     "ra": 5.2423,
     "dec": -8.2017,
     "magnitude": 0.13,
@@ -47,7 +42,6 @@
   {
     "id": "procyon",
     "name": "Procyon",
-    "nameJa": "プロキオン",
     "ra": 7.655,
     "dec": 5.225,
     "magnitude": 0.34,
@@ -56,7 +50,6 @@
   {
     "id": "betelgeuse",
     "name": "Betelgeuse",
-    "nameJa": "ベテルギウス",
     "ra": 5.9195,
     "dec": 7.4071,
     "magnitude": 0.5,
@@ -65,7 +58,6 @@
   {
     "id": "altair",
     "name": "Altair",
-    "nameJa": "アルタイル",
     "ra": 19.8464,
     "dec": 8.8683,
     "magnitude": 0.77,
@@ -74,7 +66,6 @@
   {
     "id": "aldebaran",
     "name": "Aldebaran",
-    "nameJa": "アルデバラン",
     "ra": 4.5987,
     "dec": 16.5093,
     "magnitude": 0.85,
@@ -83,7 +74,6 @@
   {
     "id": "spica",
     "name": "Spica",
-    "nameJa": "スピカ",
     "ra": 13.4199,
     "dec": -11.1614,
     "magnitude": 1.04,
@@ -92,7 +82,6 @@
   {
     "id": "antares",
     "name": "Antares",
-    "nameJa": "アンタレス",
     "ra": 16.4901,
     "dec": -26.4319,
     "magnitude": 1.06,
@@ -101,7 +90,6 @@
   {
     "id": "pollux",
     "name": "Pollux",
-    "nameJa": null,
     "ra": 7.7553,
     "dec": 28.0261,
     "magnitude": 1.14,
@@ -110,7 +98,6 @@
   {
     "id": "fomalhaut",
     "name": "Fomalhaut",
-    "nameJa": "フォーマウルト",
     "ra": 22.9608,
     "dec": -29.6222,
     "magnitude": 1.16,
@@ -119,7 +106,6 @@
   {
     "id": "deneb",
     "name": "Deneb",
-    "nameJa": "デネブ",
     "ra": 20.6905,
     "dec": 45.2803,
     "magnitude": 1.25,
@@ -128,7 +114,6 @@
   {
     "id": "regulus",
     "name": "Regulus",
-    "nameJa": null,
     "ra": 10.1395,
     "dec": 11.9672,
     "magnitude": 1.36,
@@ -137,7 +122,6 @@
   {
     "id": "adhara",
     "name": "Adhara",
-    "nameJa": "アダラ",
     "ra": 6.9772,
     "dec": -28.9722,
     "magnitude": 1.5,
@@ -146,7 +130,6 @@
   {
     "id": "castor",
     "name": "Castor",
-    "nameJa": null,
     "ra": 7.5767,
     "dec": 31.8881,
     "magnitude": 1.58,
@@ -155,7 +138,6 @@
   {
     "id": "shaula",
     "name": "Shaula",
-    "nameJa": "シャウラ",
     "ra": 17.5601,
     "dec": -37.1039,
     "magnitude": 1.62,
@@ -164,7 +146,6 @@
   {
     "id": "bellatrix",
     "name": "Bellatrix",
-    "nameJa": null,
     "ra": 5.4188,
     "dec": 6.3497,
     "magnitude": 1.64,
@@ -173,7 +154,6 @@
   {
     "id": "elnath",
     "name": "Elnath",
-    "nameJa": null,
     "ra": 5.4382,
     "dec": 28.6075,
     "magnitude": 1.65,
@@ -182,7 +162,6 @@
   {
     "id": "alnilam",
     "name": "Alnilam",
-    "nameJa": null,
     "ra": 5.6035,
     "dec": -1.2019,
     "magnitude": 1.69,
@@ -191,7 +170,6 @@
   {
     "id": "alnitak",
     "name": "Alnitak",
-    "nameJa": null,
     "ra": 5.6793,
     "dec": -1.9425,
     "magnitude": 1.74,
@@ -200,7 +178,6 @@
   {
     "id": "alioth",
     "name": "Alioth",
-    "nameJa": "アリオト",
     "ra": 12.9006,
     "dec": 55.9598,
     "magnitude": 1.77,
@@ -209,7 +186,6 @@
   {
     "id": "dubhe",
     "name": "Dubhe",
-    "nameJa": "ドゥーベ",
     "ra": 11.0621,
     "dec": 61.7507,
     "magnitude": 1.79,
@@ -218,7 +194,6 @@
   {
     "id": "mirfak",
     "name": "Mirfak",
-    "nameJa": "ミルファク",
     "ra": 3.4054,
     "dec": 49.8611,
     "magnitude": 1.79,
@@ -227,7 +202,6 @@
   {
     "id": "wezen",
     "name": "Wezen",
-    "nameJa": "ヴェゼン",
     "ra": 7.1399,
     "dec": -26.3933,
     "magnitude": 1.83,
@@ -236,7 +210,6 @@
   {
     "id": "sargas",
     "name": "Sargas",
-    "nameJa": "サガス",
     "ra": 17.622,
     "dec": -42.9978,
     "magnitude": 1.86,
@@ -245,7 +218,6 @@
   {
     "id": "alkaid",
     "name": "Alkaid",
-    "nameJa": "アルカイド",
     "ra": 13.7923,
     "dec": 49.3133,
     "magnitude": 1.86,
@@ -254,7 +226,6 @@
   {
     "id": "menkalinan",
     "name": "Menkalinan",
-    "nameJa": null,
     "ra": 5.9921,
     "dec": 44.9475,
     "magnitude": 1.9,
@@ -263,7 +234,6 @@
   {
     "id": "alhena",
     "name": "Alhena",
-    "nameJa": null,
     "ra": 6.6285,
     "dec": 16.3992,
     "magnitude": 1.93,
@@ -272,7 +242,6 @@
   {
     "id": "mirzam",
     "name": "Mirzam",
-    "nameJa": "ミルザム",
     "ra": 6.3783,
     "dec": -17.9559,
     "magnitude": 1.98,
@@ -281,7 +250,6 @@
   {
     "id": "polaris",
     "name": "Polaris",
-    "nameJa": "ポラリス",
     "ra": 2.5303,
     "dec": 89.2641,
     "magnitude": 1.97,
@@ -290,7 +258,6 @@
   {
     "id": "alphard",
     "name": "Alphard",
-    "nameJa": "アルファルド",
     "ra": 9.4595,
     "dec": -8.6586,
     "magnitude": 1.98,
@@ -299,7 +266,6 @@
   {
     "id": "algieba",
     "name": "Algieba",
-    "nameJa": null,
     "ra": 10.3329,
     "dec": 19.8417,
     "magnitude": 2.01,
@@ -308,7 +274,6 @@
   {
     "id": "hamal",
     "name": "Hamal",
-    "nameJa": "ハマル",
     "ra": 2.1196,
     "dec": 23.4624,
     "magnitude": 2,
@@ -317,7 +282,6 @@
   {
     "id": "diphda",
     "name": "Diphda",
-    "nameJa": "ディプダ",
     "ra": 0.7264,
     "dec": -17.9866,
     "magnitude": 2.04,
@@ -326,7 +290,6 @@
   {
     "id": "mirach",
     "name": "Mirach",
-    "nameJa": "ミラク",
     "ra": 1.1622,
     "dec": 35.6206,
     "magnitude": 2.05,
@@ -335,7 +298,6 @@
   {
     "id": "alpheratz",
     "name": "Alpheratz",
-    "nameJa": null,
     "ra": 0.1398,
     "dec": 29.0904,
     "magnitude": 2.06,
@@ -344,7 +306,6 @@
   {
     "id": "kochab",
     "name": "Kochab",
-    "nameJa": "コカブ",
     "ra": 14.8451,
     "dec": 74.1556,
     "magnitude": 2.07,
@@ -353,7 +314,6 @@
   {
     "id": "rasalhague",
     "name": "Rasalhague",
-    "nameJa": null,
     "ra": 17.5822,
     "dec": 12.56,
     "magnitude": 2.07,
@@ -362,7 +322,6 @@
   {
     "id": "saiph",
     "name": "Saiph",
-    "nameJa": null,
     "ra": 5.7959,
     "dec": -9.6697,
     "magnitude": 2.07,
@@ -371,7 +330,6 @@
   {
     "id": "denebola",
     "name": "Denebola",
-    "nameJa": null,
     "ra": 11.8177,
     "dec": 14.5722,
     "magnitude": 2.14,
@@ -380,7 +338,6 @@
   {
     "id": "algol",
     "name": "Algol",
-    "nameJa": "アルゴル",
     "ra": 3.1361,
     "dec": 40.9558,
     "magnitude": 2.12,
@@ -389,7 +346,6 @@
   {
     "id": "almach",
     "name": "Almach",
-    "nameJa": "アルマック",
     "ra": 2.065,
     "dec": 42.3297,
     "magnitude": 2.1,
@@ -398,7 +354,6 @@
   {
     "id": "tiaki",
     "name": "Tiaki",
-    "nameJa": "ティイェーキー",
     "ra": 22.7113,
     "dec": -46.8846,
     "magnitude": 2.07,
@@ -407,7 +362,6 @@
   {
     "id": "eltanin",
     "name": "Eltanin",
-    "nameJa": null,
     "ra": 17.9434,
     "dec": 51.4889,
     "magnitude": 2.23,
@@ -416,7 +370,6 @@
   {
     "id": "sadr",
     "name": "Sadr",
-    "nameJa": "サドル",
     "ra": 20.3704,
     "dec": 40.2567,
     "magnitude": 2.23,
@@ -425,7 +378,6 @@
   {
     "id": "schedar",
     "name": "Schedar",
-    "nameJa": null,
     "ra": 0.6751,
     "dec": 56.5373,
     "magnitude": 2.24,
@@ -434,7 +386,6 @@
   {
     "id": "mintaka",
     "name": "Mintaka",
-    "nameJa": null,
     "ra": 5.5335,
     "dec": -0.2992,
     "magnitude": 2.23,
@@ -443,7 +394,6 @@
   {
     "id": "caph",
     "name": "Caph",
-    "nameJa": null,
     "ra": 0.153,
     "dec": 59.1497,
     "magnitude": 2.27,
@@ -452,7 +402,6 @@
   {
     "id": "mizar",
     "name": "Mizar",
-    "nameJa": "ミザル",
     "ra": 13.3987,
     "dec": 54.9254,
     "magnitude": 2.27,
@@ -461,7 +410,6 @@
   {
     "id": "larawag",
     "name": "Larawag",
-    "nameJa": null,
     "ra": 16.8361,
     "dec": -34.2933,
     "magnitude": 2.29,
@@ -470,7 +418,6 @@
   {
     "id": "dschubba",
     "name": "Dschubba",
-    "nameJa": null,
     "ra": 16.0056,
     "dec": -22.6217,
     "magnitude": 2.32,
@@ -479,7 +426,6 @@
   {
     "id": "izar",
     "name": "Izar",
-    "nameJa": null,
     "ra": 14.7498,
     "dec": 27.0741,
     "magnitude": 2.37,
@@ -488,7 +434,6 @@
   {
     "id": "merak",
     "name": "Merak",
-    "nameJa": "メラク",
     "ra": 11.0307,
     "dec": 56.3825,
     "magnitude": 2.37,
@@ -497,7 +442,6 @@
   {
     "id": "enif",
     "name": "Enif",
-    "nameJa": "エニフ",
     "ra": 21.7364,
     "dec": 9.875,
     "magnitude": 2.39,
@@ -506,7 +450,6 @@
   {
     "id": "scheat",
     "name": "Scheat",
-    "nameJa": "スキアト",
     "ra": 23.0629,
     "dec": 28.0828,
     "magnitude": 2.42,
@@ -515,7 +458,6 @@
   {
     "id": "alderamin",
     "name": "Alderamin",
-    "nameJa": null,
     "ra": 21.3096,
     "dec": 62.5856,
     "magnitude": 2.45,
@@ -524,7 +466,6 @@
   {
     "id": "phecda",
     "name": "Phecda",
-    "nameJa": "フェクダ",
     "ra": 11.8972,
     "dec": 53.6948,
     "magnitude": 2.44,
@@ -533,7 +474,6 @@
   {
     "id": "gamma_cas",
     "name": "\\u03B3 Cas",
-    "nameJa": null,
     "ra": 0.9451,
     "dec": 60.7167,
     "magnitude": 2.47,
@@ -542,7 +482,6 @@
   {
     "id": "gienah_cyg",
     "name": "Gienah",
-    "nameJa": null,
     "ra": 20.7702,
     "dec": 33.9703,
     "magnitude": 2.48,
@@ -551,7 +490,6 @@
   {
     "id": "markab",
     "name": "Markab",
-    "nameJa": "マルカブ",
     "ra": 23.0794,
     "dec": 15.2053,
     "magnitude": 2.49,
@@ -560,7 +498,6 @@
   {
     "id": "menkar",
     "name": "Menkar",
-    "nameJa": null,
     "ra": 3.038,
     "dec": 4.0897,
     "magnitude": 2.54,
@@ -569,7 +506,6 @@
   {
     "id": "zosma",
     "name": "Zosma",
-    "nameJa": null,
     "ra": 11.2351,
     "dec": 20.5239,
     "magnitude": 2.56,
@@ -578,7 +514,6 @@
   {
     "id": "unukalhai",
     "name": "Unukalhai",
-    "nameJa": "ウヌ・ル・ハエ",
     "ra": 15.7378,
     "dec": 6.4258,
     "magnitude": 2.65,
@@ -587,7 +522,6 @@
   {
     "id": "muphrid",
     "name": "Muphrid",
-    "nameJa": null,
     "ra": 13.9114,
     "dec": 18.3975,
     "magnitude": 2.68,
@@ -596,7 +530,6 @@
   {
     "id": "ruchbah",
     "name": "Ruchbah",
-    "nameJa": null,
     "ra": 1.4303,
     "dec": 60.2353,
     "magnitude": 2.68,
@@ -605,7 +538,6 @@
   {
     "id": "hassaleh",
     "name": "Hassaleh",
-    "nameJa": null,
     "ra": 4.9499,
     "dec": 33.1661,
     "magnitude": 2.69,
@@ -614,7 +546,6 @@
   {
     "id": "tarazed",
     "name": "Tarazed",
-    "nameJa": null,
     "ra": 19.771,
     "dec": 10.6133,
     "magnitude": 2.72,
@@ -623,7 +554,6 @@
   {
     "id": "kornephoros",
     "name": "Kornephoros",
-    "nameJa": "コルネフォーロス",
     "ra": 16.5037,
     "dec": 21.4897,
     "magnitude": 2.78,
@@ -632,7 +562,6 @@
   {
     "id": "rastaban",
     "name": "Rastaban",
-    "nameJa": null,
     "ra": 17.5072,
     "dec": 52.3014,
     "magnitude": 2.79,
@@ -641,7 +570,6 @@
   {
     "id": "tau_sco",
     "name": "\\u03C4 Sco",
-    "nameJa": null,
     "ra": 16.598,
     "dec": -28.2161,
     "magnitude": 2.82,
@@ -650,7 +578,6 @@
   {
     "id": "mahasim",
     "name": "Mahasim",
-    "nameJa": null,
     "ra": 5.9954,
     "dec": 37.2128,
     "magnitude": 2.62,
@@ -659,7 +586,6 @@
   {
     "id": "acrab",
     "name": "Acrab",
-    "nameJa": null,
     "ra": 16.0906,
     "dec": -19.8053,
     "magnitude": 2.62,
@@ -668,7 +594,6 @@
   {
     "id": "alcyone",
     "name": "Alcyone",
-    "nameJa": null,
     "ra": 3.7914,
     "dec": 24.1052,
     "magnitude": 2.87,
@@ -677,7 +602,6 @@
   {
     "id": "delta_cyg",
     "name": "\\u03B4 Cyg",
-    "nameJa": null,
     "ra": 19.7496,
     "dec": 45.1308,
     "magnitude": 2.87,
@@ -686,7 +610,6 @@
   {
     "id": "tejat",
     "name": "Tejat",
-    "nameJa": null,
     "ra": 6.3827,
     "dec": 22.5136,
     "magnitude": 2.87,
@@ -695,7 +618,6 @@
   {
     "id": "pi_sco",
     "name": "\\u03C0 Sco",
-    "nameJa": null,
     "ra": 15.9809,
     "dec": -26.1139,
     "magnitude": 2.89,
@@ -704,7 +626,6 @@
   {
     "id": "alniyat",
     "name": "Alniyat",
-    "nameJa": null,
     "ra": 16.3531,
     "dec": -25.5928,
     "magnitude": 2.89,
@@ -713,7 +634,6 @@
   {
     "id": "algenubi",
     "name": "Algenubi",
-    "nameJa": null,
     "ra": 9.7642,
     "dec": 23.7742,
     "magnitude": 2.97,
@@ -722,7 +642,6 @@
   {
     "id": "iota_sco",
     "name": "\\u03B9¹ Sco",
-    "nameJa": null,
     "ra": 17.7931,
     "dec": -40.1269,
     "magnitude": 2.99,
@@ -731,7 +650,6 @@
   {
     "id": "zeta_aql",
     "name": "\\u03B6 Aql",
-    "nameJa": null,
     "ra": 19.0902,
     "dec": 13.8636,
     "magnitude": 2.99,
@@ -740,7 +658,6 @@
   {
     "id": "zeta_tau",
     "name": "\\u03B6 Tau",
-    "nameJa": null,
     "ra": 5.6274,
     "dec": 21.1425,
     "magnitude": 3,
@@ -749,7 +666,6 @@
   {
     "id": "almaaz",
     "name": "Almaaz",
-    "nameJa": null,
     "ra": 5.0328,
     "dec": 43.8233,
     "magnitude": 3.03,
@@ -758,7 +674,6 @@
   {
     "id": "seginus",
     "name": "Seginus",
-    "nameJa": null,
     "ra": 14.5346,
     "dec": 38.3083,
     "magnitude": 3.04,
@@ -767,7 +682,6 @@
   {
     "id": "pherkad",
     "name": "Pherkad",
-    "nameJa": null,
     "ra": 15.3455,
     "dec": 71.8339,
     "magnitude": 3.05,
@@ -776,7 +690,6 @@
   {
     "id": "mebsuta",
     "name": "Mebsuta",
-    "nameJa": null,
     "ra": 6.7322,
     "dec": 25.1311,
     "magnitude": 3.06,
@@ -785,7 +698,6 @@
   {
     "id": "altais",
     "name": "Altais",
-    "nameJa": null,
     "ra": 19.2092,
     "dec": 67.6614,
     "magnitude": 3.07,
@@ -794,7 +706,6 @@
   {
     "id": "haedus",
     "name": "Haedus",
-    "nameJa": null,
     "ra": 5.1086,
     "dec": 41.2344,
     "magnitude": 3.17,
@@ -803,7 +714,6 @@
   {
     "id": "aldhibah",
     "name": "Aldhibah",
-    "nameJa": null,
     "ra": 17.1464,
     "dec": 65.7147,
     "magnitude": 3.17,
@@ -812,7 +722,6 @@
   {
     "id": "albireo",
     "name": "Albireo",
-    "nameJa": "アルビレオ",
     "ra": 19.512,
     "dec": 27.9597,
     "magnitude": 3.18,
@@ -821,7 +730,6 @@
   {
     "id": "zeta_cyg",
     "name": "\\u03B6 Cyg",
-    "nameJa": "ゼータ・ケイ",
     "ra": 21.2156,
     "dec": 30.2269,
     "magnitude": 3.2,
@@ -830,7 +738,6 @@
   {
     "id": "gamma_cep",
     "name": "\\u03B3 Cep",
-    "nameJa": null,
     "ra": 23.6558,
     "dec": 77.6322,
     "magnitude": 3.21,
@@ -839,7 +746,6 @@
   {
     "id": "alfirk",
     "name": "Alfirk",
-    "nameJa": null,
     "ra": 21.4777,
     "dec": 70.5608,
     "magnitude": 3.23,
@@ -848,7 +754,6 @@
   {
     "id": "theta_aql",
     "name": "\\u03B8 Aql",
-    "nameJa": null,
     "ra": 20.1884,
     "dec": -0.8214,
     "magnitude": 3.23,
@@ -857,7 +762,6 @@
   {
     "id": "sulafat",
     "name": "Sulafat",
-    "nameJa": null,
     "ra": 18.9824,
     "dec": 32.6894,
     "magnitude": 3.24,
@@ -866,7 +770,6 @@
   {
     "id": "edasich",
     "name": "Edasich",
-    "nameJa": null,
     "ra": 15.4155,
     "dec": 58.9661,
     "magnitude": 3.29,
@@ -875,7 +778,6 @@
   {
     "id": "propus",
     "name": "Propus",
-    "nameJa": null,
     "ra": 6.248,
     "dec": 22.5067,
     "magnitude": 3.3,
@@ -884,7 +786,6 @@
   {
     "id": "megrez",
     "name": "Megrez",
-    "nameJa": "メグレズ",
     "ra": 12.2571,
     "dec": 57.0327,
     "magnitude": 3.31,
@@ -893,7 +794,6 @@
   {
     "id": "chertan",
     "name": "Chertan",
-    "nameJa": null,
     "ra": 11.2373,
     "dec": 15.4294,
     "magnitude": 3.34,
@@ -902,7 +802,6 @@
   {
     "id": "delta_aql",
     "name": "\\u03B4 Aql",
-    "nameJa": null,
     "ra": 19.425,
     "dec": 3.1147,
     "magnitude": 3.36,
@@ -911,7 +810,6 @@
   {
     "id": "segin",
     "name": "Segin",
-    "nameJa": "セギン",
     "ra": 1.9066,
     "dec": 63.6703,
     "magnitude": 3.37,
@@ -920,7 +818,6 @@
   {
     "id": "zeta_cep",
     "name": "\\u03B6 Cep",
-    "nameJa": null,
     "ra": 22.1809,
     "dec": 58.2011,
     "magnitude": 3.39,
@@ -929,7 +826,6 @@
   {
     "id": "meissa",
     "name": "Meissa",
-    "nameJa": null,
     "ra": 5.5856,
     "dec": 9.9342,
     "magnitude": 3.39,
@@ -938,7 +834,6 @@
   {
     "id": "theta_tau",
     "name": "\\u03B8² Tau",
-    "nameJa": null,
     "ra": 4.4777,
     "dec": 15.8708,
     "magnitude": 3.4,
@@ -947,7 +842,6 @@
   {
     "id": "lambda_aql",
     "name": "\\u03BB Aql",
-    "nameJa": null,
     "ra": 19.1041,
     "dec": -4.8825,
     "magnitude": 3.43,
@@ -956,7 +850,6 @@
   {
     "id": "adhafera",
     "name": "Adhafera",
-    "nameJa": null,
     "ra": 10.2782,
     "dec": 23.4172,
     "magnitude": 3.43,
@@ -965,7 +858,6 @@
   {
     "id": "mu_leo",
     "name": "Rasalas",
-    "nameJa": null,
     "ra": 9.8794,
     "dec": 26.0069,
     "magnitude": 3.88,
@@ -974,7 +866,6 @@
   {
     "id": "delta_boo",
     "name": "\\u03B4 Boo",
-    "nameJa": null,
     "ra": 15.2584,
     "dec": 33.3147,
     "magnitude": 3.46,
@@ -983,7 +874,6 @@
   {
     "id": "sheliak",
     "name": "Sheliak",
-    "nameJa": null,
     "ra": 18.8347,
     "dec": 33.3628,
     "magnitude": 3.45,
@@ -992,7 +882,6 @@
   {
     "id": "eta_leo",
     "name": "\\u03B7 Leo",
-    "nameJa": null,
     "ra": 10.1222,
     "dec": 16.7628,
     "magnitude": 3.48,
@@ -1001,7 +890,6 @@
   {
     "id": "nekkar",
     "name": "Nekkar",
-    "nameJa": null,
     "ra": 15.0324,
     "dec": 40.3906,
     "magnitude": 3.49,
@@ -1010,7 +898,6 @@
   {
     "id": "rasalgethi",
     "name": "Rasalgethi",
-    "nameJa": "ラーサルゲティ",
     "ra": 17.2441,
     "dec": 14.3903,
     "magnitude": 3.5,
@@ -1019,7 +906,6 @@
   {
     "id": "iota_cep",
     "name": "\\u03B9 Cep",
-    "nameJa": null,
     "ra": 22.828,
     "dec": 66.2006,
     "magnitude": 3.52,
@@ -1028,7 +914,6 @@
   {
     "id": "epsilon_tau",
     "name": "\\u03B5 Tau",
-    "nameJa": null,
     "ra": 4.4769,
     "dec": 19.1808,
     "magnitude": 3.53,
@@ -1037,7 +922,6 @@
   {
     "id": "wasat",
     "name": "Wasat",
-    "nameJa": null,
     "ra": 7.3354,
     "dec": 21.9822,
     "magnitude": 3.53,
@@ -1046,7 +930,6 @@
   {
     "id": "kappa_gem",
     "name": "\\u03BA Gem",
-    "nameJa": null,
     "ra": 7.7408,
     "dec": 24.3981,
     "magnitude": 3.57,
@@ -1055,7 +938,6 @@
   {
     "id": "rho_boo",
     "name": "\\u03C1 Boo",
-    "nameJa": null,
     "ra": 14.5305,
     "dec": 30.3717,
     "magnitude": 3.58,
@@ -1064,7 +946,6 @@
   {
     "id": "thuban",
     "name": "Thuban",
-    "nameJa": null,
     "ra": 14.0731,
     "dec": 64.3758,
     "magnitude": 3.65,
@@ -1073,7 +954,6 @@
   {
     "id": "gamma_tau",
     "name": "\\u03B3 Tau",
-    "nameJa": null,
     "ra": 4.3299,
     "dec": 15.6275,
     "magnitude": 3.65,
@@ -1082,7 +962,6 @@
   {
     "id": "alshain",
     "name": "Alshain",
-    "nameJa": null,
     "ra": 19.9219,
     "dec": 6.4067,
     "magnitude": 3.71,
@@ -1091,7 +970,6 @@
   {
     "id": "delta_aur",
     "name": "\\u03B4 Aur",
-    "nameJa": null,
     "ra": 5.9921,
     "dec": 54.2847,
     "magnitude": 3.72,
@@ -1100,7 +978,6 @@
   {
     "id": "saclateni",
     "name": "Saclateni",
-    "nameJa": null,
     "ra": 5.0413,
     "dec": 41.0758,
     "magnitude": 3.75,
@@ -1109,7 +986,6 @@
   {
     "id": "xi_dra",
     "name": "Grumium",
-    "nameJa": null,
     "ra": 17.8921,
     "dec": 56.8725,
     "magnitude": 3.75,
@@ -1118,7 +994,6 @@
   {
     "id": "delta_tau",
     "name": "\\u03B4 Tau",
-    "nameJa": null,
     "ra": 4.3823,
     "dec": 17.5425,
     "magnitude": 3.76,
@@ -1127,7 +1002,6 @@
   {
     "id": "iota_cyg",
     "name": "\\u03B9 Cyg",
-    "nameJa": "イオタ・ケイ",
     "ra": 19.4951,
     "dec": 51.7297,
     "magnitude": 3.79,
@@ -1136,7 +1010,6 @@
   {
     "id": "kappa_cyg",
     "name": "\\u03BA Cyg",
-    "nameJa": "カッパ・ケイ",
     "ra": 19.285,
     "dec": 53.3686,
     "magnitude": 3.77,
@@ -1145,7 +1018,6 @@
   {
     "id": "giausar",
     "name": "Giausar",
-    "nameJa": null,
     "ra": 11.5234,
     "dec": 69.3311,
     "magnitude": 3.84,
@@ -1154,7 +1026,6 @@
   {
     "id": "epsilon_cep",
     "name": "\\u03B5 Cep",
-    "nameJa": "エプシロン・カペ",
     "ra": 22.2506,
     "dec": 57.0436,
     "magnitude": 4.18,
@@ -1163,7 +1034,6 @@
   {
     "id": "epsilon_lyr",
     "name": "\\u03B5 Lyr",
-    "nameJa": null,
     "ra": 18.739,
     "dec": 39.67,
     "magnitude": 3.91,
@@ -1172,7 +1042,6 @@
   {
     "id": "zeta_lyr",
     "name": "\\u03B6 Lyr",
-    "nameJa": null,
     "ra": 18.7462,
     "dec": 37.6053,
     "magnitude": 4.36,
@@ -1181,7 +1050,6 @@
   {
     "id": "delta2_lyr",
     "name": "\\u03B4² Lyr",
-    "nameJa": null,
     "ra": 18.9084,
     "dec": 36.8986,
     "magnitude": 4.3,
@@ -1190,7 +1058,6 @@
   {
     "id": "yildun",
     "name": "Yildun",
-    "nameJa": null,
     "ra": 17.5369,
     "dec": 86.5864,
     "magnitude": 4.36,
@@ -1199,7 +1066,6 @@
   {
     "id": "epsilon_umi",
     "name": "\\u03B5 UMi",
-    "nameJa": null,
     "ra": 16.7662,
     "dec": 82.0372,
     "magnitude": 4.21,
@@ -1208,7 +1074,6 @@
   {
     "id": "zeta_umi",
     "name": "\\u03B6 UMi",
-    "nameJa": null,
     "ra": 15.7343,
     "dec": 77.7944,
     "magnitude": 4.32,
@@ -1217,7 +1082,6 @@
   {
     "id": "eta_umi",
     "name": "\\u03B7 UMi",
-    "nameJa": null,
     "ra": 16.2918,
     "dec": 75.7553,
     "magnitude": 4.95,
@@ -1226,7 +1090,6 @@
   {
     "id": "canopus",
     "name": "Canopus",
-    "nameJa": "カノープス",
     "ra": 6.3992,
     "dec": -52.6957,
     "magnitude": -0.74,
@@ -1235,7 +1098,6 @@
   {
     "id": "achernar",
     "name": "Achernar",
-    "nameJa": "アーケナル",
     "ra": 1.6286,
     "dec": -57.2368,
     "magnitude": 0.46,
@@ -1244,7 +1106,6 @@
   {
     "id": "hadar",
     "name": "Hadar",
-    "nameJa": "アダル",
     "ra": 14.0637,
     "dec": -60.373,
     "magnitude": 0.61,
@@ -1253,7 +1114,6 @@
   {
     "id": "acrux",
     "name": "Acrux",
-    "nameJa": "アクルックス",
     "ra": 12.4433,
     "dec": -63.0991,
     "magnitude": 0.76,
@@ -1262,7 +1122,6 @@
   {
     "id": "mimosa",
     "name": "Mimosa",
-    "nameJa": "ミモザ",
     "ra": 12.7953,
     "dec": -59.6888,
     "magnitude": 1.25,
@@ -1271,7 +1130,6 @@
   {
     "id": "gacrux",
     "name": "Gacrux",
-    "nameJa": "ガクルックス",
     "ra": 12.5194,
     "dec": -57.1132,
     "magnitude": 1.63,
@@ -1280,7 +1138,6 @@
   {
     "id": "atria",
     "name": "Atria",
-    "nameJa": "アトリア",
     "ra": 16.8111,
     "dec": -69.0277,
     "magnitude": 1.91,
@@ -1289,7 +1146,6 @@
   {
     "id": "peacock",
     "name": "Peacock",
-    "nameJa": "ピーコック",
     "ra": 20.4275,
     "dec": -56.7351,
     "magnitude": 1.94,
@@ -1298,7 +1154,6 @@
   {
     "id": "alnair",
     "name": "Alnair",
-    "nameJa": "アルナイール",
     "ra": 22.1372,
     "dec": -46.9609,
     "magnitude": 1.73,
@@ -1307,7 +1162,6 @@
   {
     "id": "avior",
     "name": "Avior",
-    "nameJa": "アヴィオル",
     "ra": 8.3752,
     "dec": -59.5095,
     "magnitude": 1.86,
@@ -1316,7 +1170,6 @@
   {
     "id": "kaus_australis",
     "name": "Kaus Australis",
-    "nameJa": "カウス・ウストゥラлис",
     "ra": 18.4029,
     "dec": -34.3846,
     "magnitude": 1.79,
@@ -1325,7 +1178,6 @@
   {
     "id": "nunki",
     "name": "Nunki",
-    "nameJa": "ナウキ",
     "ra": 18.9211,
     "dec": -26.2967,
     "magnitude": 2.02,
@@ -1334,7 +1186,6 @@
   {
     "id": "alphecca",
     "name": "Alphecca",
-    "nameJa": "アルフェッカ",
     "ra": 15.5781,
     "dec": 26.7147,
     "magnitude": 2.22,
@@ -1343,7 +1194,6 @@
   {
     "id": "sabik",
     "name": "Sabik",
-    "nameJa": "サビク",
     "ra": 17.1729,
     "dec": -15.7249,
     "magnitude": 2.43,
@@ -1352,7 +1202,6 @@
   {
     "id": "cebalrai",
     "name": "Cebalrai",
-    "nameJa": "セバライ",
     "ra": 17.7245,
     "dec": 4.5673,
     "magnitude": 2.76,
@@ -1361,7 +1210,6 @@
   {
     "id": "vindemiatrix",
     "name": "Vindemiatrix",
-    "nameJa": "ヴィンデミアトリス",
     "ra": 13.0363,
     "dec": 10.9592,
     "magnitude": 2.83,
@@ -1370,7 +1218,6 @@
   {
     "id": "almachib",
     "name": "Almachib",
-    "nameJa": "アルマキブ",
     "ra": 0.6555,
     "dec": 30.861,
     "magnitude": 2.53,
@@ -1379,7 +1226,6 @@
   {
     "id": "sadalsuud",
     "name": "Sadalsuud",
-    "nameJa": null,
     "ra": 21.5259,
     "dec": -5.5712,
     "magnitude": 2.87,
@@ -1388,7 +1234,6 @@
   {
     "id": "sadalmelik",
     "name": "Sadalmelik",
-    "nameJa": null,
     "ra": 22.0964,
     "dec": -0.3198,
     "magnitude": 2.95,
@@ -1397,7 +1242,6 @@
   {
     "id": "mirach_prime",
     "name": "Almaak B",
-    "nameJa": "ミラク・プライム",
     "ra": 2.0649,
     "dec": 42.3299,
     "magnitude": 3.86,
@@ -1406,7 +1250,6 @@
   {
     "id": "delta_per",
     "name": "Delt Per",
-    "nameJa": "δ Persei",
     "ra": 3.1964,
     "dec": 44.42,
     "magnitude": 3.02,
@@ -1415,7 +1258,6 @@
   {
     "id": "gamma_per",
     "name": "Gamma Per",
-    "nameJa": "γ Persei",
     "ra": 2.9892,
     "dec": 33.4,
     "magnitude": 2.99,
@@ -1424,7 +1266,6 @@
   {
     "id": "epsilon_per",
     "name": "Eps Per",
-    "nameJa": "ε Persei",
     "ra": 3.0558,
     "dec": 38.02,
     "magnitude": 3,
@@ -1433,7 +1274,6 @@
   {
     "id": "zeta_per",
     "name": "Zeta Per",
-    "nameJa": "ζ Persei",
     "ra": 3.065,
     "dec": 42.42,
     "magnitude": 3,
@@ -1442,7 +1282,6 @@
   {
     "id": "kappa_per",
     "name": "Kappa Per",
-    "nameJa": "κ Persei",
     "ra": 3.2236,
     "dec": 56.46,
     "magnitude": 3.26,
@@ -1451,7 +1290,6 @@
   {
     "id": "gomeisa",
     "name": "Gomeisa",
-    "nameJa": "ボテイン",
     "ra": 7.4801,
     "dec": 8.2982,
     "magnitude": 2.86,
@@ -1460,7 +1298,6 @@
   {
     "id": "theta_crb",
     "name": "Nudam",
-    "nameJa": "ヌダム",
     "ra": 23.8956,
     "dec": 26.0664,
     "magnitude": 2.49,
@@ -1469,7 +1306,6 @@
   {
     "id": "zeta_hya",
     "name": "Botein",
-    "nameJa": "ボテイン",
     "ra": 9.7251,
     "dec": -29.8,
     "magnitude": 2.79,
@@ -1478,7 +1314,6 @@
   {
     "id": "gamma_psc",
     "name": "γ Psc",
-    "nameJa": "γ Piscium",
     "ra": 1.3406,
     "dec": 28.4399,
     "magnitude": 2.9,
@@ -1487,7 +1322,6 @@
   {
     "id": "batenk",
     "name": "Baten Kaitos",
-    "nameJa": "バテンケイトス",
     "ra": 2.2981,
     "dec": -17.5311,
     "magnitude": 2.04,
@@ -1496,7 +1330,6 @@
   {
     "id": "delta_gru",
     "name": "δ Gru",
-    "nameJa": "δ Grus",
     "ra": 21.365,
     "dec": -35.4747,
     "magnitude": 2.6,
@@ -1505,7 +1338,6 @@
   {
     "id": "lambda_psa",
     "name": "Fawaris",
-    "nameJa": "ファワリス",
     "ra": 18.2849,
     "dec": -17.2287,
     "magnitude": 2.98,
@@ -1514,7 +1346,6 @@
   {
     "id": "arkab",
     "name": "Arkab",
-    "nameJa": "アルカブ",
     "ra": 19.0542,
     "dec": -24.9407,
     "magnitude": 2.54,
@@ -1523,7 +1354,6 @@
   {
     "id": "delta_cnc",
     "name": "Tasio",
-    "nameJa": "タシオ",
     "ra": 8.7242,
     "dec": 23.9285,
     "magnitude": 3.94,

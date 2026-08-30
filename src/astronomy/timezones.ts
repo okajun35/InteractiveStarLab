@@ -2,9 +2,9 @@ import type { PlacePreset } from "./directions";
 
 export type TimeBasis = "same-local-time" | "same-utc-instant";
 
-export const TIME_BASIS_LABELS: Record<TimeBasis, { en: string; ja: string }> = {
-  "same-local-time": { en: "Same Local Time", ja: "同じ現地時刻" },
-  "same-utc-instant": { en: "Same UTC", ja: "同じ瞬間" },
+export const TIME_BASIS_LABELS: Record<TimeBasis, string> = {
+  "same-local-time": "Same Local Time",
+  "same-utc-instant": "Same UTC",
 };
 
 function wallClockParts(date: Date, timeZone: string): Record<string, number> {

@@ -3,11 +3,22 @@
    Run: node scripts/verify-layout.cjs
    Spawns `vite` dev server, drives headless Chromium, measures real DOM rects. */
 const { spawn } = require("node:child_process");
+const { existsSync } = require("node:fs");
 const path = require("node:path");
-const pw = require(path.join(
-  process.env.HOME,
-  ".nvm/versions/node/v22.19.0/lib/node_modules/@playwright/cli/node_modules/playwright",
-));
+let pw = null;
+try {
+  pw = require("playwright");
+} catch {
+  try {
+    pw = require(path.join(
+      process.env.HOME ?? "",
+      ".nvm/versions/node/v22.19.0/lib/node_modules/@playwright/cli/node_modules/playwright",
+    ));
+  } catch {
+    console.log("SKIP  layout verification: Playwright is not installed");
+    process.exit(0);
+  }
+}
 
 const ROOT = path.join(__dirname, "..");
 const PORT = 5199;
@@ -56,12 +67,18 @@ async function main() {
     detached: true,
   });
 
-  const browser = await pw.chromium.launch({
-    headless: true,
-    executablePath: path.join(
-      process.env.HOME,
+  const executablePath = [
+    process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,
+    "/snap/bin/chromium",
+    "/usr/bin/chromium-browser",
+    path.join(
+      process.env.HOME ?? "",
       ".cache/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell",
     ),
+  ].find((candidate) => candidate && existsSync(candidate));
+  const browser = await pw.chromium.launch({
+    headless: true,
+    ...(executablePath ? { executablePath } : {}),
     args: ["--no-sandbox", "--disable-gpu", "--force-device-scale-factor=1"],
   });
   const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
@@ -85,7 +102,7 @@ async function main() {
       `width=${normal && normal.width}`);
 
     // ---- G2: compare mode — split area still fills width ----
-    await page.click('.seg-group[aria-label="比較の種類"] button:first-child');
+    await page.click('.seg-group[aria-label="Comparison type"] button:first-child');
     await page.waitForSelector(".compare-split canvas", { timeout: 10000 });
     const comp = await measure(page, ".app-canvas");
     check("G2: compare canvas area present", comp !== null);
@@ -100,10 +117,10 @@ async function main() {
       JSON.stringify(halves));
 
     // ---- C6: location compare time-basis toggle (§27 Advanced) ----
-    await page.click('.seg-group[aria-label="比較の種類"] button:nth-child(3)'); // Tokyo vs Sydney
+    await page.click('.seg-group[aria-label="Comparison type"] button:nth-child(3)'); // Tokyo vs Sydney
     await page.waitForSelector(".compare-split canvas", { timeout: 10000 });
     const basisGroup = await page.evaluate(() => {
-      const g = document.querySelector('.seg-group[aria-label="時刻の揃え方"]');
+      const g = document.querySelector('.seg-group[aria-label="Time basis"]');
       if (!g) return null;
       return {
         count: g.querySelectorAll("button").length,
@@ -119,7 +136,7 @@ async function main() {
     // HUD local times must be EQUAL under same-local-time (both wall clocks match).
     const localTimes = () => page.evaluate(() =>
       Array.from(document.querySelectorAll(".canvas-hud-time"))
-        .map((e) => (e.textContent || "").trim().replace(/^現地\s*/, "")));
+        .map((e) => (e.textContent || "").trim().replace(/^Local\s*/, "")));
     const t1 = await localTimes();
     check("C6: both sides show identical local time (same-local-time)",
       t1.length === 2 && /\d{2}:\d{2}$/.test(t1[0]) && t1[0] === t1[1],
@@ -127,7 +144,7 @@ async function main() {
 
     // Switch to Same UTC → the two wall clocks must DIFFER by exactly the
     // UTC offset gap (Tokyo +9 vs Sydney +10 in August = 1h).
-    await page.click('.seg-group[aria-label="時刻の揃え方"] button:nth-child(2)');
+    await page.click('.seg-group[aria-label="Time basis"] button:nth-child(2)');
     await new Promise((r) => setTimeout(r, 300));
     const t2 = await localTimes();
     const hm = (s) => {
@@ -140,15 +157,15 @@ async function main() {
     check("C6: offset gap is 1h (Tokyo +9 vs Sydney +10 in August)",
       diffMin === 60, `Δ=${diffMin}min ${JSON.stringify(t2)}`);
 
-    // ---- T6: twilight stage HUD + gradual visibility (§41 将来) ----
+    // ---- T6: twilight stage HUD + gradual visibility (§41 future) ----
     // (T6 runs in normal view: first close the compare mode from C6.)
-    const locationBtn = await page.$('.seg-group[aria-label="比較の種類"] button:nth-child(3)');
+    const locationBtn = await page.$('.seg-group[aria-label="Comparison type"] button:nth-child(3)');
     if (locationBtn && (await locationBtn.evaluate((b) => b.className)).includes("active")) {
       await locationBtn.click();
       await page.waitForSelector(".app-canvas canvas", { timeout: 10000 });
     }
     // Reset daylight to REAL so the stage HUD is meaningful.
-    await page.click('.seg-group[aria-label="昼間モード"] button:nth-child(1)');
+    await page.click('.seg-group[aria-label="Daylight mode"] button:nth-child(1)');
     // Set the app date/time via the React-bound datetime-local input
     // (container-TZ independent: compute the local value for the UTC instant).
     async function setDateUTC(utcDate) {
@@ -170,7 +187,7 @@ async function main() {
       page.evaluate(
         () => document.querySelector(".canvas-hud-stage")?.textContent?.trim() ?? null,
       );
-    // visible + in-view counts from the HUD (e.g. "見える 4 / 視野内 21").
+    // visible + in-view counts from the HUD (e.g. "Visible 4 / In view 21").
     const hudCounts = () =>
       page.evaluate(() => {
         const m = /\u898b\u3048\u308b (\d+) \/ \u8996\u91ce\u5185 (\d+)/.exec(
@@ -183,7 +200,7 @@ async function main() {
     //   JST 18:30 → -3.5° (civil), 18:55 → -7.9° (nautical),
     //   19:25 → -13.6° (astronomical), 22:00 → -38° (night).
     await setDateUTC("2026-08-27T09:30:00.000Z"); // JST 18:30 → civil
-    check("T6: civil twilight stage shown", (await stage()) === "民用薄暮 Civil Twilight",
+    check("T6: civil twilight stage shown", (await stage()) === "Civil Twilight",
       JSON.stringify(await stage()));
     // Gradual model (cap civil 2.0 < nautical 4.0 < astro 5.5 < night none):
     // the bright-sky stages must suppress MORE of the in-view stars than the
@@ -195,7 +212,7 @@ async function main() {
       JSON.stringify(civCounts));
 
     await setDateUTC("2026-08-27T09:55:00.000Z"); // JST 18:55 → nautical
-    check("T6: nautical stage shown", (await stage()) === "航海薄暮 Nautical Twilight",
+    check("T6: nautical stage shown", (await stage()) === "Nautical Twilight",
       JSON.stringify(await stage()));
     const nauCounts = await hudCounts();
     check("T6: nautical cap (4.0) hides fewer than civil (2.0)",
@@ -204,7 +221,7 @@ async function main() {
       JSON.stringify({ civCounts, nauCounts }));
 
     await setDateUTC("2026-08-27T10:25:00.000Z"); // JST 19:25 → astronomical
-    check("T6: astronomical stage shown", (await stage()) === "天文薄暮 Astronomical Twilight",
+    check("T6: astronomical stage shown", (await stage()) === "Astronomical Twilight",
       JSON.stringify(await stage()));
     const astroCounts = await hudCounts();
     check("T6: astronomical cap (5.5) hides fewer than nautical (4.0)",
@@ -213,12 +230,12 @@ async function main() {
       JSON.stringify({ nauCounts, astroCounts }));
 
     await setDateUTC("2026-08-27T13:00:00.000Z"); // JST 22:00 → night
-    check("T6: night stage shown", (await stage()) === "夜 Night",
+    check("T6: night stage shown", (await stage()) === "Night",
       JSON.stringify(await stage()));
 
     // ---- O5: Observer Sensitivity control present, default = typical (§20) ----
     const sens = await page.evaluate(() => {
-      const group = document.querySelector('.seg-group[aria-label="観察者の感受性"]');
+      const group = document.querySelector('.seg-group[aria-label="Observer sensitivity"]');
       if (!group) return null;
       const btns = Array.from(group.querySelectorAll("button"));
       const active = btns.filter((b) => b.className.includes("active"));
@@ -227,13 +244,13 @@ async function main() {
     check("O5: observer sensitivity group present (3 presets)",
       sens !== null && sens.count === 3,
       JSON.stringify(sens));
-    check("O5: default is typical (標準 / 0.0 active)",
+    check("O5: default is typical (0.0 active)",
       sens !== null && sens.activeLabels.length === 1 && sens.activeLabels[0].includes("0.0"),
       JSON.stringify(sens ? sens.activeLabels : []));
     // clicking Sharp updates the UI without crashing
-    await page.click('.seg-group[aria-label="観察者の感受性"] button:last-child');
+    await page.click('.seg-group[aria-label="Observer sensitivity"] button:last-child');
     const sharpActive = await page.evaluate(() => {
-      const group = document.querySelector('.seg-group[aria-label="観察者の感受性"]');
+      const group = document.querySelector('.seg-group[aria-label="Observer sensitivity"]');
       const active = Array.from(group.querySelectorAll("button.active"));
       return active.map((b) => b.textContent);
     });

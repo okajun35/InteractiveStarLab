@@ -129,7 +129,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudSnapshotReferences(rows.flatMap((row) => isCloudMissionSnapshotReference(row.skySnapshot) ? [row.skySnapshot] : []));
       setCloudError(null);
     } catch (error) {
-      setCloudError(error instanceof Error ? error.message : "クラウド履歴を読み込めませんでした。");
+      setCloudError(error instanceof Error ? error.message : "Could not load cloud history.");
     } finally {
       setCloudLoading(false);
     }
@@ -174,7 +174,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudError(null);
       return mission;
     } catch (error) {
-      setCloudError(error instanceof Error ? error.message : "Missionをクラウドへ保存できませんでした。");
+      setCloudError(error instanceof Error ? error.message : "Could not save the Mission to the cloud.");
       throw error;
     }
   }, [cloudRepository, createMission]);
@@ -208,7 +208,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       await refreshCloudMissions();
       return restored.mission;
     } catch (error) {
-      setCloudError(error instanceof Error ? error.message : "Missionを復元できませんでした。");
+      setCloudError(error instanceof Error ? error.message : "Could not restore the Mission.");
       throw error;
     }
   }, [cloudClient, cloudRepository, refreshCloudMissions]);
@@ -296,7 +296,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudError(null);
       return record;
     } catch (error) {
-      setCloudError(error instanceof Error ? error.message : "観測結果をクラウドへ保存できませんでした。");
+      setCloudError(error instanceof Error ? error.message : "Could not save the observation results to the cloud.");
       throw error;
     }
   }, [cloudRepository, saveObservationRecord]);
@@ -313,7 +313,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudError(null);
       return record;
     } catch (error) {
-      setCloudError(error instanceof Error ? error.message : "観測結果をクラウドへ保存できませんでした。");
+      setCloudError(error instanceof Error ? error.message : "Could not save the observation results to the cloud.");
       throw error;
     }
   }, [cloudRepository, saveResultsForMission]);

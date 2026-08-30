@@ -19,7 +19,6 @@ export interface PredictVisibleStarsInput {
 export interface PredictedStarToolResult {
   starId: string;
   name: string;
-  nameJa?: string;
   magnitude: number;
   altitude: number;
   azimuth: number;
@@ -43,7 +42,6 @@ export interface CreateObservationPlanInput {
 export interface ObservationResultToolItem {
   starId: string;
   name: string;
-  nameJa?: string;
   prediction: "visible" | "not_visible";
   observation: ObservationStatus;
   predictedAltitude: number;
@@ -62,7 +60,6 @@ export interface ObservationRecordToolResult {
 export interface ComparisonStarToolResult {
   starId: string;
   name: string;
-  nameJa?: string;
   prediction: "visible" | "not_visible";
   observation: ObservationStatus;
   match: boolean | null;
@@ -94,7 +91,6 @@ export interface CurrentSkyStateInput {
 export interface CurrentSkyStarToolResult {
   starId: string;
   name: string;
-  nameJa?: string;
   magnitude: number;
   altitude: number;
   azimuth: number;

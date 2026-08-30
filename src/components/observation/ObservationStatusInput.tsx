@@ -6,10 +6,10 @@ interface ObservationStatusInputProps {
   onChange: (status: ObservationStatus) => void;
 }
 
-const OPTIONS: Array<{ status: ObservationStatus; en: string; ja: string }> = [
-  { status: "visible", en: "Visible", ja: "見えた" },
-  { status: "not_visible", en: "Not Visible", ja: "見えなかった" },
-  { status: "unsure", en: "Unsure", ja: "わからない" },
+const OPTIONS: Array<{ status: ObservationStatus; label: string }> = [
+  { status: "visible", label: "Visible" },
+  { status: "not_visible", label: "Not Visible" },
+  { status: "unsure", label: "Unsure" },
 ];
 
 export function ObservationStatusInput({
@@ -18,7 +18,7 @@ export function ObservationStatusInput({
   onChange,
 }: ObservationStatusInputProps) {
   return (
-    <div className="observation-status" role="group" aria-label={`${starId}の観測結果`}>
+    <div className="observation-status" role="group" aria-label={`${starId} observation result`}>
       {OPTIONS.map((option) => (
         <button
           key={option.status}
@@ -27,8 +27,7 @@ export function ObservationStatusInput({
           aria-pressed={status === option.status}
           onClick={() => onChange(option.status)}
         >
-          <span className="en">{option.en}</span>
-          {option.ja}
+          {option.label}
         </button>
       ))}
     </div>
