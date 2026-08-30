@@ -15,7 +15,6 @@ import { ObservationPlanScreen } from "./components/observation/ObservationPlanS
 import { ObservationRunScreen } from "./components/observation/ObservationRunScreen";
 import { ObservationResultsScreen } from "./components/observation/ObservationResultsScreen";
 import { ObservationHistoryScreen } from "./components/observation/ObservationHistoryScreen";
-import { WebMcpStatus } from "./components/WebMcpStatus";
 import { PLACE_PRESETS } from "./astronomy/directions";
 import { localTimeOf } from "./astronomy/timezones";
 import type { SceneOverride } from "./state/scene";
@@ -208,7 +207,6 @@ function AppShell() {
               <span className="en">Explore the sky</span> — 空の条件を変えて観察する
             </span>
           </h1>
-          <WebMcpStatus />
           <nav className="app-nav" aria-label="アプリケーション">
             <div className="app-nav-primary">
               {PRIMARY_NAV_ITEMS.map((item) => (
