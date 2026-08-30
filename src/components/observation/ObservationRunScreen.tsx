@@ -143,7 +143,6 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
           <button type="button" className="primary observe-save-btn" disabled={!isComplete || saving || cloudIdentityLoading} onClick={handleSave}>
             {saving ? "保存中…" : "観測結果を保存"}
           </button>
-          {cloudAuthenticated && <p className="cloud-save-note">Cloud保存モード：結果はSupabaseへ保存されます。</p>}
           {cloudIdentityLoading && <p className="workflow-note">Cloud接続を準備中です。接続準備が完了すると保存できます。</p>}
           {!cloudAuthenticated && !cloudIdentityLoading && <p className="workflow-note">Cloud未接続時は、この端末のローカルへ保存されます。</p>}
           {cloudError && <p className="cloud-error" role="alert">{cloudError}</p>}

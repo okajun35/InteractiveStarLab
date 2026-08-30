@@ -843,12 +843,6 @@ button[aria-label="閉じる"] {
   font-size: 0.75rem;
 }
 
-.cloud-save-note {
-  margin: 8px 0 0;
-  color: var(--ok);
-  font-size: 0.75rem;
-}
-
 .snapshot-cloud-badge {
   display: inline-block;
   margin-top: 8px;

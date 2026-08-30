@@ -19,6 +19,7 @@ check("RECOVERY-UI-1: MCP diagnostics are not shown in the user header", !app.in
 check("RECOVERY-UI-1: auth state has no password login API", !auth.includes("signInWithPassword") && !auth.includes("signOut") && !auth.includes("email:"));
 check("RECOVERY-UI-2: planner does not disable Mission creation for anonymous bootstrap", !plan.includes("cloudConfigured && !cloudAuthenticated") && !plan.includes("Cloudログイン"));
 check("RECOVERY-UI-2: observation does not disable result save for anonymous bootstrap", !run.includes("cloudConfigured && !cloudAuthenticated") && !run.includes("Cloudログイン"));
+check("RECOVERY-UI-2: cloud persistence mode is not shown to end users", !plan.includes("Cloud保存モード") && !run.includes("Cloud保存モード"));
 check("RECOVERY-UI-3: creation panel displays and copies the one-time code", recoveryPanel.includes("recoveryCode") && recoveryPanel.includes("navigator.clipboard.writeText") && recoveryPanel.includes("clearRecoveryCode"));
 check("RECOVERY-UI-3: creation panel can be dismissed", recoveryPanel.includes("dismiss") && recoveryPanel.includes("再表示できません"));
 check("RECOVERY-UI-4: history provides a recovery form", history.includes("RecoveryMissionForm") && recoveryPanel.includes("復元コードからMissionを復元"));

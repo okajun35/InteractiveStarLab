@@ -167,7 +167,6 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
                 {saving ? "保存中…" : "Missionを作成"}
               </button>
             </section>
-            {cloudAuthenticated && <p className="cloud-save-note">Cloud保存モード：MissionはSupabaseへ保存されます。</p>}
             {cloudConfigured && cloudIdentityLoading && <p className="workflow-note">Cloud接続を準備中です。接続準備が完了するとMissionを作成できます。</p>}
             {cloudConfigured && !cloudIdentityLoading && !cloudAuthenticated && <p className="workflow-note">Cloudへ接続できないため、この端末ではローカル保存を続けます。</p>}
             {cloudIdentityError && <p className="cloud-error" role="alert">{cloudIdentityError} ローカル保存は利用できます。</p>}
