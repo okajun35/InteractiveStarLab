@@ -4,10 +4,10 @@
  */
 export const RECOVERY_CODE_PREFIX = "ISL";
 export const RECOVERY_CODE_ENTROPY_BYTES = 16;
-export const RECOVERY_CODE_LENGTH = 26;
+export const RECOVERY_CODE_LENGTH = 32;
 
-const RECOVERY_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const RECOVERY_ALPHABET_PATTERN = /^[A-HJ-NP-Z2-9]+$/;
+const RECOVERY_ALPHABET = "0123456789ABCDEF";
+const RECOVERY_ALPHABET_PATTERN = /^[0-9A-F]+$/;
 
 export type RandomBytes = (length: number) => Uint8Array;
 
@@ -18,20 +18,10 @@ function defaultRandomBytes(length: number): Uint8Array {
   return globalThis.crypto.getRandomValues(new Uint8Array(length));
 }
 
-function encodeBase32(bytes: Uint8Array): string {
-  let buffer = 0;
-  let bits = 0;
-  let output = "";
-  for (const byte of bytes) {
-    buffer = (buffer << 8) | byte;
-    bits += 8;
-    while (bits >= 5) {
-      bits -= 5;
-      output += RECOVERY_ALPHABET[(buffer >>> bits) & 31];
-    }
-  }
-  if (bits > 0) output += RECOVERY_ALPHABET[(buffer << (5 - bits)) & 31];
-  return output;
+function encodeHex(bytes: Uint8Array): string {
+  return [...bytes]
+    .map((byte) => `${RECOVERY_ALPHABET[byte >>> 4]}${RECOVERY_ALPHABET[byte & 15]}`)
+    .join("");
 }
 
 /** Returns the unformatted recovery-code body, or null for invalid input. */
@@ -59,7 +49,7 @@ export function generateRecoveryCode(randomBytes: RandomBytes = defaultRandomByt
   if (bytes.length !== RECOVERY_CODE_ENTROPY_BYTES) {
     throw new Error("Random source returned an invalid byte length");
   }
-  return formatRecoveryCode(encodeBase32(bytes));
+  return formatRecoveryCode(encodeHex(bytes));
 }
 
 function bytesToHex(bytes: Uint8Array): string {
