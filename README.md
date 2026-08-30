@@ -89,3 +89,7 @@ scripts/             Verification and catalog generation scripts
 data-source/         Checked-in source catalogs
 supabase/migrations/ Database schema and RLS migrations
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
