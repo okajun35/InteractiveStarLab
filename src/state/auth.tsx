@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../cloud/client";
+import { createAnonymousSessionBootstrap, type AnonymousAuthApi } from "../cloud/anonymousIdentity";
 
 export interface AuthState {
   cloudConfigured: boolean;
@@ -23,20 +24,31 @@ function friendlyAuthError(error: unknown): string {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const client = useMemo<SupabaseClient | null>(() => getSupabaseClient(), []);
+  const anonymousAuth = useMemo<AnonymousAuthApi | null>(() => {
+    if (client === null) return null;
+    return {
+      getSession: () => client.auth.getSession(),
+      signInAnonymously: () => client.auth.signInAnonymously(),
+    };
+  }, [client]);
+  const bootstrapAnonymousSession = useMemo(
+    () => anonymousAuth === null ? null : createAnonymousSessionBootstrap(anonymousAuth),
+    [anonymousAuth],
+  );
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (client === null) {
+    if (client === null || bootstrapAnonymousSession === null) {
       setLoading(false);
       return;
     }
     let disposed = false;
-    void client.auth.getSession().then(({ data, error: sessionError }) => {
+    setLoading(true);
+    void bootstrapAnonymousSession().then((nextSession) => {
       if (disposed) return;
-      if (sessionError) setError(friendlyAuthError(sessionError));
-      setSession(data.session);
+      setSession(nextSession);
       setLoading(false);
     }).catch((sessionError: unknown) => {
       if (disposed) return;
@@ -54,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       disposed = true;
       data.subscription.unsubscribe();
     };
-  }, [client]);
+  }, [bootstrapAnonymousSession, client]);
 
   const signIn = useCallback(async (email: string, password: string): Promise<boolean> => {
     if (client === null) {

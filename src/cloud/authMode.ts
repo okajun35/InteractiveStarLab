@@ -1,10 +1,10 @@
-export type CloudPersistenceMode = "local" | "sign-in-required" | "cloud";
+export type CloudPersistenceMode = "local" | "cloud";
 
-/** Selects the persistence mode without making authentication a startup dependency. */
+/** Selects local fallback until the anonymous Cloud Identity is ready. */
 export function resolveCloudPersistenceMode(
   configured: boolean,
   userId: string | null,
 ): CloudPersistenceMode {
   if (!configured) return "local";
-  return userId === null || userId.trim() === "" ? "sign-in-required" : "cloud";
+  return userId === null || userId.trim() === "" ? "local" : "cloud";
 }
