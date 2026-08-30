@@ -6,6 +6,7 @@ import {
   isCloudMissionRowData,
   missionInsertPayload,
 } from "./missionValidation";
+import { normalizeRecoveryCode } from "./recoveryCode";
 
 export interface CloudMissionRow {
   mission: ObservationMission;
@@ -18,11 +19,16 @@ export interface CloudMissionRow {
 }
 
 export interface CloudMissionRepository {
-  createMission(mission: ObservationMission): Promise<CloudMissionRow>;
+  createMission(mission: ObservationMission): Promise<CreatedCloudMission>;
+  restoreMission(recoveryCode: string): Promise<CloudMissionRow>;
   listMissions(): Promise<CloudMissionRow[]>;
   getMission(missionId: string): Promise<CloudMissionRow | null>;
   saveRecord(missionId: string, record: ObservationRecord): Promise<CloudMissionRow>;
   attachSnapshot(missionId: string, snapshot: unknown): Promise<CloudMissionRow>;
+}
+
+export interface CreatedCloudMission extends CloudMissionRow {
+  recoveryCode: string;
 }
 
 type QueryResult = { data: unknown; error: { message?: string; code?: string } | null };
@@ -38,9 +44,25 @@ function message(error: { message?: string } | null): string {
   return error?.message?.trim() || "Supabase request failed";
 }
 
+function object(value: unknown): Record<string, unknown> | null {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function createdMissionOrThrow(data: unknown): CreatedCloudMission {
+  const candidate = object(data);
+  const recoveryCode = candidate?.recovery_code;
+  if (typeof recoveryCode !== "string" || normalizeRecoveryCode(recoveryCode) === null) {
+    throw cloudError("CLOUD_MISSION_SAVE_FAILED", "Supabase did not return a valid Mission recovery code");
+  }
+  const row = rowOrThrow(data, "CLOUD_MISSION_SAVE_FAILED");
+  return { ...row, recoveryCode };
+}
+
 function requiredUserId(getUserId: () => string | null): string {
   const userId = getUserId();
-  if (!userId) throw cloudError("AUTH_REQUIRED", "Sign in before using cloud observation storage");
+  if (!userId) throw cloudError("AUTH_REQUIRED", "Cloud identity is unavailable for cloud observation storage");
   return userId;
 }
 
@@ -52,14 +74,37 @@ export function createSupabaseMissionRepository(
   return {
     async createMission(mission) {
       const userId = requiredUserId(getUserId);
+      const payload = missionInsertPayload(mission, userId);
       let result: QueryResult;
       try {
-        result = await client.from("observation_missions").insert(missionInsertPayload(mission, userId)).select(columns).single();
+        result = await client.rpc("create_observation_mission_with_recovery", {
+          p_id: payload.id,
+          p_planned_at: payload.planned_at,
+          p_mission: payload.mission,
+        });
       } catch (error) {
         throw cloudError("CLOUD_MISSION_SAVE_FAILED", "Mission could not be saved to Supabase", error);
       }
       if (result.error) throw cloudError("CLOUD_MISSION_SAVE_FAILED", message(result.error), result.error);
-      return rowOrThrow(result.data, "CLOUD_MISSION_SAVE_FAILED");
+      return createdMissionOrThrow(result.data);
+    },
+    async restoreMission(recoveryCode) {
+      requiredUserId(getUserId);
+      if (normalizeRecoveryCode(recoveryCode) === null) {
+        throw cloudError("RESTORE_CODE_INVALID", "Recovery code is invalid");
+      }
+      let result: QueryResult;
+      try {
+        result = await client.rpc("restore_observation_mission", { p_recovery_code: recoveryCode });
+      } catch (error) {
+        throw cloudError("RESTORE_CODE_INVALID", "Recovery code is invalid", error);
+      }
+      if (result.error || typeof result.data !== "string" || result.data.trim() === "") {
+        throw cloudError("RESTORE_CODE_INVALID", "Recovery code is invalid", result.error);
+      }
+      const restored = await this.getMission(result.data);
+      if (restored === null) throw cloudError("RESTORE_CODE_INVALID", "Recovery code is invalid");
+      return restored;
     },
     async listMissions() {
       requiredUserId(getUserId);

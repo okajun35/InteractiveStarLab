@@ -1,6 +1,6 @@
 -- Anonymous Mission recovery access for the POC.
 -- The browser still receives an authenticated Supabase session, but no
--- email/password login is required. The recovery code is returned once and
+-- no email/password login is required. The recovery code is returned once and
 -- only its SHA-256 digest is stored.
 
 create schema if not exists private;

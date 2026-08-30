@@ -44,8 +44,34 @@ class FakeQuery {
 }
 
 class FakeSupabase {
+  public readonly rpcCalls: string[] = [];
+  public readonly recoveryCode = "ISL-ABCD-1234-EF56-7890-ABCD-1234-EF56-7890";
   constructor(public readonly rows: Row[] = []) {}
   from(_table: string) { return new FakeQuery(this.rows); }
+  async rpc(name: string, args: Row) {
+    this.rpcCalls.push(name);
+    if (name === "create_observation_mission_with_recovery") {
+      const row = {
+        id: args.p_id,
+        user_id: "user-1",
+        planned_at: args.p_planned_at,
+        mission: args.p_mission,
+        record: null,
+        sky_snapshot: null,
+        guide: null,
+        created_at: "2026-08-29T11:01:00.000Z",
+        updated_at: "2026-08-29T11:01:00.000Z",
+      };
+      this.rows.push(row);
+      return { data: { ...row, recovery_code: this.recoveryCode }, error: null };
+    }
+    if (name === "restore_observation_mission") {
+      return args.p_recovery_code === this.recoveryCode
+        ? { data: this.rows[0]?.id ?? null, error: null }
+        : { data: null, error: { code: "RESTORE_CODE_INVALID", message: "RESTORE_CODE_INVALID" } };
+    }
+    return { data: null, error: { message: `unexpected rpc: ${name}` } };
+  }
 }
 
 let failures = 0;
@@ -64,10 +90,20 @@ const fake = new FakeSupabase();
 const repository = createSupabaseMissionRepository(fake as any, () => "user-1");
 const created = await repository.createMission(mission);
 check("CLOUD-REPO-1: create returns Mission", created.mission.id === mission.id);
+check("CLOUD-REPO-1: create returns a one-time recovery code", created.recoveryCode === fake.recoveryCode);
+check("CLOUD-REPO-1: create uses the RPC boundary", fake.rpcCalls[0] === "create_observation_mission_with_recovery");
 check("CLOUD-REPO-1: create preserves fixed altitude", created.mission.targets[0]?.predictedAltitude === 62);
 check("CLOUD-REPO-1: create starts without record", created.record === null);
+check("CLOUD-REPO-1: recovery code is not persisted in the Mission row", !JSON.stringify(fake.rows).includes(fake.recoveryCode));
 check("CLOUD-REPO-2: list returns saved Mission", (await repository.listMissions()).length === 1);
 check("CLOUD-REPO-2: get returns saved Mission", (await repository.getMission(mission.id))?.mission.id === mission.id);
+check("CLOUD-REPO-2: restore RPC returns the Mission", (await repository.restoreMission(fake.recoveryCode))?.mission.id === mission.id);
+try {
+  await repository.restoreMission("ISL-0000-0000-0000-0000-0000-0000-0000-0000");
+  check("CLOUD-REPO-2: invalid recovery code is structured", false);
+} catch (error) {
+  check("CLOUD-REPO-2: invalid recovery code is structured", error instanceof Error && error.name === "CloudApplicationError");
+}
 
 const record: ObservationRecord = {
   missionId: mission.id,

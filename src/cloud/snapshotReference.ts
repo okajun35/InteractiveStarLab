@@ -120,10 +120,8 @@ export function isCloudMissionSnapshotReference(value: unknown): value is CloudM
 export function cloudSnapshotReferenceFromRecord(
   record: SkySnapshotRecord,
   missionId: string,
-  userId: string,
 ): CloudMissionSnapshotReference {
   if (!missionId.trim()) throw new Error("missionId is required");
-  if (!userId.trim()) throw new Error("userId is required");
   if (record.mimeType !== "image/png" || record.blob.type !== "image/png") {
     throw new Error("Mission Snapshot must be a PNG");
   }
@@ -131,7 +129,7 @@ export function cloudSnapshotReferenceFromRecord(
   return {
     snapshotId: record.snapshotId,
     missionId,
-    storagePath: `${userId}/${missionId}/${record.snapshotId}.png`,
+    storagePath: `${missionId}/${record.snapshotId}.png`,
     fileName: record.fileName,
     mimeType: "image/png",
     width: record.width,

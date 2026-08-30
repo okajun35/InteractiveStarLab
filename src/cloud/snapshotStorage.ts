@@ -13,7 +13,6 @@ import {
 
 export interface CloudSnapshotStorage {
   saveMissionSnapshot(input: {
-    userId: string;
     missionId: string;
     record: SkySnapshotRecord;
   }): Promise<CloudMissionSnapshotReference>;
@@ -30,8 +29,8 @@ export function createSupabaseSnapshotStorage(
   missionRepository: CloudMissionRepository,
 ): CloudSnapshotStorage {
   return {
-    async saveMissionSnapshot({ userId, missionId, record }) {
-      const reference = cloudSnapshotReferenceFromRecord(record, missionId, userId);
+    async saveMissionSnapshot({ missionId, record }) {
+      const reference = cloudSnapshotReferenceFromRecord(record, missionId);
       // Check the immutable Mission slot before uploading so a repeated
       // capture does not leave an unreferenced object in private Storage.
       const mission = await missionRepository.getMission(missionId);

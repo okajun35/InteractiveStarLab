@@ -1,5 +1,12 @@
 # Cloud Persistence / Immutable Mission Snapshot 実装計画書
 
+> **認証方式の更新（2026-08-30）**
+>
+> 本文書のEmail / Password認証仕様、Storage path、Cloud UI仕様は、POC方針の変更により
+> [`supabase-recovery-code-poc-implementation-plan.md`](supabase-recovery-code-poc-implementation-plan.md)
+> の「ログイン画面なし＋Supabase匿名セッション＋Missionごとの復元コード」に置き換える。
+> Lunaは新計画を優先し、旧「4. 認証仕様」を実装しないこと。
+
 最終更新：2026-08-29  
 対象：InteractiveStarLab  
 実装担当想定：GPT-5.6 Luna  

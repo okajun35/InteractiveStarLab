@@ -43,14 +43,17 @@ VITE_SUPABASE_ANON_KEY=<publishable-or-anon-key>
 
 `service_role` keyはブラウザへ設定しないでください。Supabase SQL Editorで
 [`supabase/migrations/20260829000000_cloud_observation_missions.sql`](supabase/migrations/20260829000000_cloud_observation_missions.sql)
-を適用し、Authenticationでデモ用のEmail / Passwordユーザーを作成します。設定がない環境では、従来どおりLocalStorage / IndexedDBモードで起動します。
+と後続のmigrationを適用し、Authentication > Providers > Anonymous Sign-Insを有効にしてください。Email / Passwordのログイン画面はありません。アプリが匿名セッションを内部で自動作成し、Mission作成時に一度だけ復元コードを表示します。設定がない環境やCloud接続に失敗した場合は、従来どおりLocalStorage / IndexedDBモードで起動します。
+
+復元コードはHistory画面の「復元コードからMissionを復元」へ入力できます。復元コードの平文はSupabaseへ保存せず、Mission作成後の画面に一度だけ表示します。Mission IDだけでは別端末から復元できません。
 
 Codex Desktopのビルトインブラウザでのクラウド観測フローは次のとおりです。
 
-1. Cloudログイン後、Agentで`create_observation_plan`を実行する。
+1. Agentで`create_observation_plan`を実行し、作成画面に表示された復元コードを安全な場所へ保存する。
 2. 返された`missionId`の日時・地点をSky画面へ設定し、`capture_sky_snapshot({ missionId })`を実行する。
 3. ビルトインブラウザのObserve画面でVisible / Not Visible / Unsureを入力して保存する。
-4. Agentで`get_observation_results({ missionId })`または`get_sky_snapshot_metadata({ snapshotId })`を実行する。
+4. 別端末ではHistory画面またはWebMCPの`restore_observation_mission`へ復元コードを渡す。
+5. Agentで`get_observation_results({ missionId })`または`get_sky_snapshot_metadata({ snapshotId })`を実行する。
 
 Snapshot PNGはprivate Storageへ不変保存され、必要な時だけ短時間のsigned URLが発行されます。Observation Guide PDFは保存済みMissionの固定予測からブラウザ内で直接生成します。
 

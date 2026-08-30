@@ -16,6 +16,7 @@ import { useNavigation } from "./navigation";
 import { useSnapshots } from "./snapshots";
 import { useGuides } from "./guides";
 import { registerGuideTools } from "../mcp/guideTools";
+import { registerRecoveryTools } from "../mcp/recoveryTools";
 
 export interface WebMcpState {
   availability: WebMcpAvailability;
@@ -38,6 +39,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
     selectedRecordMissionId,
     updateActiveSite,
     createMissionAndPersist,
+    restoreMission,
     saveResultsForMissionAndPersist,
     getCloudRecord,
     getCloudLatestRecord,
@@ -66,6 +68,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const layersRef = useRef(layers);
   const optionsRef = useRef(options);
   const createMissionAndPersistRef = useRef(createMissionAndPersist);
+  const restoreMissionRef = useRef(restoreMission);
   const missionsRef = useRef(missions);
   const updateActiveSiteRef = useRef(updateActiveSite);
   const updateSettingsRef = useRef(updateSettings);
@@ -102,6 +105,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   layersRef.current = layers;
   optionsRef.current = options;
   createMissionAndPersistRef.current = createMissionAndPersist;
+  restoreMissionRef.current = restoreMission;
   missionsRef.current = missions;
   updateActiveSiteRef.current = updateActiveSite;
   updateSettingsRef.current = updateSettings;
@@ -140,6 +144,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "predict_visible_stars",
       "get_current_sky_state",
       "create_observation_plan",
+      "restore_observation_mission",
       "get_observation_mission",
       "get_observation_results",
       "compare_prediction_and_observation",
@@ -189,6 +194,15 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
               targets: planned.targets,
             });
           },
+          openObserve: () => setViewRef.current("observe"),
+          isCloudEnabled: () => cloudAuthenticatedRef.current,
+        },
+        { signal: controller.signal },
+      ))
+      .then(() => registerRecoveryTools(
+        modelContext,
+        {
+          restoreMission: (recoveryCode) => restoreMissionRef.current(recoveryCode),
           openObserve: () => setViewRef.current("observe"),
           isCloudEnabled: () => cloudAuthenticatedRef.current,
         },

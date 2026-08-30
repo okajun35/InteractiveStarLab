@@ -3,7 +3,6 @@ import { createSkySnapshotMetadata } from "../snapshots/metadata";
 import { canvasToPng, triggerSnapshotDownload } from "../snapshots/renderer";
 import { createDefaultSnapshotStorage, type SnapshotStorage } from "../snapshots/storage";
 import type { SkySnapshotMetadata, SkySnapshotMetadataInput, SkySnapshotRecord } from "../snapshots/types";
-import { useAuth } from "./auth";
 import { useObservation } from "./observation";
 import { missionSnapshotContextMatches, snapshotMetadataFromReference, type CloudMissionSnapshotReference } from "../cloud/snapshotReference";
 import { cloudError } from "../cloud/errors";
@@ -32,8 +31,7 @@ export function SnapshotProvider({
   children: React.ReactNode;
   storage?: SnapshotStorage;
 }) {
-  const { userId } = useAuth();
-  const { missions, cloudConfigured, cloudSnapshotStorage, cloudSnapshotReferences, refreshCloudMissions } = useObservation();
+  const { missions, cloudSnapshotStorage, cloudSnapshotReferences, refreshCloudMissions } = useObservation();
   const storageRef = useRef<SnapshotStorage>(storage ?? createDefaultSnapshotStorage());
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // React state updates are asynchronous. Keep a ref so the capture WebMCP
@@ -76,10 +74,7 @@ export function SnapshotProvider({
     const blob = await canvasToPng(canvas);
     const record: SkySnapshotRecord = { ...metadata, blob };
     let displayedMetadata = metadata;
-    if (input.missionId !== undefined && cloudConfigured && userId === null) {
-      throw cloudError("AUTH_REQUIRED", "Sign in before associating a Snapshot with a cloud Mission");
-    }
-    if (input.missionId !== undefined && cloudSnapshotStorage !== null && userId !== null) {
+    if (input.missionId !== undefined && cloudSnapshotStorage !== null) {
       const mission = missions.find((item) => item.id === input.missionId);
       if (mission === undefined) {
         throw new Error(`Mission not found: ${input.missionId}`);
@@ -94,8 +89,8 @@ export function SnapshotProvider({
     // Context validation must complete before any local or cloud persistence;
     // a mismatched image must not appear in Snapshot history at all.
     await storageRef.current.save(record);
-    if (input.missionId !== undefined && cloudSnapshotStorage !== null && userId !== null) {
-      const reference = await cloudSnapshotStorage.saveMissionSnapshot({ userId, missionId: input.missionId, record });
+    if (input.missionId !== undefined && cloudSnapshotStorage !== null) {
+      const reference = await cloudSnapshotStorage.saveMissionSnapshot({ missionId: input.missionId, record });
       cloudReferencesRef.current = [
         ...cloudReferencesRef.current.filter((item) => item.snapshotId !== reference.snapshotId),
         reference,
@@ -106,7 +101,7 @@ export function SnapshotProvider({
     setSnapshots((previous) => [displayedMetadata, ...previous.filter((item) => item.snapshotId !== displayedMetadata.snapshotId)]);
     setSelectedSnapshotId(metadata.snapshotId);
     return record;
-  }, [cloudConfigured, cloudSnapshotStorage, missions, refreshCloudMissions, userId]);
+  }, [cloudSnapshotStorage, missions, refreshCloudMissions]);
 
   const getSnapshot = useCallback(async (snapshotId: string) => {
     const local = await storageRef.current.get(snapshotId);

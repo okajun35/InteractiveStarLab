@@ -4,6 +4,7 @@ import { buildObservationResults, countCompletedResults } from "../../observatio
 import { useObservation } from "../../state/observation";
 import type { ObservationStatus } from "../../types/observation";
 import { ObservationStatusInput } from "./ObservationStatusInput";
+import { RecoveryCodePanel } from "./RecoveryCodePanel";
 
 interface ObservationRunScreenProps {
   onOpenPlan: () => void;
@@ -19,8 +20,10 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
     draftResults,
     setDraftResult,
     saveObservationRecordAndPersist,
-    cloudConfigured,
     cloudAuthenticated,
+    cloudIdentityLoading,
+    recoveryCode,
+    clearRecoveryCode,
     cloudError,
   } = useObservation();
   const [saving, setSaving] = useState(false);
@@ -131,15 +134,18 @@ export function ObservationRunScreen({ onOpenPlan, onOpenResults, onOpenGuide, h
           </div>
         </section>
 
+        {recoveryCode && <RecoveryCodePanel recoveryCode={recoveryCode} clearRecoveryCode={clearRecoveryCode} />}
+
         <div className="observe-actions">
           <p className="workflow-note">
             すべての対象を入力すると観測結果を保存できます。「わからない」も観測結果として記録されます。
           </p>
-          <button type="button" className="primary observe-save-btn" disabled={!isComplete || saving || (cloudConfigured && !cloudAuthenticated)} onClick={handleSave}>
+          <button type="button" className="primary observe-save-btn" disabled={!isComplete || saving || cloudIdentityLoading} onClick={handleSave}>
             {saving ? "保存中…" : "観測結果を保存"}
           </button>
           {cloudAuthenticated && <p className="cloud-save-note">Cloud保存モード：結果はSupabaseへ保存されます。</p>}
-          {cloudConfigured && !cloudAuthenticated && <p className="workflow-note">Cloud保存を使う場合は、画面上部のCloudログインを先に完了してください。</p>}
+          {cloudIdentityLoading && <p className="workflow-note">Cloud接続を準備中です。接続準備が完了すると保存できます。</p>}
+          {!cloudAuthenticated && !cloudIdentityLoading && <p className="workflow-note">Cloud未接続時は、この端末のローカルへ保存されます。</p>}
           {cloudError && <p className="cloud-error" role="alert">{cloudError}</p>}
         </div>
       </div>

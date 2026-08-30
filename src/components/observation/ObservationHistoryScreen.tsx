@@ -2,14 +2,16 @@ import { useMemo } from "react";
 import { compareObservationRecord } from "../../observation/comparison";
 import { sortObservationRecords } from "../../observation/history";
 import { useObservation } from "../../state/observation";
+import { RecoveryMissionForm } from "./RecoveryCodePanel";
 
 interface ObservationHistoryScreenProps {
   onOpenResults: () => void;
+  onOpenObserve: () => void;
   onOpenPlan: () => void;
 }
 
-export function ObservationHistoryScreen({ onOpenResults, onOpenPlan }: ObservationHistoryScreenProps) {
-  const { records, selectRecord } = useObservation();
+export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenPlan }: ObservationHistoryScreenProps) {
+  const { records, selectRecord, restoreMission } = useObservation();
   const sortedRecords = useMemo(() => sortObservationRecords(records), [records]);
 
   return (
@@ -25,6 +27,11 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenPlan }: Observat
             新しいMission
           </button>
         </div>
+
+        <RecoveryMissionForm
+          restoreMission={restoreMission}
+          onRestored={() => onOpenObserve()}
+        />
 
         {sortedRecords.length === 0 ? (
           <section className="workflow-card workflow-empty-card history-empty" aria-label="履歴なし">

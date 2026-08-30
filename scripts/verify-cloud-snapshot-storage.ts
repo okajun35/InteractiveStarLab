@@ -64,8 +64,8 @@ const fakeStorage = {
 };
 
 const storage = createSupabaseSnapshotStorage({ storage: fakeStorage } as any, missionRepository);
-const reference = await storage.saveMissionSnapshot({ userId: "user-1", missionId: mission.id, record });
-check("CLOUD-STORAGE-1: upload path is user/Mission/Snapshot", uploadedPath === "user-1/mission-storage-1/snapshot-storage-1.png");
+const reference = await storage.saveMissionSnapshot({ missionId: mission.id, record });
+check("CLOUD-STORAGE-1: upload path is Mission/Snapshot", uploadedPath === "mission-storage-1/snapshot-storage-1.png");
 check("CLOUD-STORAGE-1: upload forbids overwrite", uploadedOptions?.upsert === false);
 check("CLOUD-STORAGE-1: DB link receives reference", linked?.storagePath === uploadedPath);
 check("CLOUD-STORAGE-1: reference excludes Blob", !("blob" in reference));

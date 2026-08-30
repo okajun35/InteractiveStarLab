@@ -16,7 +16,6 @@ import { ObservationRunScreen } from "./components/observation/ObservationRunScr
 import { ObservationResultsScreen } from "./components/observation/ObservationResultsScreen";
 import { ObservationHistoryScreen } from "./components/observation/ObservationHistoryScreen";
 import { WebMcpStatus } from "./components/WebMcpStatus";
-import { AuthPanel } from "./components/AuthPanel";
 import { PLACE_PRESETS } from "./astronomy/directions";
 import { localTimeOf } from "./astronomy/timezones";
 import type { SceneOverride } from "./state/scene";
@@ -210,7 +209,6 @@ function AppShell() {
             </span>
           </h1>
           <WebMcpStatus />
-          <AuthPanel />
           <nav className="app-nav" aria-label="アプリケーション">
             <div className="app-nav-primary">
               {PRIMARY_NAV_ITEMS.map((item) => (
@@ -278,6 +276,7 @@ function AppShell() {
       ) : view === "history" ? (
         <ObservationHistoryScreen
           onOpenResults={() => setView("results")}
+          onOpenObserve={() => setView("observe")}
           onOpenPlan={() => setView("plan")}
         />
       ) : view === "snapshots" ? (

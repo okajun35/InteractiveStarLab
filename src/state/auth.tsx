@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../cloud/client";
 import { createAnonymousSessionBootstrap, type AnonymousAuthApi } from "../cloud/anonymousIdentity";
@@ -8,10 +8,7 @@ export interface AuthState {
   loading: boolean;
   session: Session | null;
   userId: string | null;
-  email: string | null;
   error: string | null;
-  signIn: (email: string, password: string) => Promise<boolean>;
-  signOut: () => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -19,7 +16,7 @@ const AuthContext = createContext<AuthState | null>(null);
 
 function friendlyAuthError(error: unknown): string {
   if (error instanceof Error && error.message.trim()) return error.message;
-  return "ログインに失敗しました。設定と入力内容を確認してください。";
+  return "Cloud接続に失敗しました。この端末ではローカル保存を続けます。";
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -49,6 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void bootstrapAnonymousSession().then((nextSession) => {
       if (disposed) return;
       setSession(nextSession);
+      setError(null);
       setLoading(false);
     }).catch((sessionError: unknown) => {
       if (disposed) return;
@@ -59,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data } = client.auth.onAuthStateChange((_event, nextSession) => {
       if (!disposed) {
         setSession(nextSession);
+        if (nextSession !== null) setError(null);
         setLoading(false);
       }
     });
@@ -68,65 +67,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [bootstrapAnonymousSession, client]);
 
-  const signIn = useCallback(async (email: string, password: string): Promise<boolean> => {
-    if (client === null) {
-      setError("Supabaseが設定されていないため、クラウド保存を利用できません。");
-      return false;
-    }
-    if (!email.trim() || !password) {
-      setError("EmailとPasswordを入力してください。");
-      return false;
-    }
-    setError(null);
-    setLoading(true);
-    try {
-      const result = await client.auth.signInWithPassword({ email: email.trim(), password });
-      if (result.error) {
-        setError(friendlyAuthError(result.error));
-        setLoading(false);
-        return false;
-      }
-      setSession(result.data.session);
-      setLoading(false);
-      return true;
-    } catch (signInError) {
-      setError(friendlyAuthError(signInError));
-      setLoading(false);
-      return false;
-    }
-  }, [client]);
-
-  const signOut = useCallback(async (): Promise<boolean> => {
-    if (client === null) {
-      setSession(null);
-      return true;
-    }
-    setError(null);
-    try {
-      const result = await client.auth.signOut();
-      if (result.error) {
-        setError(friendlyAuthError(result.error));
-        return false;
-      }
-      setSession(null);
-      return true;
-    } catch (signOutError) {
-      setError(friendlyAuthError(signOutError));
-      return false;
-    }
-  }, [client]);
-
   const value = useMemo<AuthState>(() => ({
     cloudConfigured: client !== null,
     loading,
     session,
     userId: session?.user.id ?? null,
-    email: session?.user.email ?? null,
     error,
-    signIn,
-    signOut,
     clearError: () => setError(null),
-  }), [client, loading, session, error, signIn, signOut]);
+  }), [client, loading, session, error]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

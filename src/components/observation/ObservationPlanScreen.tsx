@@ -18,7 +18,16 @@ const MAX_MAGNITUDE_OPTIONS = [1, 2, 3, 4] as const;
 
 export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationPlanScreenProps) {
   const { settings, updateSettings, horizontal } = useStarViewer();
-  const { activeSite, updateActiveSite, createMissionAndPersist, cloudConfigured, cloudAuthenticated, cloudError } = useObservation();
+  const {
+    activeSite,
+    updateActiveSite,
+    createMissionAndPersist,
+    cloudConfigured,
+    cloudAuthenticated,
+    cloudIdentityLoading,
+    cloudIdentityError,
+    cloudError,
+  } = useObservation();
   const [maxMagnitude, setMaxMagnitude] = useState<number>(2);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [createdMissionId, setCreatedMissionId] = useState<string | null>(null);
@@ -152,14 +161,16 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
               <button
                 type="button"
                 className="primary mission-create-btn"
-                disabled={Boolean(siteErrors) || selectedCandidates.length === 0 || saving || (cloudConfigured && !cloudAuthenticated)}
+                disabled={Boolean(siteErrors) || selectedCandidates.length === 0 || saving || cloudIdentityLoading}
                 onClick={handleCreateMission}
               >
                 {saving ? "保存中…" : "Missionを作成"}
               </button>
             </section>
             {cloudAuthenticated && <p className="cloud-save-note">Cloud保存モード：MissionはSupabaseへ保存されます。</p>}
-            {cloudConfigured && !cloudAuthenticated && <CloudSignInNote />}
+            {cloudConfigured && cloudIdentityLoading && <p className="workflow-note">Cloud接続を準備中です。接続準備が完了するとMissionを作成できます。</p>}
+            {cloudConfigured && !cloudIdentityLoading && !cloudAuthenticated && <p className="workflow-note">Cloudへ接続できないため、この端末ではローカル保存を続けます。</p>}
+            {cloudIdentityError && <p className="cloud-error" role="alert">{cloudIdentityError} ローカル保存は利用できます。</p>}
             {cloudError && <p className="cloud-error" role="alert">{cloudError}</p>}
             {createdMissionId && (
               <div className="workflow-success" role="status">
@@ -171,13 +182,6 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
       </div>
     </main>
   );
-}
-
-function CloudSignInNote() {
-  // The AuthPanel is always present in the application header when cloud
-  // configuration exists; this copy also explains why a cloud Mission cannot
-  // be created before signing in.
-  return <p className="workflow-note">Cloud保存を使う場合は、画面上部のCloudログインを先に完了してください。</p>;
 }
 
 function validateSite(site: ObservationSite): SiteEditorErrors | null {

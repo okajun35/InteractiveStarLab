@@ -7,8 +7,10 @@ export interface SupabaseConfig {
 type Environment = Record<string, unknown>;
 
 function defaultEnvironment(): Environment {
-  const meta = import.meta as ImportMeta & { env?: Environment };
-  return meta.env ?? {};
+  // Keep the direct `import.meta.env` access: Vite replaces this expression
+  // at build time.  Hiding it behind an aliased ImportMeta prevents Vite from
+  // exposing VITE_* variables in the browser bundle.
+  return import.meta.env as unknown as Environment;
 }
 
 function asNonEmptyString(value: unknown): string | null {

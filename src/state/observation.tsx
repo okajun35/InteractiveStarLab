@@ -43,8 +43,11 @@ export interface ObservationState {
   activeMissionId: string | null;
   selectedRecordMissionId: string | null;
   draftResults: Record<string, ObservationStatus>;
+  recoveryCode: string | null;
   cloudConfigured: boolean;
   cloudAuthenticated: boolean;
+  cloudIdentityLoading: boolean;
+  cloudIdentityError: string | null;
   cloudLoading: boolean;
   cloudError: string | null;
   cloudSnapshotStorage: CloudSnapshotStorage | null;
@@ -52,6 +55,8 @@ export interface ObservationState {
   updateActiveSite: (patch: Partial<ObservationSite>) => void;
   createMission: (input: CreateMissionInput) => ObservationMission;
   createMissionAndPersist: (input: CreateMissionInput) => Promise<ObservationMission>;
+  restoreMission: (recoveryCode: string) => Promise<ObservationMission>;
+  clearRecoveryCode: () => void;
   selectMission: (missionId: string | null) => void;
   setDraftResult: (starId: string, status: ObservationStatus) => void;
   clearDraftResults: () => void;
@@ -77,7 +82,7 @@ export interface ObservationState {
 const ObservationContext = createContext<ObservationState | null>(null);
 
 export function ObservationProvider({ children }: { children: React.ReactNode }) {
-  const { userId } = useAuth();
+  const { userId, loading: cloudIdentityLoading, error: cloudIdentityError } = useAuth();
   const cloudClient = useMemo(() => getSupabaseClient(), []);
   const cloudMode = resolveCloudPersistenceMode(cloudClient !== null, userId);
   const cloudRepository = useMemo<CloudMissionRepository | null>(
@@ -96,6 +101,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
   const [activeMissionId, setActiveMissionId] = useState<string | null>(null);
   const [selectedRecordMissionId, setSelectedRecordMissionId] = useState<string | null>(null);
   const [draftResults, setDraftResults] = useState<Record<string, ObservationStatus>>({});
+  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [cloudLoading, setCloudLoading] = useState(false);
   const [cloudError, setCloudError] = useState<string | null>(null);
   const [cloudSnapshotReferences, setCloudSnapshotReferences] = useState<CloudMissionSnapshotReference[]>([]);
@@ -159,22 +165,53 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
   );
 
   const createMissionAndPersist = useCallback(async (input: CreateMissionInput): Promise<ObservationMission> => {
-    if (cloudClient !== null && userId === null) {
-      const error = createCloudError("AUTH_REQUIRED", "Sign in before creating a cloud Mission");
-      setCloudError(error.message);
-      throw error;
-    }
     const mission = createMission(input);
+    setRecoveryCode(null);
     if (cloudRepository === null) return mission;
     try {
-      await cloudRepository.createMission(mission);
+      const created = await cloudRepository.createMission(mission);
+      setRecoveryCode(created.recoveryCode);
       setCloudError(null);
       return mission;
     } catch (error) {
       setCloudError(error instanceof Error ? error.message : "Missionをクラウドへ保存できませんでした。");
       throw error;
     }
-  }, [cloudClient, cloudRepository, createMission, userId]);
+  }, [cloudRepository, createMission]);
+
+  const restoreMission = useCallback(async (recoveryCodeInput: string): Promise<ObservationMission> => {
+    if (cloudRepository === null) {
+      const error = createCloudError(cloudClient === null ? "CLOUD_NOT_CONFIGURED" : "AUTH_REQUIRED", "Cloud Mission recovery is unavailable");
+      setCloudError(error.message);
+      throw error;
+    }
+    try {
+      const restored = await cloudRepository.restoreMission(recoveryCodeInput);
+      setPersisted((previous) => ({
+        ...previous,
+        missions: [
+          ...previous.missions.filter((item) => item.id !== restored.mission.id),
+          restored.mission,
+        ],
+        records: restored.record === null
+          ? previous.records
+          : [
+            ...previous.records.filter((item) => item.missionId !== restored.mission.id),
+            restored.record,
+          ],
+      }));
+      setActiveMissionId(restored.mission.id);
+      setSelectedRecordMissionId(restored.record === null ? null : restored.mission.id);
+      setDraftResults(Object.fromEntries(restored.record?.results.map((result) => [result.starId, result.status]) ?? []));
+      setRecoveryCode(null);
+      setCloudError(null);
+      await refreshCloudMissions();
+      return restored.mission;
+    } catch (error) {
+      setCloudError(error instanceof Error ? error.message : "Missionを復元できませんでした。");
+      throw error;
+    }
+  }, [cloudClient, cloudRepository, refreshCloudMissions]);
 
   const selectMission = useCallback(
     (missionId: string | null) => {
@@ -253,11 +290,6 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
   const saveObservationRecordAndPersist = useCallback(async (): Promise<ObservationRecord | null> => {
     const record = saveObservationRecord();
     if (record === null) return record;
-    if (cloudClient !== null && userId === null) {
-      const error = createCloudError("AUTH_REQUIRED", "Sign in before saving cloud observation results");
-      setCloudError(error.message);
-      throw error;
-    }
     if (cloudRepository === null) return record;
     try {
       await cloudRepository.saveRecord(record.missionId, record);
@@ -267,7 +299,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudError(error instanceof Error ? error.message : "観測結果をクラウドへ保存できませんでした。");
       throw error;
     }
-  }, [cloudClient, cloudRepository, saveObservationRecord, userId]);
+  }, [cloudRepository, saveObservationRecord]);
 
   const saveResultsForMissionAndPersist = useCallback(async (
     missionId: string,
@@ -275,11 +307,6 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
   ): Promise<ObservationRecord | null> => {
     const record = saveResultsForMission(missionId, results);
     if (record === null) return record;
-    if (cloudClient !== null && userId === null) {
-      const error = createCloudError("AUTH_REQUIRED", "Sign in before saving cloud observation results");
-      setCloudError(error.message);
-      throw error;
-    }
     if (cloudRepository === null) return record;
     try {
       await cloudRepository.saveRecord(record.missionId, record);
@@ -289,7 +316,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudError(error instanceof Error ? error.message : "観測結果をクラウドへ保存できませんでした。");
       throw error;
     }
-  }, [cloudClient, cloudRepository, saveResultsForMission, userId]);
+  }, [cloudRepository, saveResultsForMission]);
 
   const getCloudMission = useCallback(async (missionId: string): Promise<CloudMissionRow | null> => {
     if (cloudRepository === null) return null;
@@ -324,8 +351,11 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       activeMissionId,
       selectedRecordMissionId,
       draftResults,
+      recoveryCode,
       cloudConfigured: cloudClient !== null,
       cloudAuthenticated: cloudMode === "cloud",
+      cloudIdentityLoading,
+      cloudIdentityError,
       cloudLoading,
       cloudError,
       cloudSnapshotStorage,
@@ -333,6 +363,8 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       updateActiveSite,
       createMission,
       createMissionAndPersist,
+      restoreMission,
+      clearRecoveryCode: () => setRecoveryCode(null),
       selectMission,
       setDraftResult,
       clearDraftResults,
@@ -353,9 +385,11 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       activeMissionId,
       selectedRecordMissionId,
       draftResults,
+      recoveryCode,
       updateActiveSite,
       createMission,
       createMissionAndPersist,
+      restoreMission,
       selectMission,
       setDraftResult,
       clearDraftResults,
@@ -371,6 +405,8 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       cloudClient,
       cloudRepository,
       cloudMode,
+      cloudIdentityLoading,
+      cloudIdentityError,
       cloudSnapshotStorage,
       cloudSnapshotReferences,
       cloudLoading,

@@ -837,88 +837,6 @@ button[aria-label="閉じる"] {
   color: var(--muted);
 }
 
-.auth-panel {
-  position: relative;
-  flex: 0 0 auto;
-}
-
-.auth-toggle,
-.auth-action {
-  padding: 5px 9px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--panel-2);
-  color: var(--muted);
-  font-size: 0.72rem;
-  white-space: nowrap;
-}
-
-.auth-toggle:hover,
-.auth-action:hover {
-  border-color: var(--accent);
-  color: var(--text);
-}
-
-.auth-panel-signed-in {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.auth-email {
-  max-width: 150px;
-  overflow: hidden;
-  color: var(--ok);
-  font-size: 0.7rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.auth-form {
-  position: absolute;
-  top: calc(100% + 7px);
-  right: 0;
-  z-index: 40;
-  display: grid;
-  width: 230px;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--panel-2);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
-}
-
-.auth-form label {
-  display: grid;
-  gap: 3px;
-  color: var(--muted);
-  font-size: 0.7rem;
-}
-
-.auth-form input {
-  width: 100%;
-  padding: 6px 8px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.78rem;
-}
-
-.auth-form input:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-
-.auth-submit {
-  width: 100%;
-  padding: 6px 10px;
-  font-size: 0.78rem;
-}
-
-.auth-error,
 .cloud-error {
   margin: 0;
   color: var(--error);
@@ -1344,6 +1262,101 @@ button[aria-label="閉じる"] {
   background: rgba(74, 222, 128, 0.08);
   color: var(--ok);
   font-size: 0.78rem;
+}
+
+.recovery-code-panel {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid rgba(250, 204, 21, 0.48);
+  border-radius: 14px;
+  background: rgba(120, 88, 8, 0.16);
+}
+
+.recovery-code-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.recovery-code-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recovery-code-value code {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.5);
+  color: #fde68a;
+  font-size: clamp(0.74rem, 1.8vw, 0.92rem);
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.recovery-code-value button,
+.recovery-code-dismiss {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-color: rgba(250, 204, 21, 0.45);
+}
+
+.recovery-code-status {
+  color: var(--ok) !important;
+}
+
+.recovery-code-dismiss {
+  justify-self: end;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.recovery-restore-card {
+  margin-bottom: 16px;
+}
+
+.recovery-restore-card > p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.recovery-restore-form {
+  display: grid;
+  gap: 5px;
+}
+
+.recovery-restore-form label {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.recovery-restore-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.recovery-restore-input-row input {
+  min-width: 0;
+  flex: 1 1 auto;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+}
+
+.recovery-restore-input-row input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
 }
 
 @media (max-width: 860px) {
