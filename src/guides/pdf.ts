@@ -6,9 +6,15 @@ export interface GuidePdfArtifact {
   fileName: string;
 }
 
-const MAP_X = 55;
-const MAP_Y = 365;
-const MAP_SIZE = 485;
+export const GUIDE_PDF_MAP = {
+  x: 147.64,
+  y: 375,
+  size: 300,
+} as const;
+
+const MAP_X = GUIDE_PDF_MAP.x;
+const MAP_Y = GUIDE_PDF_MAP.y;
+const MAP_SIZE = GUIDE_PDF_MAP.size;
 
 function asciiText(value: string, fallback = ""): string {
   const normalized = value.trim();

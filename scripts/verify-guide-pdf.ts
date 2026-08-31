@@ -1,6 +1,6 @@
 import { createObservationMission } from "../src/observation/mission";
 import { buildObservationGuideModel, createGuideDescriptor } from "../src/guides/model";
-import { buildObservationGuidePdf, guidePdfFileName } from "../src/guides/pdf";
+import { buildObservationGuidePdf, GUIDE_PDF_MAP, guidePdfFileName } from "../src/guides/pdf";
 
 let failures = 0;
 function check(name: string, condition: boolean, detail = ""): void {
@@ -24,6 +24,8 @@ check("PDF has a valid header", source.startsWith("%PDF-1.4"));
 check("PDF has one page", source.includes("/Count 1") && source.includes("/Type /Page"));
 check("PDF includes mission snapshot vector content", source.includes("MISSION SKY SNAPSHOT") && source.includes("/MediaBox [0 0 595.28 841.89]"));
 check("PDF includes all target names and checklist labels", source.includes("Vega") && source.includes("Altair") && source.includes("Deneb") && source.includes("Not Visible") && source.includes("Unsure"));
+check("PDF map fits below the snapshot heading", GUIDE_PDF_MAP.y + GUIDE_PDF_MAP.size <= 680);
+check("PDF map leaves room for the south label and caption", GUIDE_PDF_MAP.y - 16 >= 350);
 check("PDF has a stable file name", guidePdfFileName(guide) === "observation-guide-20260829.pdf");
 check("PDF is non-empty", pdf.length > 3_000, `${pdf.length} bytes`);
 if (failures > 0) process.exit(1);
