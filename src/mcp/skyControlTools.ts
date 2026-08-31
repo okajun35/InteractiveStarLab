@@ -29,6 +29,7 @@ export interface SkyControlToolState {
   setObserverSensitivity: (value: number) => void;
   setShowHiddenStars: (value: boolean) => void;
   openSky: () => void;
+  openObserve: () => void;
 }
 
 function openSkyViewTool(state: SkyControlToolState): WebMcpTool {
@@ -51,6 +52,26 @@ function openSkyViewTool(state: SkyControlToolState): WebMcpTool {
         view: "sky" as const,
         ...applySkyViewSettingsPatch(settings, {}),
       };
+    }),
+  };
+}
+
+function openObserveViewTool(state: SkyControlToolState): WebMcpTool {
+  return {
+    name: "open_observe_view",
+    title: "Open Observe view",
+    description: "Opens the human-facing Observe screen so the user can record observations for the active Mission.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: false, untrustedContentHint: true },
+    execute: (input) => safeExecute(() => {
+      const object = assertObject(input);
+      assertOnlyKeys(object, []);
+      state.openObserve();
+      return { view: "observe" as const };
     }),
   };
 }
@@ -167,6 +188,7 @@ export async function registerSkyControlTools(
   options: WebMcpRegisterOptions = {},
 ): Promise<void> {
   await modelContext.registerTool(openSkyViewTool(state), options);
+  await modelContext.registerTool(openObserveViewTool(state), options);
   await modelContext.registerTool(setObservationSiteTool(state), options);
   await modelContext.registerTool(setSkyViewSettingsTool(state), options);
   await modelContext.registerTool(setSkyDisplaySettingsTool(state), options);

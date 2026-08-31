@@ -80,10 +80,14 @@ const night = "2026-08-29T11:00:00.000Z";
     altitude: 30,
     fieldOfView: 80,
   };
+  let openedObserve = false;
   await registerSkyControlTools(modelContext, {
     getObservationSettings: () => observation,
     openSky: () => {
       openedSky = true;
+    },
+    openObserve: () => {
+      openedObserve = true;
     },
   });
   const openTool = registered.find((tool) => tool.name === "open_sky_view");
@@ -93,6 +97,12 @@ const night = "2026-08-29T11:00:00.000Z";
   const invalid = JSON.parse(String(await openTool!.execute({ unexpected: true })));
   check("MCP-F2: open_sky_view rejects extra input", invalid.ok === false && invalid.error.code === "INVALID_ARGUMENT");
   check("MCP-F2: open_sky_view is a UI write tool", openTool!.annotations?.readOnlyHint === false);
+  const observeTool = registered.find((tool) => tool.name === "open_observe_view");
+  check("MCP-F3: registers open_observe_view", observeTool !== undefined);
+  const observed = JSON.parse(String(await observeTool!.execute({})));
+  check("MCP-F3: open_observe_view opens Observe", observed.ok === true && observed.data.view === "observe" && openedObserve);
+  const invalidObserve = JSON.parse(String(await observeTool!.execute({ unexpected: true })));
+  check("MCP-F4: open_observe_view rejects extra input", invalidObserve.ok === false && invalidObserve.error.code === "INVALID_ARGUMENT");
 }
 
 // MCP-G: site and view settings are strict, synchronized, and do not mutate Missions.
@@ -122,6 +132,7 @@ const night = "2026-08-29T11:00:00.000Z";
       currentObservation = { ...currentObservation, ...patch };
     },
     openSky: () => undefined,
+    openObserve: () => undefined,
   });
   const siteTool = registered.find((tool) => tool.name === "set_observation_site")!;
   const viewTool = registered.find((tool) => tool.name === "set_sky_view_settings")!;
@@ -244,6 +255,7 @@ const night = "2026-08-29T11:00:00.000Z";
     setObserverSensitivity: (value) => { simulation = { ...simulation, observerSensitivity: value }; },
     setShowHiddenStars: (value) => { simulation = { ...simulation, showHiddenStars: value }; },
     openSky: () => undefined,
+    openObserve: () => undefined,
   });
   const displayTool = registered.find((tool) => tool.name === "set_sky_display_settings")!;
   const result = JSON.parse(String(await displayTool.execute({ firstMagnitude: true, secondMagnitude: false, lightPollution: "urban", limitingMagnitude: 3.2, showHiddenStars: true })));

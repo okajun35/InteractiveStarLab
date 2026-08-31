@@ -149,6 +149,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "get_observation_results",
       "compare_prediction_and_observation",
       "open_sky_view",
+      "open_observe_view",
       "set_observation_site",
       "set_sky_view_settings",
       "set_sky_display_settings",
@@ -247,6 +248,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
           setObserverSensitivity: (value) => setObserverSensitivityRef.current(value),
           setShowHiddenStars: (value) => setShowHiddenStarsRef.current(value),
           openSky: () => setViewRef.current("sky"),
+          openObserve: () => setViewRef.current("observe"),
         },
         { signal: controller.signal },
       ))

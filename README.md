@@ -49,6 +49,7 @@ Never put a Supabase `service_role` key in browser code or Vercel client-side en
 3. In Observe, record Visible, Not Visible, or Unsure for each target.
 4. Call `get_observation_results({ missionId })` to retrieve the latest results and prediction comparison.
 5. Call `get_sky_snapshot_metadata({ snapshotId })` when a short-lived signed URL is needed, or call the Guide tool to generate a PDF.
+6. Use `open_observe_view`, `open_sky_view`, or `open_observation_results` to open the corresponding human-facing screen from WebMCP.
 
 ## Verification
 
