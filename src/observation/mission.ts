@@ -4,6 +4,7 @@ import type {
   ObservationSite,
   ObservationTarget,
 } from "../types/observation";
+import { validateTimeZone } from "../astronomy/timezones";
 
 export interface CreateObservationMissionInput {
   site: ObservationSite;
@@ -41,6 +42,7 @@ export function createObservationMission(
   if (!Number.isFinite(input.site.longitude) || input.site.longitude < -180 || input.site.longitude > 180) {
     throw new RangeError("mission site longitude is invalid");
   }
+  if (input.site.timeZone !== undefined) validateTimeZone(input.site.timeZone);
   if (!input.dateTime || Number.isNaN(new Date(input.dateTime).getTime())) {
     throw new RangeError("mission dateTime is invalid");
   }

@@ -13,11 +13,14 @@ import type {
 } from "../types/astronomy";
 import type { StarLayerState } from "../astronomy/visibilityModel";
 import type { ObservationSite } from "../types/observation";
+import { PLACE_PRESETS } from "../astronomy/directions";
+import { isValidTimeZone } from "../astronomy/timezones";
 
 export interface ObservationSitePatch {
   name?: string;
   latitude: number;
   longitude: number;
+  timeZone?: string;
 }
 
 export interface SkyViewSettingsPatch {
@@ -72,7 +75,7 @@ export function normalizeObservationSitePatch(value: unknown): ObservationSitePa
     throw new RangeError("site must be an object");
   }
   const object = value as Record<string, unknown>;
-  if (Object.keys(object).some((key) => !["name", "latitude", "longitude"].includes(key))) {
+  if (Object.keys(object).some((key) => !["name", "latitude", "longitude", "timeZone"].includes(key))) {
     throw new RangeError("site contains an unknown property");
   }
   if (typeof object.latitude !== "number" || !Number.isFinite(object.latitude) || object.latitude < LIMITS.latitude.min || object.latitude > LIMITS.latitude.max) {
@@ -84,10 +87,14 @@ export function normalizeObservationSitePatch(value: unknown): ObservationSitePa
   if (object.name !== undefined && (typeof object.name !== "string" || object.name.trim() === "")) {
     throw new RangeError("name must be a non-empty string when provided");
   }
+  if (object.timeZone !== undefined && (typeof object.timeZone !== "string" || !isValidTimeZone(object.timeZone))) {
+    throw new RangeError("timeZone must be a valid IANA time zone");
+  }
   return {
     ...(object.name === undefined ? {} : { name: (object.name as string).trim() }),
     latitude: object.latitude,
     longitude: object.longitude,
+    ...(object.timeZone === undefined ? {} : { timeZone: object.timeZone }),
   };
 }
 
@@ -95,11 +102,20 @@ export function applyObservationSitePatch(
   current: ObservationSite,
   patch: ObservationSitePatch,
 ): ObservationSite {
+  const preset = PLACE_PRESETS.find(
+    (item) => Math.abs(item.latitude - patch.latitude) <= 1e-6 && Math.abs(item.longitude - patch.longitude) <= 1e-6,
+  );
+  const coordinatesUnchanged = Math.abs(current.latitude - patch.latitude) <= 1e-6
+    && Math.abs(current.longitude - patch.longitude) <= 1e-6;
+  const timeZone = patch.timeZone
+    ?? preset?.timeZone
+    ?? (coordinatesUnchanged ? current.timeZone : undefined);
   return {
     ...current,
     ...(patch.name === undefined ? {} : { name: patch.name }),
     latitude: patch.latitude,
     longitude: patch.longitude,
+    ...(timeZone === undefined ? { timeZone: undefined } : { timeZone }),
   };
 }
 

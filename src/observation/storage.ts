@@ -5,6 +5,7 @@ import type {
   ObservationTarget,
   ObservationStatus,
 } from "../types/observation";
+import { isValidTimeZone } from "../astronomy/timezones";
 
 export const OBSERVATION_STORAGE_KEY = "star-view.observation.v1";
 
@@ -68,7 +69,8 @@ function validSite(value: unknown): value is ObservationSite {
     site.latitude <= 90 &&
     finite(site.longitude) &&
     site.longitude >= -180 &&
-    site.longitude <= 180
+    site.longitude <= 180 &&
+    (site.timeZone === undefined || isValidTimeZone(site.timeZone))
   );
 }
 

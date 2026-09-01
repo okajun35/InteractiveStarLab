@@ -10,14 +10,14 @@ Scope: Sky workspace. The companion Plan specification is in [`webmcp-first-plan
 
 The Sky workspace will use a WebMCP-first, human-correctable interaction model.
 
-- WebMCP tools remain available regardless of the visible sidebar state.
-- The default sidebar is a read-only presentation named **Live Observation Context**.
-- Existing human controls are hidden by default and revealed by **Edit manually**.
+- WebMCP tools remain available in both Sky presentations.
+- The default Sky presentation is **Agent-assisted**: the star canvas fills the available workspace and Agent Activity floats above it.
+- **Manual** is an alternate presentation that restores the existing human-control sidebar.
 - Both WebMCP tools and manual controls continue to operate on the same application state.
 - A successful WebMCP mutation is visibly attributed and its changed fields are temporarily highlighted.
 - Manual controls remain a one-click fallback when WebMCP is unavailable, produces an unwanted result, or is not being used.
 
-This is progressive disclosure, not two independent application modes. Do not create separate "WebMCP state" and "manual state," and do not disable WebMCP while manual controls are open.
+The presentation switch changes layout, not application state or permissions. Do not create separate "WebMCP state" and "manual state," and do not disable WebMCP when Manual is selected.
 
 ## 2. Product intent
 
@@ -28,12 +28,12 @@ User request in an agent
         ↓
 WebMCP changes structured application state
         ↓
-Live Observation Context explains what changed
+Agent Activity explains what changed
         ↓
 The human-facing sky renders the result
 ```
 
-The user should be able to understand the current sky without interpreting sliders or form controls. If correction or exploration is needed, the existing controls remain available under **Edit manually**.
+The user should be able to see the sky first and understand the latest agent change without opening a second application. If correction or exploration is needed, **Manual** restores the existing controls.
 
 ## 3. Goals
 
@@ -50,13 +50,13 @@ This change must not:
 
 - embed a chat interface in the application;
 - introduce a second copy of Sky state;
-- add a global WebMCP/manual feature toggle;
+- add a permission switch such as Read-only/Edit;
 - remove any existing manual control, experiment, comparison, or educational explanation;
 - add an overlapping all-in-one WebMCP tool;
 - change existing WebMCP tool names, required parameters, results, or annotations; the optional site `timeZone` extension is defined by the companion Plan specification;
 - add application-level confirmation dialogs for low-risk Sky display changes;
 - add Undo in this increment;
-- persist sidebar expansion or WebMCP activity across a full page reload;
+- persist presentation selection or WebMCP activity across a full page reload;
 - infer a time zone for arbitrary coordinates or add a geocoding dependency;
 - change Mission targets or creation-time prediction snapshots when the live Sky changes;
 - expose raw WebMCP errors, registered tool lists, or internal diagnostics in the end-user UI.
@@ -67,63 +67,67 @@ Use these exact user-facing labels:
 
 | Concept | Label |
 | --- | --- |
-| Default summary | `Live Observation Context` |
-| Collapsed manual controls button | `Edit manually` |
-| Expanded manual controls button | `Done editing` |
+| Agent presentation | `Agent-assisted` |
+| Manual presentation | `Manual` |
+| Activity window title | `Agent Activity` |
 | WebMCP available | `WebMCP ready` |
 | WebMCP detection in progress | `Checking WebMCP…` |
 | WebMCP unavailable | `WebMCP unavailable` |
 | WebMCP registration failure | `WebMCP unavailable` |
 | Last mutation attribution | `Updated via WebMCP` |
 
-Do not label the default presentation "Read-only mode." It is read-only only from the visible human UI; WebMCP can still mutate the underlying state.
+Do not label the presentation as "Read-only mode." WebMCP can mutate the shared state in either presentation.
 
 ## 6. Information architecture
 
-Replace the direct list of controls in the Sky sidebar with a `SkySidebar` composition:
+The Sky workspace has two presentation layouts:
 
 ```text
-SkySidebar
-├── Live Observation Context (always visible)
+Agent-assisted
+├── Full-size Star Sky
+├── Agent Activity (small floating window on the left)
 │   ├── WebMCP availability badge
-│   ├── latest WebMCP activity summary, when present
-│   ├── Observation Context
-│   ├── Visibility
-│   └── Display
-├── Edit manually / Done editing
-└── Manual controls (conditionally visible)
+│   ├── current observation state
+│   └── latest WebMCP activity summary
+└── Object Info overlay
+
+Manual
+├── Existing human-control sidebar
     ├── ObservationPanel
     ├── MagnitudeLayers
     ├── EnvironmentPanel
     ├── ExperimentPanel
     └── ComparePanel
+├── Full-size Star Sky
+└── Existing Object Info footer
 ```
 
-The existing components remain the source of manual functionality. Refactor composition as needed, but do not reimplement their controls inside the new summary.
+The existing components remain the source of manual functionality. Refactor composition as needed, but do not reimplement their controls inside Agent Activity.
 
 ### 6.1 Initial and navigation behavior
 
-- Manual controls are collapsed on a full page load.
-- Expansion state survives navigation away from and back to Sky within the current SPA session.
-- Expansion state is not stored in LocalStorage, IndexedDB, Supabase, or the URL.
-- Opening manual controls does not change focus automatically. Focus remains on the disclosure button.
+- Sky opens in **Agent-assisted** presentation on a full page load.
+- The selected presentation survives navigation away from and back to Sky within the current SPA session.
+- Presentation state is not stored in LocalStorage, IndexedDB, Supabase, or the URL.
+- Agent Activity provides a `Manual` action. Manual provides an `Agent-assisted` action.
+- Switching presentation does not reset or copy observation, simulation, display, comparison, selection, or activity state.
 - Manual edits take effect immediately. There is no Save or Apply button.
-- The Live Observation Context remains visible above the controls while manual controls are expanded.
+- Agent Activity is a floating overlay in Agent-assisted presentation and does not reserve a fixed sidebar column.
 
 ### 6.2 WebMCP unavailable behavior
 
-The summary remains the default presentation when `document.modelContext` is unavailable. Show:
+Agent-assisted presentation remains available when `document.modelContext` is unavailable. Show:
 
 ```text
 WebMCP unavailable
 Manual controls are still available.
 ```
 
-`Edit manually` remains enabled and prominent. Do not automatically expand the controls and do not show technical error details.
+`Manual` remains enabled and prominent. Do not show technical error details.
 
 ## 7. Live Observation Context fields
 
-Every state field writable by `set_observation_site`, `set_sky_view_settings`, or `set_sky_display_settings` must be visible in the summary. `Visible Stars` and compare counts are derived outputs.
+Agent Activity shows a compact, dynamic selection of fields writable by `set_observation_site`, `set_sky_view_settings`, or `set_sky_display_settings`. The fields affected by the latest agent action take priority; the complete set remains available through Manual controls. `Visible Stars` and compare counts are derived outputs.
 
 ### 7.1 Observation Context
 
@@ -276,12 +280,12 @@ This is presentation grouping only. Do not create a new composite tool or change
 ### 8.5 Timing and presentation
 
 - Changed rows receive a subtle accent background and border for 2.5 seconds.
-- For 5 seconds, a changed row shows `before → after` beneath or beside its current value.
-- After 5 seconds, the row returns to its normal current-value presentation.
+- For 5 seconds, a changed row shows its new current value with an `Updated via WebMCP` marker.
+- After 5 seconds, the marker disappears while the new current value remains.
 - The footer `Updated via WebMCP · {localized time}` persists until another WebMCP activity or a full page reload.
 - The activity header shows `{n} settings updated` when more than one field changed.
-- Do not auto-scroll the sidebar to a changed row.
-- The latest activity summary remains at the top of the context panel so changes are discoverable even if a changed row is below the fold.
+- Do not auto-scroll Agent Activity to a changed row.
+- The latest activity summary remains at the top of Agent Activity, and changed fields move into the compact Current sky list.
 
 Use examples such as:
 
@@ -290,10 +294,11 @@ Updated via WebMCP · just now
 3 settings updated
 
 Direction
-West / 270° → South / 180°
+South / 180°
+Updated via WebMCP
 ```
 
-The highlight must not rely on color alone. The textual `before → after` representation is required.
+The highlight must not rely on color alone. The textual `Updated via WebMCP` marker is required.
 
 ### 8.6 Manual interaction during a highlight
 
@@ -320,18 +325,20 @@ Do not display stack traces, tool registration failures, browser flags, or regis
 
 ### 10.1 Desktop
 
-- Keep the existing 320-pixel sidebar width unless layout verification demonstrates truncation.
+- In Agent-assisted presentation, let the Sky canvas fill the workspace and position Agent Activity as a small floating window near the upper-left corner.
+- In Manual presentation, keep the existing 320-pixel sidebar width unless layout verification demonstrates truncation.
+- The default Sky view enables the 1st, 2nd, 3rd, 4th, and 5th+ brightness layers. The existing Dark Sky limiting magnitude of 5.5 is retained so the catalog's fifth-magnitude range is visible.
 - Use a two-column definition-list layout for field rows: label on the left, value on the right.
 - Use tabular numerals for coordinates, times, degrees, magnitudes, and counts.
-- The WebMCP status and latest activity summary remain at the top of the sidebar.
+- The WebMCP status and latest activity summary remain at the top of Agent Activity.
 - The Sky canvas remains the dominant visual surface.
 
 ### 10.2 Narrow screens
 
-- Preserve the existing breakpoint where the canvas appears before the sidebar.
-- Keep the context field layout readable at 320 CSS pixels without horizontal scrolling.
+- In Agent-assisted presentation, keep Agent Activity usable as a compact overlay that can scroll internally when necessary.
+- In Manual presentation, preserve the existing breakpoint where the canvas appears before the sidebar.
+- Keep context fields readable without horizontal scrolling.
 - Allow long values to wrap; do not truncate coordinates, time-zone information, or change text.
-- Do not overlay the activity panel on the canvas.
 
 ### 10.3 Motion
 
@@ -342,7 +349,8 @@ Do not display stack traces, tool registration failures, browser flags, or regis
 ## 11. Accessibility
 
 - Implement the context rows with semantic headings and a `<dl>` or equivalent label/value structure.
-- The manual disclosure button must use `aria-expanded` and `aria-controls`.
+- The Agent-assisted/Manual controls must be keyboard accessible and expose the selected presentation.
+- Current sky reorders its compact field list after an agent action; the complete state remains available from Manual controls.
 - The status badge must contain readable text; a colored dot is decorative only.
 - Announce a completed WebMCP batch once through an `aria-live="polite"` region.
 - Do not announce every render, every countdown update, or every scene-frame recalculation.
@@ -366,7 +374,7 @@ The existing providers remain the single sources of truth:
 - `ObservationProvider`: active site;
 - `WebMcpProvider`: WebMCP availability and tool registration.
 
-The Live Observation Context reads these values. It must not retain editable copies.
+Agent Activity and the Manual controls read these values. They must not retain editable copies.
 
 ### 12.2 Recommended new modules
 
@@ -374,25 +382,25 @@ Use these module boundaries unless an equivalent organization is demonstrably si
 
 | Module | Responsibility |
 | --- | --- |
-| `src/components/SkySidebar.tsx` | Summary/manual composition and disclosure presentation |
-| `src/components/SkyContextPanel.tsx` | Read-only context, status, activity, and accessible field rendering |
-| `src/state/skyActivity.tsx` | WebMCP activity batching, timers, and latest activity |
+| `src/components/SkySidebar.tsx` | Floating Agent Activity presentation |
+| `src/components/SkyContextPanel.tsx` | Current state, status, activity, and accessible field rendering |
+| `src/state/agentActivity.tsx` | WebMCP activity batching, timers, and latest activity |
 | `src/sky/contextModel.ts` | Pure field derivation, formatting, and typed diff helpers |
 | `src/sky/sceneMetrics.ts` | Single/compare scene metric types if they do not fit in an existing scene module |
 
-Place `SkyActivityProvider` outside `WebMcpProvider` and inside the existing domain providers so both tool registration and `AppShell` descendants can consume it. One valid provider fragment is:
+Place `AgentActivityProvider` outside `WebMcpProvider` and inside the existing domain providers so both tool registration and `AppShell` descendants can consume it. One valid provider fragment is:
 
 ```tsx
 <SnapshotProvider>
-  <SkyActivityProvider>
+  <AgentActivityProvider>
     <WebMcpProvider>
       <AppShell />
     </WebMcpProvider>
-  </SkyActivityProvider>
+  </AgentActivityProvider>
 </SnapshotProvider>
 ```
 
-Because the Sky workspace unmounts when another application view is selected, keep the manual-controls expansion boolean in `AppShell` or another component/provider above the view switch. Pass it into `SkySidebar`; do not keep it only in local `SkySidebar` state.
+Because the Sky workspace unmounts when another application view is selected, keep the Agent-assisted/Manual presentation boolean in `AppShell` or another component/provider above the view switch. Do not keep it only in local `SkySidebar` state.
 
 ### 12.3 Tool instrumentation
 
@@ -420,11 +428,11 @@ The summary and HUD must agree for the current rendered dimensions.
 
 Expected modifications include:
 
-- `src/App.tsx`: replace the direct sidebar control list with `SkySidebar`; retain all existing panels inside manual disclosure; connect scene metrics.
+- `src/App.tsx`: render the full-canvas Agent-assisted layout or the existing manual sidebar layout; connect scene metrics.
 - `src/components/StarCanvas.tsx`: publish rendered scene metrics.
 - `src/state/webmcp.tsx`: connect mutation reporting while preserving tool registration and current refs.
 - `src/mcp/skyControlTools.ts`: emit typed successful mutation details without changing public tool contracts.
-- `src/styles.css`: context layout, status, disclosure, highlight, reduced-motion, and responsive styles.
+- `src/styles.css`: floating activity window, status, dynamic field list, highlight, reduced-motion, and responsive styles.
 - `package.json`: add the new deterministic verification script to `npm run verify` if a separate script is created.
 
 Do not modify persistence schemas or add npm dependencies.
@@ -453,17 +461,17 @@ After the calls complete, the demonstration must visibly show:
 - Brightness Layers shown as `1st, 2nd`;
 - Visible Stars recalculated;
 - corresponding rows temporarily showing their previous and new values;
-- the right-side sky rendered from the same resulting state.
+- the full Sky canvas rendered from the same resulting state.
 
 ## 15. Acceptance criteria
 
 ### AC-1: Default presentation
 
-Given a new page load on Sky, Live Observation Context is visible and all manual panels are collapsed behind `Edit manually`.
+Given a new page load on Sky, Agent-assisted is selected, the Sky canvas fills the available workspace, and Agent Activity is visible as a small left-side overlay.
 
 ### AC-2: Shared state
 
-Opening manual controls shows values identical to the context summary. A manual edit immediately updates the context and canvas without copying, applying, or synchronizing a second state object.
+Selecting Manual restores the existing controls. The controls show values identical to Agent Activity, and a manual edit immediately updates the context and canvas without copying, applying, or synchronizing a second state object.
 
 ### AC-3: WebMCP mutation
 
@@ -471,7 +479,7 @@ Executing each Sky mutation tool updates the existing application state, context
 
 ### AC-4: Attribution and diff
 
-Only effectively changed fields receive the WebMCP highlight. Each highlighted field displays correctly formatted `before → after` text and the activity identifies WebMCP as the source.
+Only effectively changed fields receive the WebMCP highlight. Each highlighted field displays its correctly formatted new value with an `Updated via WebMCP` marker, and the activity identifies WebMCP as the source.
 
 ### AC-5: Coupled values
 
@@ -487,7 +495,7 @@ Visible Stars in the summary equals the current canvas HUD count for single view
 
 ### AC-8: Manual fallback
 
-When WebMCP is unavailable or registration fails, the sky and `Edit manually` remain fully usable and no raw diagnostic is shown.
+When WebMCP is unavailable or registration fails, Agent-assisted still shows the sky and activity fallback, Manual remains fully usable, and no raw diagnostic is shown.
 
 ### AC-9: Mission immutability
 
@@ -495,11 +503,11 @@ Changing live Sky values through WebMCP or manual controls does not recalculate 
 
 ### AC-10: Accessibility and motion
 
-The disclosure is keyboard accessible, updates are announced once, change information is not color-only, and reduced-motion mode removes transition animation.
+The presentation controls are keyboard accessible, the dynamic Current sky list is readable, updates are announced once, change information is not color-only, and reduced-motion mode removes transition animation.
 
 ### AC-11: Responsive behavior
 
-At the existing mobile breakpoint, the canvas remains first, the context remains readable without horizontal scrolling, and manual controls remain reachable.
+At the existing mobile breakpoint, Agent Activity remains usable as a compact overlay, the canvas remains visible, and Manual controls remain reachable.
 
 ### AC-12: Regression safety
 
@@ -532,20 +540,20 @@ npm run verify:layout
 
 `verify:layout` remains optional when Playwright or Chromium is unavailable, but Luna should capture these states when browser verification is available:
 
-1. desktop, default Live Observation Context;
+1. desktop, default Agent-assisted presentation;
 2. desktop, immediately after a multi-tool WebMCP update;
-3. desktop, manual controls expanded;
-4. mobile-width default context;
-5. WebMCP unavailable with manual fallback;
+3. desktop, Manual presentation with the existing controls;
+4. mobile-width Agent-assisted presentation;
+5. WebMCP unavailable with Manual fallback;
 6. compare mode with two visible-star counts.
 
 ## 17. Implementation order for Luna
 
 1. Add pure context formatting and activity models with deterministic verification.
-2. Add `SkyActivityProvider` and WebMCP mutation reporting.
+2. Add `AgentActivityProvider` and WebMCP mutation reporting.
 3. Add rendered scene-metric publishing.
 4. Build `SkyContextPanel` and `SkySidebar` using existing providers as sources of truth.
-5. Move existing manual panels under the disclosure without changing their behavior.
+5. Restore existing manual panels in the Manual layout without changing their behavior.
 6. Add highlight, accessibility, responsive, and reduced-motion styling.
 7. Add integration and layout verification.
 8. Run the full build and verification suite.

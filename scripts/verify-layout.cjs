@@ -88,7 +88,8 @@ async function main() {
     await page.goto(BASE, { waitUntil: "networkidle" });
     await page.waitForSelector(".app-canvas canvas", { timeout: 15000 });
 
-    // ---- G1: normal view — canvas fills the main area, not HUD width ----
+    // ---- G1: Agent-assisted view — the canvas fills the workspace and the
+    // activity window floats above it. ----
     const normal = await measure(page, ".app-canvas");
     check("G1: canvas element present", normal !== null);
     check("G1: canvas width is full (not 96px)", normal && normal.width > 500,
@@ -96,10 +97,24 @@ async function main() {
     check("G1: canvas height is full (not 24px)", normal && normal.height > 300,
       `height=${normal && normal.height}`);
 
-    // expected: viewport width minus 320px sidebar minus ~0 (no margin) => ~1080
-    check("G1: width ≈ 1400 - 320 sidebar (1040..1088)",
-      normal && normal.width >= 1040 && normal.width <= 1088,
+    check("G1: Agent-assisted canvas uses the full workspace",
+      normal && normal.width >= 1300,
       `width=${normal && normal.width}`);
+    const activity = await measure(page, ".sky-agent-window");
+    check("G1: Agent Activity window is present", activity !== null);
+    check("G1: Agent Activity is compact", activity && activity.width <= 330,
+      `width=${activity && activity.width}`);
+
+    // ---- G1b: Manual view — existing 320px sidebar layout is restored ----
+    await page.click(".sky-agent-window button");
+    await page.waitForSelector(".manual-sky-header", { timeout: 10000 });
+    const manual = await measure(page, ".app-canvas");
+    check("G1b: Manual canvas element present", manual !== null);
+    check("G1b: Manual canvas width keeps the existing sidebar",
+      manual && manual.width >= 1040 && manual.width <= 1088,
+      `width=${manual && manual.width}`);
+    check("G1b: existing manual controls are restored",
+      await page.locator(".app-side .panel").count() >= 5);
 
     // ---- G2: compare mode — split area still fills width ----
     await page.click('.seg-group[aria-label="Comparison type"] button:first-child');
@@ -257,15 +272,21 @@ async function main() {
     check("O5: clicking Sharp activates it", sharpActive.length === 1 && sharpActive[0].includes("+0.5"),
       JSON.stringify(sharpActive));
 
-    // ---- G3: responsive (<=860px) — canvas still has area, not tiny ----
+    // Switch back to Agent-assisted before checking its compact mobile overlay.
+    await page.click(".manual-sky-header button");
+    await page.waitForSelector(".sky-agent-window", { timeout: 10000 });
+
+    // ---- G3: responsive (<=860px) — canvas and Agent Activity remain usable ----
     await page.setViewportSize({ width: 800, height: 600 });
     await new Promise((r) => setTimeout(r, 300));
     const small = await measure(page, ".app-canvas");
     check("G3: responsive canvas present", small !== null);
     check("G3: responsive canvas width is full", small && small.width > 400,
       `width=${small && small.width}`);
-    check("G3: responsive canvas height >= 46vh (~276px)", small && small.height > 200,
+    check("G3: responsive canvas height remains usable", small && small.height > 300,
       `height=${small && small.height}`);
+    const smallActivity = await measure(page, ".sky-agent-window");
+    check("G3: responsive Agent Activity remains visible", smallActivity !== null);
   } finally {
     await browser.close();
     try {

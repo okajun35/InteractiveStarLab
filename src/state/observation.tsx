@@ -34,7 +34,10 @@ import { isCloudMissionSnapshotReference, type CloudMissionSnapshotReference } f
 import { useAuth } from "./auth";
 import { resolveCloudPersistenceMode } from "../cloud/authMode";
 
-export type CreateMissionInput = Omit<CreateObservationMissionInput, "site">;
+export type CreateMissionInput = Omit<CreateObservationMissionInput, "site"> & {
+  /** Temporary Plan draft site; omitted callers use the active site. */
+  site?: ObservationSite;
+};
 
 export interface ObservationState {
   activeSite: ObservationSite;
@@ -146,30 +149,41 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
     }));
   }, []);
 
+  const commitMission = useCallback((mission: ObservationMission) => {
+    setPersisted((previous) => ({
+      ...previous,
+      missions: [...previous.missions, mission],
+    }));
+    setActiveMissionId(mission.id);
+    setSelectedRecordMissionId(null);
+    setDraftResults({});
+  }, []);
+
   const createMission = useCallback(
     (input: CreateMissionInput) => {
       const mission = createObservationMission({
         ...input,
-        site: persisted.activeSite,
+        site: input.site ?? persisted.activeSite,
       });
-      setPersisted((previous) => ({
-        ...previous,
-        missions: [...previous.missions, mission],
-      }));
-      setActiveMissionId(mission.id);
-      setSelectedRecordMissionId(null);
-      setDraftResults({});
+      commitMission(mission);
       return mission;
     },
-    [persisted.activeSite],
+    [commitMission, persisted.activeSite],
   );
 
   const createMissionAndPersist = useCallback(async (input: CreateMissionInput): Promise<ObservationMission> => {
-    const mission = createMission(input);
-    setRecoveryCode(null);
-    if (cloudRepository === null) return mission;
+    if (cloudRepository === null) {
+      const mission = createMission(input);
+      setRecoveryCode(null);
+      return mission;
+    }
+    const mission = createObservationMission({
+      ...input,
+      site: input.site ?? persisted.activeSite,
+    });
     try {
       const created = await cloudRepository.createMission(mission);
+      commitMission(mission);
       setRecoveryCode(created.recoveryCode);
       setCloudError(null);
       return mission;
@@ -177,7 +191,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       setCloudError(error instanceof Error ? error.message : "Could not save the Mission to the cloud.");
       throw error;
     }
-  }, [cloudRepository, createMission]);
+  }, [cloudRepository, commitMission, createMission, persisted.activeSite]);
 
   const restoreMission = useCallback(async (recoveryCodeInput: string): Promise<ObservationMission> => {
     if (cloudRepository === null) {

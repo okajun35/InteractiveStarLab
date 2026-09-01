@@ -15,6 +15,7 @@ Interactive Star Lab is an educational sky viewer for exploring how location, da
 - Restore a Mission on another device with a one-time Recovery Code.
 - Save deterministic sky Snapshots and generate printable Observation Guides and PDFs.
 - Expose sky controls, Missions, results, Snapshots, and Guides through WebMCP.
+- Open Sky in an Agent-assisted full-canvas view with a compact Agent Activity overlay, or switch to the existing Manual controls.
 
 ## Local setup
 
@@ -44,12 +45,13 @@ Never put a Supabase `service_role` key in browser code or Vercel client-side en
 
 ## WebMCP demo flow
 
-1. Call `create_observation_plan` to select visible stars and create a Mission. Store the one-time Recovery Code securely.
-2. Set the returned Mission date and site in Sky, then call `capture_sky_snapshot({ missionId })`.
-3. In Observe, record Visible, Not Visible, or Unsure for each target.
+1. Call `set_observation_site`, `predict_visible_stars`, and `create_observation_plan` to select visible stars and create a Mission. Store the one-time Recovery Code securely.
+2. Review the returned Mission on Plan, then use `open_sky_view` / `set_sky_view_settings` or `open_observe_view` to continue. Sky opens with the Agent-assisted canvas and keeps Manual controls available as a presentation switch.
+3. Set the returned Mission date and site in Sky, then call `capture_sky_snapshot({ missionId })` when an archive is needed.
+4. In Observe, record Visible, Not Visible, or Unsure for each target.
 4. Call `get_observation_results({ missionId })` to retrieve the latest results and prediction comparison.
 5. Call `get_sky_snapshot_metadata({ snapshotId })` when a short-lived signed URL is needed, or call the Guide tool to generate a PDF.
-6. Use `open_observe_view`, `open_sky_view`, or `open_observation_results` to open the corresponding human-facing screen from WebMCP.
+6. Use `open_plan_view`, `open_observe_view`, `open_sky_view`, or `open_observation_results` to open the corresponding human-facing screen from WebMCP.
 
 ## Verification
 

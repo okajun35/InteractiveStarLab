@@ -5,6 +5,7 @@ export interface SiteEditorErrors {
   name?: string;
   latitude?: string;
   longitude?: string;
+  timeZone?: string;
 }
 
 interface SiteEditorProps {
@@ -16,7 +17,7 @@ interface SiteEditorProps {
 export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
   const currentPreset = PLACE_PRESETS.find(
     (place) =>
-      place.latitude === site.latitude && place.longitude === site.longitude,
+      Math.abs(place.latitude - site.latitude) <= 1e-6 && Math.abs(place.longitude - site.longitude) <= 1e-6,
   );
 
   return (
@@ -81,6 +82,19 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
       </div>
 
       <label className="workflow-field">
+        <span className="workflow-field-label">Time Zone <span className="workflow-optional">Optional</span></span>
+        <input
+          type="text"
+          value={site.timeZone ?? ""}
+          onChange={(event) => onChange({ timeZone: event.target.value.trim() || undefined })}
+          placeholder="e.g. Asia/Tokyo"
+          className={errors.timeZone ? "invalid" : undefined}
+          spellCheck={false}
+        />
+        {errors.timeZone && <span className="workflow-error">{errors.timeZone}</span>}
+      </label>
+
+      <label className="workflow-field">
         <span className="workflow-field-label">
           Presets
         </span>
@@ -95,6 +109,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
               name: place.name,
               latitude: place.latitude,
               longitude: place.longitude,
+              timeZone: place.timeZone,
             });
           }}
         >
