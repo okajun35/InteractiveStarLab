@@ -30,8 +30,8 @@ const ALL_ON: StarLayerState = {
 };
 
 check(
-  "L0: default brightness layers start at 1–2 mag",
-  DEFAULT_LAYERS.first && DEFAULT_LAYERS.second && !DEFAULT_LAYERS.third && !DEFAULT_LAYERS.fourth && !DEFAULT_LAYERS.faint,
+  "L0: default brightness layers show through fifth magnitude",
+  DEFAULT_LAYERS.first && DEFAULT_LAYERS.second && DEFAULT_LAYERS.third && DEFAULT_LAYERS.fourth && DEFAULT_LAYERS.faint,
   JSON.stringify(DEFAULT_LAYERS),
 );
 

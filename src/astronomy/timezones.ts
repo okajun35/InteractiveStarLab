@@ -7,6 +7,39 @@ export const TIME_BASIS_LABELS: Record<TimeBasis, string> = {
   "same-utc-instant": "Same UTC",
 };
 
+export function isValidTimeZone(timeZone: unknown): timeZone is string {
+  if (typeof timeZone !== "string" || timeZone.trim() === "") return false;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function validateTimeZone(timeZone: string): string {
+  if (!isValidTimeZone(timeZone)) throw new RangeError("timeZone must be a valid IANA time zone");
+  return timeZone;
+}
+
+export function formatDateTimeInZone(
+  date: Date,
+  timeZone: string,
+  includeTimeZoneName = true,
+): string {
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone,
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    ...(includeTimeZoneName ? { timeZoneName: "short" as const } : {}),
+  };
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+}
+
 function wallClockParts(date: Date, timeZone: string): Record<string, number> {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone,

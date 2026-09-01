@@ -26,6 +26,9 @@ import { SnapshotScreen } from "./components/snapshots/SnapshotScreen";
 import { ObservationGuideScreen } from "./components/guides/ObservationGuideScreen";
 import { PRIMARY_NAV_ITEMS, RECORD_NAV_ITEMS, isRecordView } from "./navigation/navigationModel";
 import { AuthProvider } from "./state/auth";
+import { AgentActivityProvider, useAgentActivity } from "./state/agentActivity";
+import type { SkySceneMetrics } from "./sky/contextModel";
+import { SkySidebar } from "./components/SkySidebar";
 
 function useElementSize() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -51,7 +54,7 @@ function useElementSize() {
 }
 
 /** Main canvas area — single or side-by-side compare (§22). */
-function SkyArea() {
+function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetrics) => void }) {
   const { ref, width, height } = useElementSize();
   const { compare } = useSimulation();
   const { settings: observation } = useStarViewer();
@@ -102,6 +105,7 @@ function SkyArea() {
                 compare.kind === "location" ? localTimeOf(baseDatetime, tokyo) : undefined
               }
               compact
+              onMetricsChange={(metrics) => onMetricsChange({ mode: "compare", baseCount: metrics.visibleCount })}
             />
           </div>
           <div className="compare-divider" aria-hidden="true" />
@@ -117,6 +121,7 @@ function SkyArea() {
                   : undefined
               }
               compact
+              onMetricsChange={(metrics) => onMetricsChange({ mode: "compare", changedCount: metrics.visibleCount })}
             />
           </div>
         </div>
@@ -126,29 +131,88 @@ function SkyArea() {
 
   return (
     <div className="app-canvas" ref={ref}>
-      <StarCanvas width={width} height={height} />
+      <StarCanvas
+        width={width}
+        height={height}
+        onMetricsChange={(metrics) => onMetricsChange({ mode: "single", visibleCount: metrics.visibleCount })}
+      />
     </div>
   );
 }
 
-function SkyWorkspace() {
+function SkyWorkspace({
+  presentation,
+  onPresentationChange,
+}: {
+  presentation: "agent" | "manual";
+  onPresentationChange: (presentation: "agent" | "manual") => void;
+}) {
+  const [metrics, setMetrics] = useState<SkySceneMetrics | null>(null);
+  const metricsRef = useRef<SkySceneMetrics | null>(null);
+  const { reportSceneMetrics } = useAgentActivity();
+  const handleMetricsChange = (next: SkySceneMetrics) => {
+    const previous = metricsRef.current;
+    const merged = next.mode === "compare" && previous?.mode === "compare"
+      ? { ...previous, ...next }
+      : next;
+    metricsRef.current = merged;
+    setMetrics((current) => {
+      if (
+        current?.mode === merged.mode &&
+        current.visibleCount === merged.visibleCount &&
+        current.baseCount === merged.baseCount &&
+        current.changedCount === merged.changedCount
+      ) return current;
+      return merged;
+    });
+    reportSceneMetrics(merged);
+  };
+  if (presentation === "manual") {
+    return (
+      <>
+        <div className="app-main sky-manual-layout">
+          <aside className="app-side">
+            <div className="manual-sky-header">
+              <div>
+                <h2>Manual controls</h2>
+                <p>Adjust the observation conditions directly.</p>
+              </div>
+              <button type="button" onClick={() => onPresentationChange("agent")}>
+                Agent-assisted
+              </button>
+            </div>
+            <ObservationPanel />
+            <MagnitudeLayers />
+            <EnvironmentPanel />
+            <ExperimentPanel />
+            <ComparePanel />
+          </aside>
+
+          <main className="app-main-content">
+            <SkyArea onMetricsChange={handleMetricsChange} />
+          </main>
+        </div>
+
+        <footer className="app-footer">
+          <ObjectInfo />
+        </footer>
+      </>
+    );
+  }
+
   return (
     <>
-      <div className="app-main">
-        <aside className="app-side">
-          <ObservationPanel />
-          <MagnitudeLayers />
-          <EnvironmentPanel />
-          <ExperimentPanel />
-          <ComparePanel />
-        </aside>
-
-        <main className="app-main-content">
-          <SkyArea />
+      <div className="app-main sky-agent-layout">
+        <main className="app-main-content sky-agent-content">
+          <SkyArea onMetricsChange={handleMetricsChange} />
+          <SkySidebar
+            metrics={metrics}
+            onOpenManual={() => onPresentationChange("manual")}
+          />
         </main>
       </div>
 
-      <footer className="app-footer">
+      <footer className="app-footer sky-agent-footer">
         <ObjectInfo />
       </footer>
     </>
@@ -160,6 +224,7 @@ function AppShell() {
   const { activeMissionId, missions } = useObservation();
   const { selectedGuide, getGuideForMission, prepareGuide, selectGuide, generatePdf } = useGuides();
   const [recordsOpen, setRecordsOpen] = useState(false);
+  const [skyPresentation, setSkyPresentation] = useState<"agent" | "manual">("agent");
   const recordsMenuRef = useRef<HTMLDivElement | null>(null);
   const navigate = (nextView: AppView) => {
     setView(nextView);
@@ -282,7 +347,7 @@ function AppShell() {
       ) : view === "guide" ? (
         <ObservationGuideScreen guide={activeGuide} onOpenObserve={() => setView("observe")} onGeneratePdf={generatePdf} />
       ) : (
-        <SkyWorkspace />
+        <SkyWorkspace presentation={skyPresentation} onPresentationChange={setSkyPresentation} />
       )}
     </div>
   );
@@ -297,9 +362,11 @@ export default function App() {
             <NavigationProvider>
               <GuideProvider>
                 <SnapshotProvider>
-                  <WebMcpProvider>
-                    <AppShell />
-                  </WebMcpProvider>
+                  <AgentActivityProvider>
+                    <WebMcpProvider>
+                      <AppShell />
+                    </WebMcpProvider>
+                  </AgentActivityProvider>
                 </SnapshotProvider>
               </GuideProvider>
             </NavigationProvider>

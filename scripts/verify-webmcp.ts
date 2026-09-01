@@ -136,12 +136,14 @@ const night = "2026-08-29T11:00:00.000Z";
   });
   const siteTool = registered.find((tool) => tool.name === "set_observation_site")!;
   const viewTool = registered.find((tool) => tool.name === "set_sky_view_settings")!;
-  const siteResult = JSON.parse(String(await siteTool.execute({ name: " Tokyo ", latitude: 35.7, longitude: 139.8 })));
-  check("MCP-G1: site tool updates site and Sky location", siteResult.ok === true && siteResult.data.site.name === "Tokyo" && currentSite.latitude === 35.7 && currentObservation.longitude === 139.8);
+  const siteResult = JSON.parse(String(await siteTool.execute({ name: " Tokyo ", latitude: 35.7, longitude: 139.8, timeZone: "Asia/Tokyo" })));
+  check("MCP-G1: site tool updates site and Sky location", siteResult.ok === true && siteResult.data.site.name === "Tokyo" && siteResult.data.site.timeZone === "Asia/Tokyo" && currentSite.latitude === 35.7 && currentObservation.longitude === 139.8);
   const viewResult = JSON.parse(String(await viewTool.execute({ dateTime: "2026-08-29T12:00:00.000Z", azimuth: 90 })));
   check("MCP-G1: view tool applies partial settings", viewResult.ok === true && viewResult.data.dateTime === "2026-08-29T12:00:00.000Z" && viewResult.data.azimuth === 90 && viewResult.data.altitude === 30);
   const invalidSite = JSON.parse(String(await siteTool.execute({ latitude: 91, longitude: 0 })));
   check("MCP-G2: invalid site input returns failure", invalidSite.ok === false && invalidSite.error.code === "INVALID_ARGUMENT");
+  const invalidTimeZone = JSON.parse(String(await siteTool.execute({ latitude: 35.7, longitude: 139.8, timeZone: "Mars/Olympus" })));
+  check("MCP-G2: invalid IANA time zone returns failure", invalidTimeZone.ok === false && invalidTimeZone.error.code === "INVALID_ARGUMENT");
   const emptyView = JSON.parse(String(await viewTool.execute({})));
   check("MCP-G2: empty view patch returns failure", emptyView.ok === false && emptyView.error.code === "INVALID_ARGUMENT");
   const normalized = normalizeObservationSitePatch({ name: " Home ", latitude: 0, longitude: 0 });
@@ -509,9 +511,10 @@ console.log("\nAll WebMCP domain checks passed.");
 }
 
 // MCP-C: Agent-created plans are persisted through the app callback and move
-// the application to the Observe view.
+// the application to the Plan review view.
 {
-  const created: ObservationRecord[] = [];
+  const created: Array<{ missionId: string }> = [];
+  let openedPlan = false;
   let openedObserve = false;
   const registered: WebMcpTool[] = [];
   const modelContext: WebMcpModelContext = {
@@ -526,15 +529,28 @@ console.log("\nAll WebMCP domain checks passed.");
   await registerPlanTools(modelContext, {
     getObservationSite: () => site,
     createObservationPlan: () => mission,
+    getActiveMissionId: () => mission.id,
+    openPlan: () => {
+      openedPlan = true;
+    },
     openObserve: () => {
       openedObserve = true;
     },
+    reportPlanMissionCreated: (activity) => {
+      created.push({ missionId: activity.missionId });
+    },
   });
-  check("MCP-C1: registers the create plan tool", registered.map((tool) => tool.name).join(",") === "create_observation_plan");
-  const planTool = registered[0]!;
+  check("MCP-C1: registers Plan navigation and create tools", registered.map((tool) => tool.name).join(",") === "open_plan_view,create_observation_plan");
+  const openPlanTool = registered[0]!;
+  const opened = JSON.parse(String(await openPlanTool.execute({})));
+  check("MCP-C1: open_plan_view returns the active Mission", opened.ok === true && opened.data.view === "plan" && opened.data.activeMissionId === mission.id && openedPlan);
+  const invalidPlanOpen = JSON.parse(String(await openPlanTool.execute({ unexpected: true })));
+  check("MCP-C1: open_plan_view rejects extra input", invalidPlanOpen.ok === false && invalidPlanOpen.error.code === "INVALID_ARGUMENT");
+  const planTool = registered[1]!;
   const result = JSON.parse(String(await planTool.execute({ dateTime: night, maxMagnitude: 2, starIds: ["vega", "altair"] })));
   check("MCP-C1: plan tool returns mission id and target count", result.ok === true && result.data.missionId === "mission-mcp-c" && result.data.targetCount === 2);
-  check("MCP-C1: plan tool opens Observe", openedObserve);
+  check("MCP-C1: plan tool opens Plan", result.data.view === "plan" && openedPlan && !openedObserve);
+  check("MCP-C1: plan tool records activity after creation", created.length === 1 && created[0]?.missionId === mission.id);
   const tooMany = JSON.parse(String(await planTool.execute({ dateTime: night, maxMagnitude: 2, starIds: ["vega", "altair", "deneb", "sirius", "polaris", "rigel"] })));
   check("MCP-C2: plan tool rejects more than five stars", tooMany.ok === false && tooMany.error.code === "INVALID_ARGUMENT");
   void created;

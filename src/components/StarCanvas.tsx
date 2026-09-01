@@ -14,6 +14,11 @@ import { STAR_BY_ID } from "../astronomy/stars";
 import { TWILIGHT_LABELS } from "../astronomy/twilight";
 import type { Star } from "../types/astronomy";
 
+export interface StarCanvasMetrics {
+  visibleCount: number;
+  inViewCount: number;
+}
+
 interface StarCanvasProps {
   width: number;
   height: number;
@@ -25,6 +30,7 @@ interface StarCanvasProps {
   timeLabel?: string;
   /** Hide the snapshot button (used in compare mode). */
   compact?: boolean;
+  onMetricsChange?: (metrics: StarCanvasMetrics) => void;
 }
 
 export function StarCanvas({
@@ -34,6 +40,7 @@ export function StarCanvas({
   label,
   timeLabel,
   compact,
+  onMetricsChange,
 }: StarCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const {
@@ -63,6 +70,7 @@ export function StarCanvas({
   simRef.current = sim;
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const metricsKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -85,6 +93,12 @@ export function StarCanvas({
       selectedStar?.id,
     );
 
+    const metricsKey = `${scene.visibleCount}:${scene.inViewCount}`;
+    if (onMetricsChange !== undefined && metricsKeyRef.current !== metricsKey) {
+      metricsKeyRef.current = metricsKey;
+      onMetricsChange({ visibleCount: scene.visibleCount, inViewCount: scene.inViewCount });
+    }
+
     // Sun (§15): always drawn when in view, even in "removed" mode.
     if (scene.sunX !== null && scene.sunY !== null) {
       drawSun(ctx, scene.sunX, scene.sunY, selectedSun ? 18 : 14);
@@ -104,6 +118,7 @@ export function StarCanvas({
     selectedSun,
     width,
     height,
+    onMetricsChange,
   ]);
 
   const findHit = (px: number, py: number): { kind: "star" | "sun"; id?: string } | null => {

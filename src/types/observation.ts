@@ -10,6 +10,8 @@ export interface ObservationSite {
   name: string;
   latitude: number;
   longitude: number;
+  /** Optional IANA zone used for human-facing Mission and Sky formatting. */
+  timeZone?: string;
 }
 
 export type ObservationStatus = "visible" | "not_visible" | "unsure";

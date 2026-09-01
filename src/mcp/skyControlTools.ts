@@ -12,6 +12,7 @@ import {
   normalizeSkyDisplaySettingsPatch,
   normalizeSkyViewSettingsPatch,
 } from "./skyControlServices";
+import { resolveSkyLocation, valuesEqual, type SkyContextField, type SkyFieldChange } from "../sky/contextModel";
 
 export interface SkyControlToolState {
   getObservationSite: () => ObservationSite;
@@ -30,6 +31,19 @@ export interface SkyControlToolState {
   setShowHiddenStars: (value: boolean) => void;
   openSky: () => void;
   openObserve: () => void;
+  reportSkyMutation?: (report: { toolName: string; changes: SkyFieldChange[] }) => void;
+}
+
+function changed(field: SkyContextField, before: unknown, after: unknown, derived = false): SkyFieldChange | null {
+  return valuesEqual(before, after) ? null : { field, before, after, ...(derived ? { derived: true } : {}) };
+}
+
+function reportSkyMutation(state: SkyControlToolState, toolName: string, changes: SkyFieldChange[]): void {
+  try {
+    state.reportSkyMutation?.({ toolName, changes });
+  } catch {
+    // Activity presentation is best effort and must never fail a tool call.
+  }
 }
 
 function openSkyViewTool(state: SkyControlToolState): WebMcpTool {
@@ -87,6 +101,7 @@ function setObservationSiteTool(state: SkyControlToolState): WebMcpTool {
         name: { type: "string", description: "Optional display name; the existing name is kept when omitted" },
         latitude: { type: "number", minimum: -90, maximum: 90, description: "Latitude in degrees" },
         longitude: { type: "number", minimum: -180, maximum: 180, description: "Longitude in degrees" },
+        timeZone: { type: "string", description: "Optional IANA time zone, for example Asia/Tokyo" },
       },
       required: ["latitude", "longitude"],
       additionalProperties: false,
@@ -96,8 +111,15 @@ function setObservationSiteTool(state: SkyControlToolState): WebMcpTool {
       const patch = normalizeObservationSitePatch(input);
       const current = state.getObservationSite();
       const site = applyObservationSitePatch(current, patch);
-      state.updateObservationSite({ name: site.name, latitude: site.latitude, longitude: site.longitude });
+      state.updateObservationSite({ name: site.name, latitude: site.latitude, longitude: site.longitude, timeZone: site.timeZone });
       state.updateObservationSettings({ latitude: site.latitude, longitude: site.longitude });
+      const beforeLocation = resolveSkyLocation(current, current).label;
+      const afterLocation = resolveSkyLocation(site, site).label;
+      const changes = [
+        changed("location", beforeLocation, afterLocation),
+        changed("coordinates", [current.latitude, current.longitude], [site.latitude, site.longitude]),
+      ].filter((item): item is SkyFieldChange => item !== null);
+      reportSkyMutation(state, "set_observation_site", changes);
       return { site, skyLocationSynchronized: true };
     }),
   };
@@ -129,6 +151,13 @@ function setSkyViewSettingsTool(state: SkyControlToolState): WebMcpTool {
         ...(patch.altitude === undefined ? {} : { altitude: view.altitude }),
         ...(patch.fieldOfView === undefined ? {} : { fieldOfView: view.fieldOfView }),
       });
+      const changes = [
+        patch.dateTime === undefined ? null : changed("dateTime", current.datetime.toISOString(), view.dateTime),
+        patch.azimuth === undefined ? null : changed("direction", current.azimuth, view.azimuth),
+        patch.altitude === undefined ? null : changed("altitude", current.altitude, view.altitude),
+        patch.fieldOfView === undefined ? null : changed("fieldOfView", current.fieldOfView, view.fieldOfView),
+      ].filter((item): item is SkyFieldChange => item !== null);
+      reportSkyMutation(state, "set_sky_view_settings", changes);
       return view;
     }),
   };
@@ -177,6 +206,19 @@ function setSkyDisplaySettingsTool(state: SkyControlToolState): WebMcpTool {
       if (patch.limitingMagnitude !== undefined) state.setLimitingMagnitude(next.simulation.limitingMagnitude);
       if (patch.observerSensitivity !== undefined) state.setObserverSensitivity(next.simulation.observerSensitivity ?? 0);
       if (patch.showHiddenStars !== undefined) state.setShowHiddenStars(next.simulation.showHiddenStars);
+      const changes = [
+        changed("stars", current.displayOptions.stars, next.displayOptions.stars),
+        changed("starNames", current.displayOptions.starNames, next.displayOptions.starNames),
+        changed("constellationLines", current.displayOptions.constellationLines, next.displayOptions.constellationLines),
+        changed("constellationNames", current.displayOptions.constellationNames, next.displayOptions.constellationNames),
+        changed("brightnessLayers", current.layers, next.layers),
+        changed("daylight", current.simulation.daylightMode, next.simulation.daylightMode),
+        changed("lightPollution", current.simulation.lightPollution, next.simulation.lightPollution),
+        changed("limitingMagnitude", current.simulation.limitingMagnitude, next.simulation.limitingMagnitude),
+        changed("observerSensitivity", current.simulation.observerSensitivity ?? 0, next.simulation.observerSensitivity ?? 0),
+        changed("hiddenStars", current.simulation.showHiddenStars, next.simulation.showHiddenStars),
+      ].filter((item): item is SkyFieldChange => item !== null);
+      reportSkyMutation(state, "set_sky_display_settings", changes);
       return next;
     }),
   };

@@ -5,6 +5,7 @@ import type {
   ObservationSite,
   ObservationTarget,
 } from "../types/observation";
+import { isValidTimeZone } from "../astronomy/timezones";
 
 function object(value: unknown): Record<string, unknown> | null {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -26,7 +27,8 @@ function site(value: unknown): value is ObservationSite {
     && string(candidate.id)
     && string(candidate.name)
     && finite(candidate.latitude) && candidate.latitude >= -90 && candidate.latitude <= 90
-    && finite(candidate.longitude) && candidate.longitude >= -180 && candidate.longitude <= 180;
+    && finite(candidate.longitude) && candidate.longitude >= -180 && candidate.longitude <= 180
+    && (candidate.timeZone === undefined || isValidTimeZone(candidate.timeZone));
 }
 
 function target(value: unknown): value is ObservationTarget {

@@ -17,6 +17,7 @@ import { useSnapshots } from "./snapshots";
 import { useGuides } from "./guides";
 import { registerGuideTools } from "../mcp/guideTools";
 import { registerRecoveryTools } from "../mcp/recoveryTools";
+import { useAgentActivity } from "./agentActivity";
 
 export interface WebMcpState {
   availability: WebMcpAvailability;
@@ -34,6 +35,7 @@ const WebMcpContext = createContext<WebMcpState | null>(null);
 export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const {
     activeSite,
+    activeMissionId,
     missions,
     records,
     selectedRecordMissionId,
@@ -62,6 +64,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const { setView } = useNavigation();
   const { captureSnapshot, downloadRecord, snapshots, getSnapshot, isCloudSnapshot, getSnapshotStoragePath, getSnapshotAccessUrl } = useSnapshots();
   const { prepareGuide, selectedGuide, generatePdfForGuide } = useGuides();
+  const { reportSkyMutation, reportPlanMissionCreated } = useAgentActivity();
   const siteRef = useRef(activeSite);
   const observationRef = useRef(observation);
   const simulationRef = useRef(simulation);
@@ -99,6 +102,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const setViewRef = useRef(setView);
   const recordsRef = useRef(records);
   const selectedRecordMissionIdRef = useRef(selectedRecordMissionId);
+  const activeMissionIdRef = useRef(activeMissionId);
+  const reportSkyMutationRef = useRef(reportSkyMutation);
+  const reportPlanMissionCreatedRef = useRef(reportPlanMissionCreated);
   siteRef.current = activeSite;
   observationRef.current = observation;
   simulationRef.current = simulation;
@@ -136,6 +142,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   setViewRef.current = setView;
   recordsRef.current = records;
   selectedRecordMissionIdRef.current = selectedRecordMissionId;
+  activeMissionIdRef.current = activeMissionId;
+  reportSkyMutationRef.current = reportSkyMutation;
+  reportPlanMissionCreatedRef.current = reportPlanMissionCreated;
 
   const [availability, setAvailability] = useState<WebMcpAvailability>("unknown");
   const registeredToolNames = useMemo(
@@ -144,6 +153,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "predict_visible_stars",
       "get_current_sky_state",
       "create_observation_plan",
+      "open_plan_view",
       "restore_observation_mission",
       "get_observation_mission",
       "get_observation_results",
@@ -187,16 +197,21 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         modelContext,
         {
           getObservationSite: () => siteRef.current,
-          createObservationPlan: (input) => {
+          getActiveMissionId: () => activeMissionIdRef.current,
+          createObservationPlan: async (input) => {
             const planned = createObservationPlanFromStarIds(input);
-            return createMissionAndPersistRef.current({
+            const mission = await createMissionAndPersistRef.current({
               dateTime: planned.dateTime,
               maxMagnitude: planned.maxMagnitude,
               targets: planned.targets,
             });
+            activeMissionIdRef.current = mission.id;
+            return mission;
           },
+          openPlan: () => setViewRef.current("plan"),
           openObserve: () => setViewRef.current("observe"),
           isCloudEnabled: () => cloudAuthenticatedRef.current,
+          reportPlanMissionCreated: (activity) => reportPlanMissionCreatedRef.current(activity),
         },
         { signal: controller.signal },
       ))
@@ -249,6 +264,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
           setShowHiddenStars: (value) => setShowHiddenStarsRef.current(value),
           openSky: () => setViewRef.current("sky"),
           openObserve: () => setViewRef.current("observe"),
+          reportSkyMutation: (activity) => reportSkyMutationRef.current(activity),
         },
         { signal: controller.signal },
       ))

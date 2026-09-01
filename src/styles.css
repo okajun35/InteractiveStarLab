@@ -46,6 +46,7 @@ body {
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  position: relative;
 }
 
 .app-header {
@@ -890,6 +891,135 @@ button[aria-label="Close"] {
   flex-direction: column;
 }
 
+.sky-agent-layout,
+.sky-agent-content {
+  min-height: 0;
+}
+
+.sky-agent-content {
+  position: relative;
+  overflow: hidden;
+}
+
+.sky-agent-window {
+  position: absolute;
+  z-index: 4;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  width: min(310px, calc(100% - 28px));
+  max-height: calc(100% - 28px);
+  overflow-y: auto;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  background: rgba(17, 21, 31, 0.88);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+}
+
+.sky-agent-window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.sky-agent-window-header h2,
+.sky-agent-eyebrow {
+  margin: 0;
+}
+
+.sky-agent-window-header h2 {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.sky-agent-eyebrow {
+  display: block;
+  margin-bottom: 1px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sky-agent-window-header button {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-color: var(--accent);
+  background: rgba(96, 165, 250, 0.12);
+  font-size: 0.72rem;
+}
+
+.sky-context-panel-compact {
+  padding: 11px 10px 4px;
+}
+
+.sky-context-panel-compact .sky-context-section {
+  margin-top: 12px;
+}
+
+.sky-agent-manual-link {
+  width: calc(100% - 20px);
+  margin: 6px 10px 10px;
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.08);
+  font-size: 0.72rem;
+}
+
+.sky-agent-footer {
+  position: absolute;
+  z-index: 3;
+  right: 18px;
+  bottom: 12px;
+  left: 18px;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.sky-agent-footer .object-info {
+  width: fit-content;
+  max-width: min(100%, 760px);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  background: rgba(17, 21, 31, 0.82);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.manual-sky-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.manual-sky-header h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.manual-sky-header p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.manual-sky-header button {
+  flex: 0 0 auto;
+  border-color: var(--accent);
+  background: rgba(96, 165, 250, 0.12);
+  font-size: 0.7rem;
+}
+
 /* ── observation planning workflow ─────────────────────── */
 .app-header-topline {
   display: flex;
@@ -1415,6 +1545,409 @@ button[aria-label="Close"] {
 
   .mission-create-btn {
     width: 100%;
+  }
+}
+
+/* WebMCP-first Sky context and Plan review surfaces. */
+.sky-sidebar {
+  min-width: 0;
+}
+
+.sky-context-panel {
+  padding: 14px 12px 8px;
+}
+
+.sky-context-status-row,
+.plan-empty-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sky-context-status-row h2,
+.plan-empty-heading h1 {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.sky-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.67rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.sky-status-ready {
+  color: var(--ok);
+}
+
+.sky-status-error {
+  color: #fbbf24;
+}
+
+.sky-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sky-fallback-note,
+.workflow-optional {
+  color: var(--muted);
+  font-size: 0.73rem;
+}
+
+.sky-fallback-note {
+  margin: 6px 0 8px;
+}
+
+.sky-activity-summary {
+  display: grid;
+  gap: 1px;
+  margin: 10px 0;
+  padding: 8px 9px;
+  border-left: 2px solid var(--accent);
+  background: rgba(96, 165, 250, 0.08);
+  font-size: 0.73rem;
+}
+
+.sky-activity-summary span {
+  color: var(--muted);
+}
+
+.sky-context-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sky-context-section {
+  margin-top: 17px;
+}
+
+.sky-context-section h3 {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sky-context-list {
+  margin: 0;
+}
+
+.sky-context-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+  gap: 8px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.sky-context-row dt {
+  color: var(--muted);
+}
+
+.sky-context-row dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.sky-context-row.changed {
+  border-color: rgba(96, 165, 250, 0.65);
+  background: rgba(96, 165, 250, 0.13);
+}
+
+.sky-context-diff {
+  display: block;
+  margin-top: 2px;
+  color: var(--accent);
+  font-size: 0.67rem;
+  text-align: right;
+}
+
+.sky-context-compare-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 12px 6px 4px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.sky-context-compare-row strong {
+  color: var(--text);
+  text-align: right;
+}
+
+.sky-manual-toggle,
+.plan-manual-toggle {
+  width: calc(100% - 24px);
+  margin: 8px 12px 12px;
+  border-color: var(--accent);
+  background: rgba(96, 165, 250, 0.1);
+  font-weight: 700;
+}
+
+.sky-manual-controls {
+  border-top: 1px solid var(--line);
+}
+
+.sky-manual-controls .panel {
+  border-bottom: 1px solid var(--line);
+}
+
+.app-side .panel {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.plan-container {
+  max-width: 1180px;
+}
+
+.plan-empty-state,
+.plan-summary {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.plan-empty-state {
+  padding: 24px;
+}
+
+.plan-empty-state h2 {
+  margin: 30px 0 6px;
+  font-size: 1.35rem;
+}
+
+.plan-empty-state p {
+  max-width: 620px;
+  color: var(--muted);
+}
+
+.plan-example {
+  display: grid;
+  gap: 2px;
+  margin: 18px 0;
+  padding: 11px 13px;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+}
+
+.plan-example q {
+  color: var(--text);
+}
+
+.plan-summary {
+  padding: 4px 0 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+
+.plan-summary-highlighted {
+  border-color: rgba(96, 165, 250, 0.7);
+  background: rgba(96, 165, 250, 0.05);
+}
+
+.plan-summary-hero {
+  margin-bottom: 16px;
+  padding: 0 18px;
+}
+
+.plan-summary-hero h1 {
+  margin-top: 2px;
+}
+
+.plan-activity {
+  color: var(--accent) !important;
+  font-size: 0.82rem;
+}
+
+.plan-live-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.plan-context-card,
+.plan-targets-section {
+  margin: 0 18px 18px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(22, 27, 40, 0.7);
+}
+
+.plan-context-card h2,
+.plan-targets-section h2 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+}
+
+.mission-context-list,
+.plan-target-facts {
+  margin: 0;
+}
+
+.mission-context-row {
+  display: grid;
+  grid-template-columns: minmax(125px, 0.7fr) minmax(0, 1.5fr);
+  gap: 14px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(35, 43, 61, 0.8);
+  font-size: 0.82rem;
+}
+
+.mission-context-row:last-child {
+  border-bottom: 0;
+}
+
+.mission-context-row dt,
+.plan-target-facts dt {
+  color: var(--muted);
+}
+
+.mission-context-row dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.selectable-value {
+  user-select: text;
+}
+
+.plan-target-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-target-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel-2);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.plan-target-highlighted {
+  border-color: rgba(96, 165, 250, 0.65);
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.plan-target-card-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan-target-card h3 {
+  margin: 0;
+  font-size: 0.93rem;
+}
+
+.plan-target-card-heading > strong {
+  color: var(--ok);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.primary-target-label {
+  display: inline-block;
+  margin-top: 3px;
+  color: var(--accent);
+  font-size: 0.67rem;
+}
+
+.plan-target-facts .mission-context-row {
+  grid-template-columns: 1fr 1fr;
+  padding: 4px 0;
+  font-size: 0.75rem;
+}
+
+.plan-target-facts .mission-context-row dd {
+  text-align: right;
+}
+
+.plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 18px;
+}
+
+.plan-actions button {
+  flex: 1 1 160px;
+}
+
+.plan-manual-editor {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.plan-manual-editor .workflow-grid {
+  margin-top: 0;
+}
+
+@media (max-width: 860px) {
+  .sky-context-panel {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .sky-context-row {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  .plan-summary-hero,
+  .plan-context-card,
+  .plan-targets-section,
+  .plan-actions {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .plan-actions {
+    flex-direction: column;
+  }
+
+  .plan-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-context-row,
+  .plan-target-card {
+    transition: none;
   }
 }
 

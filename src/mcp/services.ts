@@ -26,6 +26,7 @@ import type {
   PredictVisibleStarsResult,
   PredictedStarToolResult,
 } from "./contracts";
+import { isValidTimeZone } from "../astronomy/timezones";
 
 const DEFAULT_VIEW = {
   azimuth: 180,
@@ -42,7 +43,8 @@ function assertSite(site: ObservationSite): void {
     site.latitude > 90 ||
     !Number.isFinite(site.longitude) ||
     site.longitude < -180 ||
-    site.longitude > 180
+    site.longitude > 180 ||
+    (site.timeZone !== undefined && !isValidTimeZone(site.timeZone))
   ) {
     throw new RangeError("site is invalid");
   }

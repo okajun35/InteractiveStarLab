@@ -2,6 +2,7 @@ import type { DisplayOptions, SimulationSettings } from "../types/astronomy";
 import type { ObservationMission, ObservationSite } from "../types/observation";
 import type { StarLayerState } from "../astronomy/visibilityModel";
 import type { SkySnapshotMetadata, SkySnapshotRecord, SkySnapshotView } from "../snapshots/types";
+import { isValidTimeZone } from "../astronomy/timezones";
 
 export const CLOUD_SNAPSHOT_BUCKET = "observation-assets";
 export const MAX_SKY_SNAPSHOT_BYTES = 10 * 1024 * 1024;
@@ -61,7 +62,8 @@ function validSite(value: unknown): value is ObservationSite {
   return candidate !== null
     && nonEmpty(candidate.id) && nonEmpty(candidate.name)
     && finite(candidate.latitude) && candidate.latitude >= -90 && candidate.latitude <= 90
-    && finite(candidate.longitude) && candidate.longitude >= -180 && candidate.longitude <= 180;
+    && finite(candidate.longitude) && candidate.longitude >= -180 && candidate.longitude <= 180
+    && (candidate.timeZone === undefined || isValidTimeZone(candidate.timeZone));
 }
 
 function validView(value: unknown): value is SkySnapshotView {

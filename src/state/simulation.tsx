@@ -27,9 +27,9 @@ import { useStarViewer } from "./context";
 export const DEFAULT_LAYERS: StarLayerState = {
   first: true,
   second: true,
-  third: false,
-  fourth: false,
-  faint: false,
+  third: true,
+  fourth: true,
+  faint: true,
 };
 
 /** State captured before a What-If experiment is applied. */
@@ -57,7 +57,7 @@ export function cloneExperimentSnapshot(
 }
 
 const DEFAULT_SETTINGS: SimulationSettings = {
-  // Keep the existing look: catalog goes to ~4.95, dark-sky limit 5.5.
+  // Start with a full, dark-sky view that includes the catalog's fifth-magnitude range.
   daylightMode: "real",
   lightPollution: "dark-sky",
   limitingMagnitude: lightPollutionLimit("dark-sky"),
