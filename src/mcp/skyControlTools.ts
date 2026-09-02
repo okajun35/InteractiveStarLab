@@ -64,6 +64,10 @@ function configureSkyViewTool(state: SkyControlToolState): WebMcpTool {
         fieldOfView: { type: "number", minimum: 20, maximum: 140 },
       },
       required: ["localDateTime"],
+      oneOf: [
+        { type: "object", required: ["preset"] },
+        { type: "object", required: ["site"] },
+      ],
       additionalProperties: false,
     },
     annotations: { readOnlyHint: false, untrustedContentHint: true },
