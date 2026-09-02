@@ -10,7 +10,7 @@ export interface NavigationState {
 const NavigationContext = createContext<NavigationState | null>(null);
 
 export function NavigationProvider({ children }: { children: React.ReactNode }) {
-  const [view, setView] = useState<AppView>("plan");
+  const [view, setView] = useState<AppView>("sky");
   const value = useMemo(() => ({ view, setView }), [view]);
   return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
 }
