@@ -2,6 +2,8 @@ import type { DisplayOptions, ObservationSettings, SimulationSettings } from "..
 import type { ObservationSite } from "../types/observation";
 import type { StarLayerState } from "../astronomy/visibilityModel";
 import type { MagnitudeLayer } from "../astronomy/magnitude";
+import { PLACE_PRESETS } from "../astronomy/directions";
+import { isValidTimeZone, localDateTimeToInstant } from "../astronomy/timezones";
 import { assertObject, assertOnlyKeys, safeExecute } from "./input";
 import type { WebMcpModelContext, WebMcpRegisterOptions, WebMcpTool } from "./webmcp";
 import {
@@ -32,6 +34,94 @@ export interface SkyControlToolState {
   openSky: () => void;
   openObserve: () => void;
   reportSkyMutation?: (report: { toolName: string; changes: SkyFieldChange[] }) => void;
+}
+
+function configureSkyViewTool(state: SkyControlToolState): WebMcpTool {
+  const presetNames = PLACE_PRESETS.flatMap((preset) => [preset.id, preset.name]);
+  return {
+    name: "configure_sky_view",
+    title: "Configure and open sky view",
+    description: "Configures a location and local wall-clock time, then opens Sky in one operation. Use either a built-in preset id (for example new-york) or a custom site with latitude, longitude, and timeZone. localDateTime has no UTC offset and is interpreted in the selected site's time zone.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        preset: { type: "string", enum: presetNames, description: "Built-in place preset id or name" },
+        site: {
+          type: "object",
+          description: "Custom site; required when preset is omitted",
+          properties: {
+            name: { type: "string" },
+            latitude: { type: "number", minimum: -90, maximum: 90 },
+            longitude: { type: "number", minimum: -180, maximum: 180 },
+            timeZone: { type: "string", description: "IANA time zone, for example America/New_York" },
+          },
+          required: ["name", "latitude", "longitude", "timeZone"],
+          additionalProperties: false,
+        },
+        localDateTime: { type: "string", description: "Local time as YYYY-MM-DDTHH:mm or YYYY-MM-DDTHH:mm:ss" },
+        azimuth: { type: "number", minimum: 0, maximum: 359.999999 },
+        altitude: { type: "number", minimum: 0, maximum: 90 },
+        fieldOfView: { type: "number", minimum: 20, maximum: 140 },
+      },
+      required: ["localDateTime"],
+      oneOf: [
+        { type: "object", required: ["preset"] },
+        { type: "object", required: ["site"] },
+      ],
+      additionalProperties: false,
+    },
+    annotations: { readOnlyHint: false, untrustedContentHint: true },
+    execute: (input) => safeExecute(() => {
+      const object = assertObject(input);
+      assertOnlyKeys(object, ["preset", "site", "localDateTime", "azimuth", "altitude", "fieldOfView"]);
+      const hasPreset = object.preset !== undefined;
+      const hasSite = object.site !== undefined;
+      if (hasPreset === hasSite) throw new RangeError("provide exactly one of preset or site");
+      const currentSite = state.getObservationSite();
+      let site: ObservationSite;
+      if (hasPreset) {
+        if (typeof object.preset !== "string") throw new RangeError("preset must be a string");
+        const presetValue = object.preset.trim().toLowerCase();
+        const preset = PLACE_PRESETS.find((item) => item.id === presetValue || item.name.toLowerCase() === presetValue);
+        if (preset === undefined) throw new RangeError(`unknown preset: ${object.preset}`);
+        site = applyObservationSitePatch(currentSite, {
+          name: preset.name,
+          latitude: preset.latitude,
+          longitude: preset.longitude,
+          timeZone: preset.timeZone,
+        });
+      } else {
+        const custom = normalizeObservationSitePatch(object.site);
+        if (custom.name === undefined || custom.timeZone === undefined) {
+          throw new RangeError("custom site requires name and timeZone");
+        }
+        site = applyObservationSitePatch(currentSite, custom);
+      }
+      if (typeof object.localDateTime !== "string") throw new RangeError("localDateTime must be a string");
+      if (!isValidTimeZone(site.timeZone)) throw new RangeError("selected site must have a valid timeZone");
+      const dateTime = localDateTimeToInstant(object.localDateTime, site.timeZone).toISOString();
+      const current = state.getObservationSettings();
+      const viewPatch = normalizeSkyViewSettingsPatch({
+        dateTime,
+        ...(object.azimuth === undefined ? {} : { azimuth: object.azimuth as number }),
+        ...(object.altitude === undefined ? {} : { altitude: object.altitude as number }),
+        ...(object.fieldOfView === undefined ? {} : { fieldOfView: object.fieldOfView as number }),
+      });
+      const view = applySkyViewSettingsPatch(current, viewPatch);
+      state.updateObservationSite({ name: site.name, latitude: site.latitude, longitude: site.longitude, timeZone: site.timeZone });
+      state.updateObservationSettings({ latitude: site.latitude, longitude: site.longitude, datetime: new Date(view.dateTime), azimuth: view.azimuth, altitude: view.altitude, fieldOfView: view.fieldOfView });
+      state.openSky();
+      reportSkyMutation(state, "configure_sky_view", [
+        changed("location", resolveSkyLocation(currentSite, currentSite).label, resolveSkyLocation(site, site).label),
+        changed("coordinates", [currentSite.latitude, currentSite.longitude], [site.latitude, site.longitude]),
+        changed("dateTime", current.datetime.toISOString(), view.dateTime),
+        changed("direction", current.azimuth, view.azimuth),
+        changed("altitude", current.altitude, view.altitude),
+        changed("fieldOfView", current.fieldOfView, view.fieldOfView),
+      ].filter((item): item is SkyFieldChange => item !== null));
+      return { view: "sky" as const, site, ...view };
+    }),
+  };
 }
 
 function changed(field: SkyContextField, before: unknown, after: unknown, derived = false): SkyFieldChange | null {
@@ -229,6 +319,7 @@ export async function registerSkyControlTools(
   state: SkyControlToolState,
   options: WebMcpRegisterOptions = {},
 ): Promise<void> {
+  await modelContext.registerTool(configureSkyViewTool(state), options);
   await modelContext.registerTool(openSkyViewTool(state), options);
   await modelContext.registerTool(openObserveViewTool(state), options);
   await modelContext.registerTool(setObservationSiteTool(state), options);

@@ -61,6 +61,31 @@ function localWallAsUtc(date: Date, timeZone: string): number {
   return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second, date.getMilliseconds());
 }
 
+/** Converts a local wall-clock value (without an offset) into an instant. */
+export function localDateTimeToInstant(value: string, timeZone: string): Date {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value);
+  if (match === null) throw new RangeError("localDateTime must be YYYY-MM-DDTHH:mm or YYYY-MM-DDTHH:mm:ss");
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText = "0"] = match;
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  const second = Number(secondText);
+  const wallUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+  const wallDate = new Date(wallUtc);
+  if (
+    wallDate.getUTCFullYear() !== year ||
+    wallDate.getUTCMonth() !== month - 1 ||
+    wallDate.getUTCDate() !== day ||
+    wallDate.getUTCHours() !== hour ||
+    wallDate.getUTCMinutes() !== minute ||
+    wallDate.getUTCSeconds() !== second
+  ) throw new RangeError("localDateTime is not a valid calendar date");
+  const offset = localWallAsUtc(wallDate, timeZone) - wallUtc;
+  return new Date(wallUtc - offset);
+}
+
 function sameWallClockInstant(
   date: Date,
   from: PlacePreset,

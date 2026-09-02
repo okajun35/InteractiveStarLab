@@ -12,6 +12,7 @@ export interface WebMcpSchemaProperty {
   properties?: Record<string, WebMcpSchemaProperty>;
   required?: string[];
   additionalProperties?: boolean;
+  oneOf?: WebMcpJsonSchema[];
 }
 
 export interface WebMcpJsonSchema extends WebMcpSchemaProperty {

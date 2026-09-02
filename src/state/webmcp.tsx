@@ -158,6 +158,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "get_observation_mission",
       "get_observation_results",
       "compare_prediction_and_observation",
+      "configure_sky_view",
       "open_sky_view",
       "open_observe_view",
       "set_observation_site",
