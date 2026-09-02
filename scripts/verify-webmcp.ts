@@ -32,6 +32,7 @@ import {
 import type { WebMcpModelContext, WebMcpTool } from "../src/mcp/webmcp";
 import type { ObservationSettings, SimulationSettings } from "../src/types/astronomy";
 import type { ObservationRecord, ObservationSite } from "../src/types/observation";
+import { localDateTimeToInstant } from "../src/astronomy/timezones";
 
 let failures = 0;
 function check(name: string, ok: boolean, detail = ""): void {
@@ -148,6 +149,16 @@ const night = "2026-08-29T11:00:00.000Z";
   check("MCP-G2: empty view patch returns failure", emptyView.ok === false && emptyView.error.code === "INVALID_ARGUMENT");
   const normalized = normalizeObservationSitePatch({ name: " Home ", latitude: 0, longitude: 0 });
   check("MCP-G3: site normalization trims only the display name", applyObservationSitePatch(site, normalized).name === "Home");
+
+  const configureTool = registered.find((tool) => tool.name === "configure_sky_view")!;
+  let configuredSky = false;
+  const configured = JSON.parse(String(await configureTool.execute({
+    preset: "New York",
+    localDateTime: "2026-09-03T21:00",
+  })));
+  configuredSky = configured.data.view === "sky";
+  check("MCP-G4: configure_sky_view applies preset and local time in one call", configured.ok === true && configuredSky && configured.data.site.timeZone === "America/New_York" && configured.data.dateTime === "2026-09-04T01:00:00.000Z" && currentObservation.latitude === 40.7128 && currentObservation.longitude === -74.006);
+  check("MCP-G4: local wall clock conversion honors the selected time zone", localDateTimeToInstant("2026-09-03T21:00", "America/New_York").toISOString() === "2026-09-04T01:00:00.000Z");
 }
 
 // MCP-I: result saving validates every target and calls one atomic persistence action.
