@@ -4,7 +4,7 @@
 
 Tell an Agent where and when you want to observe. Interactive Star Lab configures the sky, predicts visible stars, creates an Observation Mission, records what you actually saw, and compares the results with its predictions. The same application also works as a standalone manual sky viewer without WebMCP.
 
-[Live Demo](https://interactive-star-lab.vercel.app) · [Devpost](https://devpost.com/software/interactive-star-lab)
+[Live Demo](https://interactive-star-lab.vercel.app) · [Demo Video](https://youtu.be/A5fB2o8e4Dk) · [Devpost Story](https://devpost.com/software/interactive-star-lab)
 
 ![Interactive Star Lab workflow](docs/assets/workflow.png)
 
