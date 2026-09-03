@@ -1,9 +1,25 @@
 # Interactive Star Lab
 
-Interactive Star Lab is an educational sky viewer for exploring how location, date and time, direction, daylight, light pollution, and observer sensitivity change what we can see. It includes the 88 modern constellations, 674 constellation lines, and 752 stars from the checked-in Stellarium-derived catalogs.
+**A WebMCP-powered stargazing guide that turns natural-language intent into an actionable observation workflow.**
+
+Tell an Agent where and when you want to observe. Interactive Star Lab configures the sky, predicts visible stars, creates an Observation Mission, records what you actually saw, and compares the results with its predictions. The same application also works as a standalone manual sky viewer without WebMCP.
+
+[Live Demo](https://interactive-star-lab.vercel.app) · [Demo Video](https://youtu.be/A5fB2o8e4Dk) · [Devpost Story](https://devpost.com/software/interactive-star-lab)
+
+![Interactive Star Lab workflow](docs/assets/workflow.png)
+
+_The diagram shows the overall agent-assisted workflow. Location lookup may be handled by the Agent; direct weather, cloud-cover, and moonlight integrations are planned future work._
+
+## Why WebMCP?
+
+Traditional astronomy software asks users to translate a simple goal into coordinates, time zones, viewing directions, and visibility settings. Interactive Star Lab exposes its deterministic astronomy and observation workflow through WebMCP, allowing an Agent to translate requests such as “Show me New York’s sky at 9 PM” into application operations.
+
+Actions performed by an Agent and actions performed manually share the same React state and astronomy calculations. A sky configured through WebMCP is immediately visible and editable in the browser; Missions, results, Snapshots, and Guides remain available to the human observer.
 
 ## Highlights
 
+- Configure a location, local time, and open Sky with one `configure_sky_view` call.
+- Use WebMCP to query the sky, create Missions, save results, capture Snapshots, and generate Guides.
 - Explore the sky from any latitude and longitude.
 - Change observation date and time, direction, altitude, and field of view.
 - Toggle stars, star names, constellation lines, and constellation names.
@@ -14,7 +30,6 @@ Interactive Star Lab is an educational sky viewer for exploring how location, da
 - Record Visible, Not Visible, or Unsure results and compare them with predictions.
 - Restore a Mission on another device with a one-time Recovery Code.
 - Save deterministic sky Snapshots and generate printable Observation Guides and PDFs.
-- Expose sky controls, Missions, results, Snapshots, and Guides through WebMCP.
 - Open Sky in an Agent-assisted full-canvas view with a compact Agent Activity overlay, or switch to the existing Manual controls.
 
 ## Local setup
@@ -45,13 +60,23 @@ Never put a Supabase `service_role` key in browser code or Vercel client-side en
 
 ## WebMCP demo flow
 
-1. Call `set_observation_site`, `predict_visible_stars`, and `create_observation_plan` to select visible stars and create a Mission. Store the one-time Recovery Code securely.
-2. Review the returned Mission on Plan, then use `open_sky_view` / `set_sky_view_settings` or `open_observe_view` to continue. Sky opens with the Agent-assisted canvas and keeps Manual controls available as a presentation switch.
-3. Set the returned Mission date and site in Sky, then call `capture_sky_snapshot({ missionId })` when an archive is needed.
-4. In Observe, record Visible, Not Visible, or Unsure for each target.
-4. Call `get_observation_results({ missionId })` to retrieve the latest results and prediction comparison.
-5. Call `get_sky_snapshot_metadata({ snapshotId })` when a short-lived signed URL is needed, or call the Guide tool to generate a PDF.
-6. Use `open_plan_view`, `open_observe_view`, `open_sky_view`, or `open_observation_results` to open the corresponding human-facing screen from WebMCP.
+1. Call `configure_sky_view` with a built-in place preset or custom coordinates, an IANA time zone, and the desired local date and time. This configures the viewer and opens Sky in one operation.
+2. Call `predict_visible_stars` to find suitable targets, then `create_observation_plan` to create a Mission. Store the one-time Recovery Code securely.
+3. Review the Mission on Plan, inspect the configured Sky, or call `open_observe_view` to begin recording observations.
+4. In Observe, record Visible, Not Visible, or Unsure for each target, then save the results with `save_observation_results`.
+5. Call `get_observation_results` or `compare_prediction_and_observation` to compare the Mission prediction with the real observation.
+6. Optionally call `capture_sky_snapshot` to archive the rendered Sky or `generate_observation_guide` to create a printable guide and PDF.
+
+For example, an Agent can configure New York City at 9 PM local time with:
+
+```json
+{
+  "preset": "new-york",
+  "localDateTime": "2026-09-03T21:00"
+}
+```
+
+For a place that is not built in, replace `preset` with a `site` object containing `name`, `latitude`, `longitude`, and `timeZone`.
 
 ## Verification
 
