@@ -77,19 +77,23 @@ function calculateCandidates(input: PredictVisibleStarsInput) {
     datetime: date,
     ...DEFAULT_VIEW,
   };
+  const horizontal = horizontalStars(observation, STARS);
   return {
     date,
+    horizontal,
     candidates: buildObservationCandidates({
-      horizontalStars: horizontalStars(observation, STARS),
+      horizontalStars: horizontal,
       maxMagnitude: input.maxMagnitude,
     }),
   };
 }
 
+const MAX_REJECTED_LISTED = 15;
+
 export function predictVisibleStars(
   input: PredictVisibleStarsInput,
 ): PredictVisibleStarsResult {
-  const { date, candidates } = calculateCandidates(input);
+  const { date, horizontal, candidates } = calculateCandidates(input);
   const limit = input.limit ?? 5;
   if (!Number.isInteger(limit) || limit < 1 || limit > 20) {
     throw new RangeError("limit must be an integer from 1 to 20");
@@ -102,11 +106,36 @@ export function predictVisibleStars(
     azimuth: star.azimuth,
     predictedVisible: star.predictedVisible,
   }));
+
+  const visibleIds = new Set(candidates.map((star) => star.starId));
+  const rejectedCounts = { belowHorizon: 0, tooFaint: 0 };
+  const rejected: PredictVisibleStarsResult["rejected"] = [];
+  for (const star of horizontal) {
+    if (visibleIds.has(star.id)) continue;
+    // Horizon wins when both apply: it is the physical blocker an agent reports.
+    const reason = star.altitude <= 0 ? "below-horizon" : "too-faint";
+    if (reason === "below-horizon") rejectedCounts.belowHorizon += 1;
+    else rejectedCounts.tooFaint += 1;
+    if (rejected.length < MAX_REJECTED_LISTED) {
+      rejected.push({ starId: star.id, name: star.name, reason });
+    }
+  }
+
   return {
     site: { ...input.site },
     dateTime: date.toISOString(),
     maxMagnitude: input.maxMagnitude,
     stars,
+    summary:
+      `${stars.length} of ${candidates.length} candidate star(s) above the horizon at ` +
+      `${input.site.name} are predicted visible (magnitude <= ${input.maxMagnitude}); ` +
+      `${rejectedCounts.belowHorizon} below the horizon, ${rejectedCounts.tooFaint} too faint.`,
+    caveats: [
+      "Geometric prediction only: weather, horizon obstacles, and real sky brightness are not included.",
+      "predictedVisible is computed at this date and site; it does not update stored Mission predictions.",
+    ],
+    rejected,
+    rejectedCounts,
   };
 }
 

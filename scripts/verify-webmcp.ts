@@ -177,6 +177,8 @@ const night = "2026-08-29T11:00:00.000Z";
   };
   await registerObservationWriteTools(modelContext, {
     getMissions: () => [mission],
+    getRecord: () => null,
+    restoreRecord: () => undefined,
     saveResultsForMission: (missionId, results) => {
       saves += 1;
       savedRecord = buildObservationRecord(mission, results, "2026-08-29T12:00:00.000Z");

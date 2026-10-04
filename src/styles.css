@@ -1069,6 +1069,85 @@ button[aria-label="Close"] {
   font-size: 0.72rem;
 }
 
+.agent-harness {
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 6px 10px;
+}
+
+.agent-harness-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.agent-harness-toggle:hover {
+  color: var(--text);
+}
+
+.agent-harness-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.agent-harness-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.agent-harness-field select,
+.agent-harness-field textarea {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  background: rgba(10, 13, 20, 0.7);
+  color: var(--text);
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  font-family: inherit;
+}
+
+.agent-harness-field textarea {
+  font-family: ui-monospace, monospace;
+  resize: vertical;
+}
+
+.agent-harness-description {
+  margin: 0;
+  font-size: 0.68rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.agent-harness-body > button {
+  align-self: flex-start;
+  font-size: 0.72rem;
+}
+
+.agent-harness-output {
+  margin: 0;
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 6px;
+  background: rgba(10, 13, 20, 0.7);
+  color: var(--text);
+  font-size: 0.66rem;
+  padding: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .sky-agent-footer {
   position: absolute;
   z-index: 3;

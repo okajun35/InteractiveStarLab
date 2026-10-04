@@ -73,6 +73,8 @@ export interface ObservationState {
     missionId: string,
     results: ObservationRecord["results"],
   ) => Promise<ObservationRecord | null>;
+  /** Replaces or removes (null) a Mission's stored record; used to spend undo tokens. */
+  restoreObservationRecord: (missionId: string, record: ObservationRecord | null) => void;
   refreshCloudMissions: () => Promise<void>;
   getCloudRecord: (missionId: string) => Promise<ObservationRecord | null>;
   getCloudLatestRecord: () => Promise<ObservationRecord | null>;
@@ -332,6 +334,25 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
     }
   }, [cloudRepository, saveResultsForMission]);
 
+  const restoreObservationRecord = useCallback(
+    (missionId: string, record: ObservationRecord | null): void => {
+      setPersisted((previous) => ({
+        ...previous,
+        records: record === null
+          ? previous.records.filter((item) => item.missionId !== missionId)
+          : [
+            ...previous.records.filter((item) => item.missionId !== missionId),
+            record,
+          ],
+      }));
+      setDraftResults(
+        Object.fromEntries(record?.results.map((result) => [result.starId, result.status]) ?? []),
+      );
+      setSelectedRecordMissionId(record === null ? null : missionId);
+    },
+    [],
+  );
+
   const getCloudMission = useCallback(async (missionId: string): Promise<CloudMissionRow | null> => {
     if (cloudRepository === null) return null;
     return cloudRepository.getMission(missionId);
@@ -386,6 +407,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       saveResultsForMission,
       saveObservationRecordAndPersist,
       saveResultsForMissionAndPersist,
+      restoreObservationRecord,
       refreshCloudMissions,
       getCloudRecord,
       getCloudLatestRecord,
@@ -411,6 +433,7 @@ export function ObservationProvider({ children }: { children: React.ReactNode })
       saveResultsForMission,
       saveObservationRecordAndPersist,
       saveResultsForMissionAndPersist,
+      restoreObservationRecord,
       refreshCloudMissions,
       getCloudRecord,
       getCloudLatestRecord,

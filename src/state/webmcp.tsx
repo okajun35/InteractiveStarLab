@@ -12,7 +12,8 @@ import { registerSkyControlTools } from "../mcp/skyControlTools";
 import { registerSnapshotTools } from "../mcp/snapshotTools";
 import { createObservationPlanFromStarIds } from "../mcp/services";
 import type { SkySelection } from "../mcp/describeView";
-import { getModelContext, type WebMcpAvailability } from "../mcp/webmcp";
+import { getModelContext, type WebMcpAvailability, type WebMcpTool } from "../mcp/webmcp";
+import { createHarnessModelContext } from "../mcp/harness";
 import { useNavigation } from "./navigation";
 import { useSnapshots } from "./snapshots";
 import { useGuides } from "./guides";
@@ -23,6 +24,8 @@ import { useAgentActivity } from "./agentActivity";
 export interface WebMcpState {
   availability: WebMcpAvailability;
   registeredToolNames: readonly string[];
+  /** Locally captured tool registry: works even when the browser has no WebMCP. */
+  harnessTools: readonly WebMcpTool[];
 }
 
 const WebMcpContext = createContext<WebMcpState | null>(null);
@@ -44,6 +47,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
     createMissionAndPersist,
     restoreMission,
     saveResultsForMissionAndPersist,
+    restoreObservationRecord,
     getCloudRecord,
     getCloudLatestRecord,
     getCloudMission,
@@ -87,6 +91,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const setObserverSensitivityRef = useRef(setObserverSensitivity);
   const setShowHiddenStarsRef = useRef(setShowHiddenStars);
   const saveResultsForMissionAndPersistRef = useRef(saveResultsForMissionAndPersist);
+  const restoreObservationRecordRef = useRef(restoreObservationRecord);
   const getCloudRecordRef = useRef(getCloudRecord);
   const getCloudLatestRecordRef = useRef(getCloudLatestRecord);
   const getCloudMissionRef = useRef(getCloudMission);
@@ -133,6 +138,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   setObserverSensitivityRef.current = setObserverSensitivity;
   setShowHiddenStarsRef.current = setShowHiddenStars;
   saveResultsForMissionAndPersistRef.current = saveResultsForMissionAndPersist;
+  restoreObservationRecordRef.current = restoreObservationRecord;
   getCloudRecordRef.current = getCloudRecord;
   getCloudLatestRecordRef.current = getCloudLatestRecord;
   getCloudMissionRef.current = getCloudMission;
@@ -164,12 +170,15 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   getLatestMetricsRef.current = getLatestMetrics;
 
   const [availability, setAvailability] = useState<WebMcpAvailability>("unknown");
+  const [harnessTools, setHarnessTools] = useState<readonly WebMcpTool[]>([]);
   const registeredToolNames = useMemo(
     () => [
       "get_observation_site",
       "predict_visible_stars",
       "get_current_sky_state",
       "describe_current_view",
+      "get_night_ephemeris",
+      "rank_nights",
       "create_observation_plan",
       "open_plan_view",
       "restore_observation_mission",
@@ -194,15 +203,18 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const modelContext = getModelContext();
+    // The harness captures every registration locally so the same tools can run
+    // inside the page (AgentHarness panel) even without browser WebMCP support.
+    const harness = createHarnessModelContext(modelContext);
+    const target = harness.modelContext;
     if (modelContext === null) {
       setAvailability("unavailable");
-      return;
     }
 
     const controller = new AbortController();
     let disposed = false;
     registerReadTools(
-      modelContext,
+      target,
       {
         getObservationSite: () => siteRef.current,
         getObservationSettings: () => observationRef.current,
@@ -217,7 +229,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       { signal: controller.signal },
     )
       .then(() => registerPlanTools(
-        modelContext,
+        target,
         {
           getObservationSite: () => siteRef.current,
           getActiveMissionId: () => activeMissionIdRef.current,
@@ -239,7 +251,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerRecoveryTools(
-        modelContext,
+        target,
         {
           restoreMission: (recoveryCode) => restoreMissionRef.current(recoveryCode),
           openObserve: () => setViewRef.current("observe"),
@@ -248,7 +260,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerMissionTools(
-        modelContext,
+        target,
         {
           getMissions: () => missionsRef.current,
           isCloudEnabled: () => cloudAuthenticatedRef.current,
@@ -257,7 +269,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerResultTools(
-        modelContext,
+        target,
         {
           getRecords: () => recordsRef.current,
           getSelectedRecordMissionId: () => selectedRecordMissionIdRef.current,
@@ -269,7 +281,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerSkyControlTools(
-        modelContext,
+        target,
         {
           getObservationSite: () => siteRef.current,
           getObservationSettings: () => observationRef.current,
@@ -304,15 +316,17 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerObservationWriteTools(
-        modelContext,
+        target,
         {
           getMissions: () => missionsRef.current,
+          getRecord: (missionId) => recordsRef.current.find((record) => record.missionId === missionId) ?? null,
+          restoreRecord: (missionId, record) => restoreObservationRecordRef.current(missionId, record),
           saveResultsForMission: (missionId, results) => saveResultsForMissionAndPersistRef.current(missionId, results),
         },
         { signal: controller.signal },
       ))
       .then(() => registerResultNavigationTools(
-        modelContext,
+        target,
         {
           getRecords: () => recordsRef.current,
           getSelectedRecordMissionId: () => selectedRecordMissionIdRef.current,
@@ -322,7 +336,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerSnapshotTools(
-        modelContext,
+        target,
         {
           getMissions: () => missionsRef.current,
           getCurrentMetadata: () => ({
@@ -349,7 +363,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => registerGuideTools(
-        modelContext,
+        target,
         {
           getMissions: () => missionsRef.current,
           getSelectedGuide: () => selectedGuideRef.current,
@@ -361,10 +375,16 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         { signal: controller.signal },
       ))
       .then(() => {
-        if (!disposed) setAvailability("ready");
+        if (!disposed) {
+          setHarnessTools([...harness.tools]);
+          if (modelContext !== null) setAvailability("ready");
+        }
       })
       .catch(() => {
-        if (!disposed) setAvailability("error");
+        if (!disposed) {
+          setHarnessTools([...harness.tools]);
+          setAvailability(modelContext === null ? "unavailable" : "error");
+        }
       });
 
     return () => {
@@ -374,8 +394,8 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<WebMcpState>(
-    () => ({ availability, registeredToolNames }),
-    [availability, registeredToolNames],
+    () => ({ availability, registeredToolNames, harnessTools }),
+    [availability, registeredToolNames, harnessTools],
   );
 
   return <WebMcpContext.Provider value={value}>{children}</WebMcpContext.Provider>;

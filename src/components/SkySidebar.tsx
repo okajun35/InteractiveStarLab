@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SkyContextPanel } from "./SkyContextPanel";
+import { AgentHarness } from "./AgentHarness";
 import type { SkySceneMetrics } from "../sky/contextModel";
 
 export function SkySidebar({
@@ -46,6 +47,7 @@ export function SkySidebar({
         </div>
       </div>
       <SkyContextPanel metrics={metrics} compact />
+      <AgentHarness />
       <button
         type="button"
         className="sky-agent-manual-link"

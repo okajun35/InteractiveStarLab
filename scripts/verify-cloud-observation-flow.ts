@@ -24,6 +24,8 @@ const registeredWrite: WebMcpTool[] = [];
 const context: WebMcpModelContext = { async registerTool(tool) { registeredWrite.push(tool); } };
 await registerObservationWriteTools(context, {
   getMissions: () => [mission],
+  getRecord: () => null,
+  restoreRecord: () => undefined,
   saveResultsForMission: async (missionId, results) => {
     check("CLOUD-FLOW-1: cloud save receives the Mission ID", missionId === mission.id);
     remoteRecord = buildObservationRecord(mission, results, "2026-08-29T12:00:00.000Z");

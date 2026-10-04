@@ -30,6 +30,14 @@ export interface PredictVisibleStarsResult {
   dateTime: string;
   maxMagnitude: number;
   stars: PredictedStarToolResult[];
+  /** One quotable sentence about the prediction. */
+  summary: string;
+  /** Scope limits an agent should relay, e.g. that weather is not included. */
+  caveats: string[];
+  /** Catalog stars that failed the prediction, with the reason, capped at a readable size. */
+  rejected: { starId: string; name: string; reason: "below-horizon" | "too-faint" }[];
+  /** Total rejections per reason, beyond what `rejected` lists. */
+  rejectedCounts: { belowHorizon: number; tooFaint: number };
 }
 
 export interface CreateObservationPlanInput {
