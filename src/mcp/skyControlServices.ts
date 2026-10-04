@@ -28,6 +28,8 @@ export interface SkyViewSettingsPatch {
   azimuth?: number;
   altitude?: number;
   fieldOfView?: number;
+  /** Optional view-mode switch; dome ignores the camera angles. */
+  skyMode?: "window" | "dome";
 }
 
 export interface SkyViewSettingsResult {
@@ -35,6 +37,7 @@ export interface SkyViewSettingsResult {
   azimuth: number;
   altitude: number;
   fieldOfView: number;
+  skyMode?: "window" | "dome";
 }
 
 export interface SkyDisplaySettingsPatch {
@@ -42,6 +45,10 @@ export interface SkyDisplaySettingsPatch {
   starNames?: boolean;
   constellationLines?: boolean;
   constellationNames?: boolean;
+  milkyWay?: boolean;
+  denseStars?: boolean;
+  deepSky?: boolean;
+  nightMode?: boolean;
   firstMagnitude?: boolean;
   secondMagnitude?: boolean;
   thirdMagnitude?: boolean;
@@ -60,9 +67,10 @@ export interface SkyDisplaySettingsResult {
   simulation: SimulationSettings;
 }
 
-const VIEW_KEYS = ["dateTime", "azimuth", "altitude", "fieldOfView"] as const;
+const VIEW_KEYS = ["dateTime", "azimuth", "altitude", "fieldOfView", "skyMode"] as const;
 const DISPLAY_KEYS = [
   "stars", "starNames", "constellationLines", "constellationNames",
+  "milkyWay", "denseStars", "deepSky", "nightMode",
   "firstMagnitude", "secondMagnitude", "thirdMagnitude", "fourthMagnitude", "faintMagnitude",
   "daylightMode", "lightPollution", "limitingMagnitude", "observerSensitivity", "showHiddenStars",
 ] as const;
@@ -171,11 +179,13 @@ export function normalizeSkyViewSettingsPatch(value: unknown): SkyViewSettingsPa
   if (fieldOfView !== undefined && (fieldOfView < LIMITS.fieldOfView.min || fieldOfView > LIMITS.fieldOfView.max)) {
     throw new RangeError("fieldOfView is outside the supported range");
   }
+  const skyMode = optionalEnum(object, "skyMode", ["window", "dome"] as const);
   return {
     ...(dateTime === undefined ? {} : { dateTime }),
     ...(azimuth === undefined ? {} : { azimuth }),
     ...(altitude === undefined ? {} : { altitude }),
     ...(fieldOfView === undefined ? {} : { fieldOfView }),
+    ...(skyMode === undefined ? {} : { skyMode }),
   };
 }
 
@@ -188,13 +198,14 @@ export function applySkyViewSettingsPatch(
     azimuth: patch.azimuth ?? current.azimuth,
     altitude: patch.altitude ?? current.altitude,
     fieldOfView: patch.fieldOfView ?? current.fieldOfView,
+    ...(patch.skyMode === undefined ? {} : { skyMode: patch.skyMode }),
   };
 }
 
 export function normalizeSkyDisplaySettingsPatch(value: unknown): SkyDisplaySettingsPatch {
   const object = assertPatchObject(value, DISPLAY_KEYS, "settings");
   const result: SkyDisplaySettingsPatch = {};
-  for (const key of ["stars", "starNames", "constellationLines", "constellationNames", "firstMagnitude", "secondMagnitude", "thirdMagnitude", "fourthMagnitude", "faintMagnitude", "showHiddenStars"] as const) {
+  for (const key of ["stars", "starNames", "constellationLines", "constellationNames", "milkyWay", "denseStars", "deepSky", "nightMode", "firstMagnitude", "secondMagnitude", "thirdMagnitude", "fourthMagnitude", "faintMagnitude", "showHiddenStars"] as const) {
     const valueForKey = optionalBoolean(object, key);
     if (valueForKey !== undefined) result[key] = valueForKey;
   }
@@ -245,6 +256,10 @@ export function applySkyDisplaySettingsPatch(
       ...(patch.starNames === undefined ? {} : { starNames: patch.starNames }),
       ...(patch.constellationLines === undefined ? {} : { constellationLines: patch.constellationLines }),
       ...(patch.constellationNames === undefined ? {} : { constellationNames: patch.constellationNames }),
+      ...(patch.milkyWay === undefined ? {} : { milkyWay: patch.milkyWay }),
+      ...(patch.denseStars === undefined ? {} : { denseStars: patch.denseStars }),
+      ...(patch.deepSky === undefined ? {} : { deepSky: patch.deepSky }),
+      ...(patch.nightMode === undefined ? {} : { nightMode: patch.nightMode }),
     },
     layers: { ...current.layers, ...layerPatch },
     simulation,

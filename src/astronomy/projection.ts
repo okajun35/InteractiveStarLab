@@ -1,6 +1,6 @@
 const DEG = Math.PI / 180;
 
-type Vec3 = [number, number, number];
+export type Vec3 = [number, number, number];
 
 export function dot(a: Vec3, b: Vec3): number {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];

@@ -18,6 +18,17 @@ import { sunPosition, type SunPosition } from "./sun";
 import { twilightStage, type TwilightStage } from "./twilight";
 import { evaluateStar, type StarLayerState } from "./visibilityModel";
 import { createContext } from "./observer";
+import {
+  buildSharedSceneObjects,
+  windowProjector,
+  type SceneBody,
+  type SceneCardinal,
+  type SceneDenseStar,
+  type SceneMessier,
+  type SceneMilkyWay,
+} from "./sceneObjects";
+import { starColorAt } from "./denseCatalog";
+import { skyPalette, type SkyPalette } from "./skyPalette";
 
 /** A star carrying computed horizontal coordinates (degrees). */
 export type HorizontalStar = Star & {
@@ -172,6 +183,8 @@ export interface SceneStar {
   x: number;
   y: number;
   status: StarStatus;
+  /** Display colour derived from the star's B-V index. */
+  color: string;
 }
 
 export interface SceneLine {
@@ -205,6 +218,24 @@ export interface SkyScene {
   sunY: number | null;
   sunAzimuthDeg: number;
   sunAltitudeDeg: number;
+  /** Vertical field of view the scene was projected for, in degrees. */
+  fovDeg: number;
+  // Shared scenery layers (see sceneObjects.ts). Scenery never counts toward
+  // visibleCount/inViewCount, which stay about the named catalog.
+  denseStars: SceneDenseStar[];
+  bodies: SceneBody[];
+  messier: SceneMessier[];
+  milkyWay: SceneMilkyWay[];
+  horizon: { x: number; y: number }[];
+  cardinals: SceneCardinal[];
+  zenith: { x: number; y: number } | null;
+  sunScreen: { x: number; y: number } | null;
+  palette: SkyPalette;
+  /**
+   * Present only for dome scenes: the stereographic dome circle the renderer
+   * clips to. Window scenes leave this unset.
+   */
+  dome?: { cx: number; cy: number; radiusPx: number } | null;
 }
 
 export function skyPhase(sunAltitude: number): SkyPhase {
@@ -270,6 +301,7 @@ export function buildSkyScene(
     x: star.x,
     y: star.y,
     status: evaluateStar(star, layers, simulation, sun.altitude),
+    color: starColorAt(star.ra, star.dec),
   }));
   const statusById = new Map(sceneStars.map((sceneStar) => [sceneStar.star.id, sceneStar.status]));
 
@@ -298,6 +330,30 @@ export function buildSkyScene(
     return { ...label, factor: labelStyleFactor(statuses) };
   });
   const projectedSun = projectSun(sun, viewSettings, width, height);
+  let shared: ReturnType<typeof buildSharedSceneObjects>;
+  try {
+    shared = buildSharedSceneObjects(
+      viewSettings,
+      simulation,
+      windowProjector(viewSettings, width, height),
+      width,
+      height,
+      sun,
+    );
+  } catch {
+    // Invalid input is handled by the observation panel; keep a safe scene.
+    shared = {
+      sunAltitudeDeg: sun.altitude,
+      bodies: [],
+      messier: [],
+      milkyWay: [],
+      denseStars: [],
+      horizon: [],
+      cardinals: [],
+      zenith: null,
+      sunScreen: null,
+    };
+  }
   return {
     stars: sceneStars,
     lines,
@@ -313,5 +369,17 @@ export function buildSkyScene(
     sunY: projectedSun?.y ?? null,
     sunAzimuthDeg: sun.azimuth,
     sunAltitudeDeg: sun.altitude,
+    fovDeg: viewSettings.fieldOfView,
+    denseStars: shared.denseStars,
+    bodies: shared.bodies,
+    messier: shared.messier,
+    milkyWay: shared.milkyWay,
+    horizon: shared.horizon,
+    cardinals: shared.cardinals,
+    zenith: shared.zenith,
+    sunScreen: shared.sunScreen,
+    palette: skyPalette(
+      simulation.daylightMode === "removed" ? -90 : shared.sunAltitudeDeg,
+    ),
   };
 }

@@ -21,6 +21,8 @@ export interface SkyControlToolState {
   getObservationSettings: () => ObservationSettings;
   updateObservationSite: (patch: Partial<ObservationSite>) => void;
   updateObservationSettings: (patch: Partial<ObservationSettings>) => void;
+  getSkyMode?: () => "window" | "dome";
+  setSkyMode?: (mode: "window" | "dome") => void;
   getDisplayOptions: () => DisplayOptions;
   getLayers: () => StarLayerState;
   getSimulationSettings: () => SimulationSettings;
@@ -223,6 +225,7 @@ function setSkyViewSettingsTool(state: SkyControlToolState): WebMcpTool {
         azimuth: { type: "number", minimum: 0, maximum: 359.999999, description: "View azimuth in degrees; 0 is north" },
         altitude: { type: "number", minimum: 0, maximum: 90, description: "View altitude in degrees" },
         fieldOfView: { type: "number", minimum: 20, maximum: 140, description: "Vertical field of view in degrees" },
+        skyMode: { type: "string", enum: ["window", "dome"], description: "Sky projection: the azimuth/altitude window or the stereographic all-sky dome" },
       },
       additionalProperties: false,
     },
@@ -237,11 +240,13 @@ function setSkyViewSettingsTool(state: SkyControlToolState): WebMcpTool {
         ...(patch.altitude === undefined ? {} : { altitude: view.altitude }),
         ...(patch.fieldOfView === undefined ? {} : { fieldOfView: view.fieldOfView }),
       });
+      if (patch.skyMode !== undefined) state.setSkyMode?.(patch.skyMode);
       const changes = [
         patch.dateTime === undefined ? null : changed("dateTime", current.datetime.toISOString(), view.dateTime),
         patch.azimuth === undefined ? null : changed("direction", current.azimuth, view.azimuth),
         patch.altitude === undefined ? null : changed("altitude", current.altitude, view.altitude),
         patch.fieldOfView === undefined ? null : changed("fieldOfView", current.fieldOfView, view.fieldOfView),
+        patch.skyMode === undefined ? null : changed("skyMode", state.getSkyMode?.() ?? "window", patch.skyMode),
       ].filter((item): item is SkyFieldChange => item !== null);
       reportSkyMutation(state, "set_sky_view_settings", changes);
       return view;
@@ -261,6 +266,10 @@ function setSkyDisplaySettingsTool(state: SkyControlToolState): WebMcpTool {
         starNames: { type: "boolean", description: "Show star names" },
         constellationLines: { type: "boolean", description: "Show constellation lines" },
         constellationNames: { type: "boolean", description: "Show constellation names" },
+        milkyWay: { type: "boolean", description: "Show the Milky Way band" },
+        denseStars: { type: "boolean", description: "Show the dense background star field" },
+        deepSky: { type: "boolean", description: "Show Messier objects, planets and the Moon" },
+        nightMode: { type: "boolean", description: "Red-light mode for night-time instrument use" },
         firstMagnitude: { type: "boolean", description: "Enable 1st-magnitude display layer only" },
         secondMagnitude: { type: "boolean", description: "Enable 2nd-magnitude display layer only" },
         thirdMagnitude: { type: "boolean", description: "Enable 3rd-magnitude display layer only" },
@@ -297,6 +306,10 @@ function setSkyDisplaySettingsTool(state: SkyControlToolState): WebMcpTool {
         changed("starNames", current.displayOptions.starNames, next.displayOptions.starNames),
         changed("constellationLines", current.displayOptions.constellationLines, next.displayOptions.constellationLines),
         changed("constellationNames", current.displayOptions.constellationNames, next.displayOptions.constellationNames),
+        changed("milkyWay", current.displayOptions.milkyWay, next.displayOptions.milkyWay),
+        changed("denseStars", current.displayOptions.denseStars, next.displayOptions.denseStars),
+        changed("deepSky", current.displayOptions.deepSky, next.displayOptions.deepSky),
+        changed("nightMode", current.displayOptions.nightMode, next.displayOptions.nightMode),
         changed("brightnessLayers", current.layers, next.layers),
         changed("daylight", current.simulation.daylightMode, next.simulation.daylightMode),
         changed("lightPollution", current.simulation.lightPollution, next.simulation.lightPollution),

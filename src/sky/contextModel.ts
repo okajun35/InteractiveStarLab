@@ -28,7 +28,12 @@ export type SkyContextField =
   | "stars"
   | "starNames"
   | "constellationLines"
-  | "constellationNames";
+  | "constellationNames"
+  | "milkyWay"
+  | "denseStars"
+  | "deepSky"
+  | "nightMode"
+  | "skyMode";
 
 export interface SkyFieldChange {
   field: SkyContextField;
@@ -194,6 +199,7 @@ export function buildSkyContextModel(input: {
   simulation: SimulationSettings;
   layers: StarLayerState;
   displayOptions: DisplayOptions;
+  skyMode?: "window" | "dome";
   metrics: SkySceneMetrics | null;
   compareLabel?: string | null;
 }): SkyContextModel {
@@ -231,6 +237,11 @@ export function buildSkyContextModel(input: {
       row("starNames", "Star Names", onOff(input.displayOptions.starNames), input.displayOptions.starNames),
       row("constellationLines", "Constellation Lines", onOff(input.displayOptions.constellationLines), input.displayOptions.constellationLines),
       row("constellationNames", "Constellation Names", onOff(input.displayOptions.constellationNames), input.displayOptions.constellationNames),
+      row("milkyWay", "Milky Way", onOff(input.displayOptions.milkyWay), input.displayOptions.milkyWay),
+      row("denseStars", "Dense Stars", onOff(input.displayOptions.denseStars), input.displayOptions.denseStars),
+      row("deepSky", "Deep Sky", onOff(input.displayOptions.deepSky), input.displayOptions.deepSky),
+      row("nightMode", "Night Mode", onOff(input.displayOptions.nightMode), input.displayOptions.nightMode),
+      row("skyMode", "Sky Mode", input.skyMode === "dome" ? "All-sky dome" : "Window", input.skyMode ?? "window"),
     ],
     compareLabel: input.metrics?.mode === "compare" ? input.compareLabel ?? null : null,
   };

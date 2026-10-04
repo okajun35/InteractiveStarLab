@@ -38,6 +38,14 @@ export interface DisplayOptions {
   starNames: boolean;
   constellationLines: boolean;
   constellationNames: boolean;
+  /** Milky Way isophote band. */
+  milkyWay: boolean;
+  /** Dense background star field (B-V coloured). */
+  denseStars: boolean;
+  /** Messier objects, planets and the Moon. */
+  deepSky: boolean;
+  /** Red-light mode for night-time instrument use. */
+  nightMode: boolean;
 }
 
 /** A star with horizontal coordinates in degrees. */

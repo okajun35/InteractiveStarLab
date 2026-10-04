@@ -11,6 +11,10 @@ export function DisplayOptions() {
     { key: "starNames", label: "Star Names" },
     { key: "constellationLines", label: "Constellation Lines" },
     { key: "constellationNames", label: "Constellation Names" },
+    { key: "milkyWay", label: "Milky Way" },
+    { key: "denseStars", label: "Dense Stars" },
+    { key: "deepSky", label: "Deep Sky & Planets" },
+    { key: "nightMode", label: "Night Mode (Red)" },
   ];
 
   return (
