@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { STAR_BY_ID } from "../../astronomy/stars";
 import { formatDirection } from "../../sky/contextModel";
 import { formatMissionDateTime } from "../../observation/missionView";
+import { missionTargetsToCsv, missionToIcs } from "../../export/missionExport";
 import type { ObservationMission } from "../../types/observation";
 import { RecoveryCodePanel } from "./RecoveryCodePanel";
 import { useAgentActivity } from "../../state/agentActivity";
@@ -98,12 +99,23 @@ export function ObservationPlanSummary({
           <button type="button" className="primary" disabled={!hasCatalogTarget} onClick={onShowTargetSky}>Show target sky</button>
           <button type="button" onClick={onStartObserving}>Start observing</button>
           <button type="button" aria-expanded={manualOpen} aria-controls="plan-manual-editor" onClick={onEdit}>{manualOpen ? "Done editing" : "Edit manually"}</button>
+          <button type="button" onClick={() => downloadFile(`${mission.id}.ics`, missionToIcs(mission), "text/calendar")}>Export .ics</button>
+          <button type="button" onClick={() => downloadFile(`${mission.id}-targets.csv`, missionTargetsToCsv(mission), "text/csv")}>Export .csv</button>
         </div>
         {!hasCatalogTarget && <p className="workflow-note">The target Sky is unavailable because this Mission has no matching catalog star.</p>}
       </section>
       {recoveryCode !== null && <RecoveryCodePanel recoveryCode={recoveryCode} clearRecoveryCode={onClearRecoveryCode} />}
     </>
   );
+}
+
+function downloadFile(name: string, content: string, mime: string): void {
+  const url = URL.createObjectURL(new Blob([content], { type: mime }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = name;
+  anchor.click();
+  URL.revokeObjectURL(url);
 }
 
 function ContextRow({ label, value, selectable = false }: { label: string; value: string; selectable?: boolean }) {
