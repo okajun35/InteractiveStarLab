@@ -20,6 +20,7 @@ import { useGuides } from "./guides";
 import { registerGuideTools } from "../mcp/guideTools";
 import { registerRecoveryTools } from "../mcp/recoveryTools";
 import { registerProposalTools } from "../mcp/proposalTools";
+import { registerWeatherTools } from "../mcp/weatherTools";
 import { useProposals } from "./proposals";
 import { useAgentActivity } from "./agentActivity";
 
@@ -191,6 +192,8 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "propose_plan",
       "commit_proposal",
       "plan_stale",
+      "get_sky_conditions",
+      "compare_dark_sky_sites",
       "create_observation_plan",
       "open_plan_view",
       "restore_observation_mission",
@@ -382,6 +385,13 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
           getProposal: () => proposalRef.current,
           propose: (next) => proposeRef.current(next),
           commitProposal: (proposalToCommit, starIds) => commitProposalRef.current(proposalToCommit, starIds),
+        },
+        { signal: controller.signal },
+      ))
+      .then(() => registerWeatherTools(
+        target,
+        {
+          getObservationSite: () => siteRef.current,
         },
         { signal: controller.signal },
       ))
