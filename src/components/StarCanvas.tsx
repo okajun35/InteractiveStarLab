@@ -22,8 +22,8 @@ import {
 } from "../astronomy/interaction";
 import { STAR_BY_ID } from "../astronomy/stars";
 import { formatHeading } from "../astronomy/visibility";
-import { TWILIGHT_LABELS } from "../astronomy/twilight";
 import type { Star } from "../types/astronomy";
+import { useLocale, type MessageKey } from "../i18n";
 
 export interface StarCanvasMetrics {
   visibleCount: number;
@@ -79,6 +79,7 @@ export function StarCanvas({
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
   const { registerCanvas, captureSnapshot, downloadRecord } = useSnapshots();
+  const { t } = useLocale();
 
   const scene = useScene(width, height, override);
   const [hover, setHover] = useState<{ x: number; y: number; hit: SceneHit } | null>(null);
@@ -389,8 +390,8 @@ export function StarCanvas({
           type="button"
           className="snapshot-btn"
           onClick={takeSnapshot}
-          title="Save a sky snapshot as PNG"
-          aria-label="Save sky snapshot as PNG"
+          title={t("canvas.snapshotTitle")}
+          aria-label={t("canvas.snapshotTitle")}
         >
           <svg
             width="16"
@@ -406,22 +407,22 @@ export function StarCanvas({
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
             <circle cx="12" cy="13" r="4" />
           </svg>
-          Snapshot
+          {t("canvas.snapshot")}
         </button>
       )}
       <div className="canvas-hud" aria-hidden="true">
         <span className="canvas-hud-heading">
           {scene.heading}
-          {label && timeLabel ? <span className="canvas-hud-time"> Local {timeLabel}</span> : ""}
+          {label && timeLabel ? <span className="canvas-hud-time"> {t("canvas.local")} {timeLabel}</span> : ""}
           {!label && sim.daylightMode === "real" ? (
             <span className="canvas-hud-stage">
               {" "}
-              <span>{TWILIGHT_LABELS[scene.twilightStage]}</span>
+              <span>{t(`twilight.${scene.twilightStage}` as MessageKey)}</span>
             </span>
           ) : ""}
         </span>
         <span className="canvas-hud-count">
-          {label ? "" : `Visible ${scene.visibleCount} / In view ${scene.inViewCount}`}
+          {label ? "" : t("canvas.visibleInView", { visible: scene.visibleCount, total: scene.inViewCount })}
         </span>
       </div>
     </div>

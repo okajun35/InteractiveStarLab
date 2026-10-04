@@ -1,5 +1,6 @@
 import { PLACE_PRESETS } from "../../astronomy/directions";
 import type { ObservationSite } from "../../types/observation";
+import { useLocale } from "../../i18n";
 
 export interface SiteEditorErrors {
   name?: string;
@@ -15,6 +16,7 @@ interface SiteEditorProps {
 }
 
 export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
+  const { t } = useLocale();
   const currentPreset = PLACE_PRESETS.find(
     (place) =>
       Math.abs(place.latitude - site.latitude) <= 1e-6 && Math.abs(place.longitude - site.longitude) <= 1e-6,
@@ -24,21 +26,21 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
     <section className="workflow-card" aria-labelledby="site-editor-title">
       <div className="workflow-card-heading">
         <div>
-          <span className="en">Observation site</span>
-          <h2 id="site-editor-title">Observation site</h2>
+          <span className="en">{t("plan.siteTitle")}</span>
+          <h2 id="site-editor-title">{t("plan.siteTitle")}</h2>
         </div>
         <span className="step-badge">1</span>
       </div>
 
       <label className="workflow-field">
         <span className="workflow-field-label">
-          Name
+          {t("plan.siteName")}
         </span>
         <input
           type="text"
           value={site.name}
           onChange={(event) => onChange({ name: event.target.value })}
-          placeholder="e.g. Home balcony"
+          placeholder={t("plan.siteNamePlaceholder")}
           className={errors.name ? "invalid" : undefined}
         />
         {errors.name && <span className="workflow-error">{errors.name}</span>}
@@ -47,7 +49,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
       <div className="workflow-field-row">
         <label className="workflow-field">
           <span className="workflow-field-label">
-            Latitude
+            {t("panel.latitude")}
           </span>
           <input
             type="number"
@@ -64,7 +66,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
         </label>
         <label className="workflow-field">
           <span className="workflow-field-label">
-            Longitude
+            {t("panel.longitude")}
           </span>
           <input
             type="number"
@@ -82,12 +84,12 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
       </div>
 
       <label className="workflow-field">
-        <span className="workflow-field-label">Time Zone <span className="workflow-optional">Optional</span></span>
+        <span className="workflow-field-label">{t("plan.timeZone")} <span className="workflow-optional">{t("plan.optional")}</span></span>
         <input
           type="text"
           value={site.timeZone ?? ""}
           onChange={(event) => onChange({ timeZone: event.target.value.trim() || undefined })}
-          placeholder="e.g. Asia/Tokyo"
+          placeholder={t("plan.timeZonePlaceholder")}
           className={errors.timeZone ? "invalid" : undefined}
           spellCheck={false}
         />
@@ -96,7 +98,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
 
       <label className="workflow-field">
         <span className="workflow-field-label">
-          Presets
+          {t("plan.presets")}
         </span>
         <select
           className="place-select"
@@ -113,7 +115,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
             });
           }}
         >
-          <option value="custom">Custom location</option>
+          <option value="custom">{t("panel.customLocation")}</option>
           {PLACE_PRESETS.map((place) => (
             <option key={place.id} value={place.id}>
               {place.name}
@@ -123,7 +125,7 @@ export function SiteEditor({ site, errors, onChange }: SiteEditorProps) {
       </label>
 
       <p className="workflow-note">
-        Latitude and longitude determine star altitude and azimuth. You can enter them manually if location access fails.
+        {t("plan.siteNote")}
       </p>
     </section>
   );

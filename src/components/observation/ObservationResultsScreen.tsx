@@ -5,6 +5,7 @@ import { findObservationRecord, sortObservationRecords } from "../../observation
 import { useObservation } from "../../state/observation";
 import { ComparisonSummary } from "./ComparisonSummary";
 import { ResultStarCard } from "./ResultStarCard";
+import { useLocale, intlLocale, type Locale } from "../../i18n";
 
 interface ObservationResultsScreenProps {
   onOpenPlan: () => void;
@@ -18,6 +19,7 @@ export function ObservationResultsScreen({
   onOpenSky,
 }: ObservationResultsScreenProps) {
   const { records, selectedRecordMissionId } = useObservation();
+  const { t, locale } = useLocale();
   const record = useMemo(() => {
     if (records.length === 0) return null;
     if (selectedRecordMissionId !== null) {
@@ -30,12 +32,12 @@ export function ObservationResultsScreen({
     return (
       <main className="workflow-page">
         <div className="workflow-container workflow-empty-page">
-          <section className="workflow-card workflow-empty-card" aria-label="No observation results">
-            <span className="en">Observation results</span>
-            <h1>No observation results</h1>
-            <p>Run a Mission and save your observation results.</p>
+          <section className="workflow-card workflow-empty-card" aria-label={t("results.empty")}>
+            <span className="en">{t("results.kicker")}</span>
+            <h1>{t("results.empty")}</h1>
+            <p>{t("results.emptyHint")}</p>
             <button type="button" className="primary" onClick={onOpenPlan}>
-              Go to Plan
+              {t("results.goToPlan")}
             </button>
           </section>
         </div>
@@ -51,35 +53,35 @@ export function ObservationResultsScreen({
       <div className="workflow-container">
         <div className="workflow-hero">
           <div>
-            <span className="en">Observation results</span>
-            <h1>Review observation results</h1>
-            <p>Compare the prediction with what you actually observed.</p>
+            <span className="en">{t("results.kicker")}</span>
+            <h1>{t("results.title")}</h1>
+            <p>{t("results.lead")}</p>
           </div>
           <div className="workflow-hero-actions">
-            <button type="button" onClick={onOpenHistory}>History</button>
+            <button type="button" onClick={onOpenHistory}>{t("results.history")}</button>
             <button type="button" onClick={onOpenSky}>
-              Sky
+              {t("results.sky")}
             </button>
           </div>
         </div>
 
-        <section className="mission-overview results-overview" aria-label="Observation record information">
+        <section className="mission-overview results-overview" aria-label={t("results.aria")}>
           <div>
-            <span className="en">Site</span>
+            <span className="en">{t("results.site")}</span>
             <strong>{record.siteSnapshot.name}</strong>
             <small>{record.siteSnapshot.latitude.toFixed(4)}°, {record.siteSnapshot.longitude.toFixed(4)}°</small>
           </div>
           <div>
-            <span className="en">Date / Time</span>
-            <strong>{formatDateTime(record.dateTime)}</strong>
+            <span className="en">{t("results.dateTime")}</span>
+            <strong>{formatDateTime(record.dateTime, locale)}</strong>
           </div>
           <div>
-            <span className="en">Targets</span>
-            <strong>{record.targets.length} stars</strong>
+            <span className="en">{t("results.targets")}</span>
+            <strong>{t("results.targetsCount", { count: record.targets.length })}</strong>
           </div>
           <div>
-            <span className="en">Completed</span>
-            <strong>{formatDateTime(record.completedAt)}</strong>
+            <span className="en">{t("results.completed")}</span>
+            <strong>{formatDateTime(record.completedAt, locale)}</strong>
           </div>
         </section>
 
@@ -88,8 +90,8 @@ export function ObservationResultsScreen({
         <section className="workflow-card results-card" aria-labelledby="results-detail-title">
           <div className="workflow-card-heading">
             <div>
-              <span className="en">Star by star</span>
-              <h2 id="results-detail-title">Results by star</h2>
+              <span className="en">{t("results.starByStar")}</span>
+              <h2 id="results-detail-title">{t("results.byStar")}</h2>
             </div>
           </div>
           <div className="result-star-list">
@@ -108,18 +110,18 @@ export function ObservationResultsScreen({
         </section>
 
         <div className="results-actions">
-          <button type="button" onClick={onOpenPlan}>Create a new Mission</button>
-          <button type="button" className="primary" onClick={onOpenHistory}>View history</button>
+          <button type="button" onClick={onOpenPlan}>{t("results.newMission")}</button>
+          <button type="button" className="primary" onClick={onOpenHistory}>{t("results.viewHistory")}</button>
         </div>
       </div>
     </main>
   );
 }
 
-function formatDateTime(value: string): string {
+function formatDateTime(value: string, locale: Locale): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);

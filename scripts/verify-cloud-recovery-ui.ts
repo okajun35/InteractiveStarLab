@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { en as enDict } from "../src/i18n/en";
 
 const app = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const auth = readFileSync(new URL("../src/state/auth.tsx", import.meta.url), "utf8");
@@ -21,8 +22,8 @@ check("RECOVERY-UI-2: planner does not disable Mission creation for anonymous bo
 check("RECOVERY-UI-2: observation does not disable result save for anonymous bootstrap", !run.includes("cloudConfigured && !cloudAuthenticated") && !run.includes("Cloud login"));
 check("RECOVERY-UI-2: cloud persistence mode is not shown to end users", !plan.includes("Cloud persistence mode") && !run.includes("Cloud persistence mode"));
 check("RECOVERY-UI-3: creation panel displays and copies the one-time code", recoveryPanel.includes("recoveryCode") && recoveryPanel.includes("navigator.clipboard.writeText") && recoveryPanel.includes("clearRecoveryCode"));
-check("RECOVERY-UI-3: creation panel can be dismissed", recoveryPanel.includes("dismiss") && recoveryPanel.includes("will not be shown again"));
-check("RECOVERY-UI-4: history provides a recovery form", history.includes("RecoveryMissionForm") && recoveryPanel.includes("Restore Mission with a Recovery Code"));
+check("RECOVERY-UI-3: creation panel can be dismissed", recoveryPanel.includes("dismiss") && recoveryPanel.includes("recovery.body") && enDict["recovery.body"].includes("will not be shown again"));
+check("RECOVERY-UI-4: history provides a recovery form", history.includes("RecoveryMissionForm") && enDict["recovery.restoreTitle"] === "Restore Mission with a Recovery Code");
 check("RECOVERY-UI-4: restore errors do not echo the submitted code", recoveryPanel.includes("RESTORE_CODE_INVALID") && !recoveryPanel.includes("recoveryCodeInput} to"));
 
 if (failures > 0) process.exit(1);

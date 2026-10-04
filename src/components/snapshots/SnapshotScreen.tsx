@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSnapshots } from "../../state/snapshots";
+import { useLocale, intlLocale } from "../../i18n";
 
 function SnapshotThumbnail({ snapshotId }: { snapshotId: string }) {
   const { getSnapshot } = useSnapshots();
+  const { t } = useLocale();
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,18 +24,19 @@ function SnapshotThumbnail({ snapshotId }: { snapshotId: string }) {
   }, [getSnapshot, snapshotId]);
 
   return url === null
-    ? <div className="snapshot-thumbnail placeholder">Loading image…</div>
-    : <img className="snapshot-thumbnail" src={url} alt="Saved sky snapshot" />;
+    ? <div className="snapshot-thumbnail placeholder">{t("snap.loading")}</div>
+    : <img className="snapshot-thumbnail" src={url} alt={t("snap.alt")} />;
 }
 
 export function SnapshotScreen() {
   const { snapshots, selectedSnapshotId, downloadSnapshot, removeSnapshot, isCloudSnapshot } = useSnapshots();
+  const { t, locale } = useLocale();
   const [error, setError] = useState<string | null>(null);
 
   const remove = (snapshotId: string) => {
     setError(null);
     void removeSnapshot(snapshotId).catch((reason: unknown) => {
-      setError(reason instanceof Error ? reason.message : "Could not delete the Snapshot.");
+      setError(reason instanceof Error ? reason.message : t("snap.deleteFailed"));
     });
   };
 
@@ -41,16 +44,16 @@ export function SnapshotScreen() {
     <main className="snapshot-screen">
       <div className="screen-heading">
         <div>
-          <p className="eyebrow">SKY SNAPSHOTS</p>
-          <h2>Saved sky snapshots</h2>
-          <p className="screen-lead">Review sky images and observation metadata captured at that time.</p>
+          <p className="eyebrow">{t("snap.eyebrow")}</p>
+          <h2>{t("snap.title")}</h2>
+          <p className="screen-lead">{t("snap.lead")}</p>
         </div>
-        <span className="status-badge">{snapshots.length} snapshots</span>
+        <span className="status-badge">{t("snap.count", { count: snapshots.length })}</span>
       </div>
       {snapshots.length === 0 ? (
         <section className="empty-state">
-          <h3>No Snapshots yet</h3>
-          <p>Use the Snapshot button on Sky or the MCP tool <code>capture_sky_snapshot</code> to save one.</p>
+          <h3>{t("snap.empty")}</h3>
+          <p>{t("snap.emptyHint")}</p>
         </section>
       ) : (
         <div className="snapshot-grid">
@@ -59,21 +62,21 @@ export function SnapshotScreen() {
               <SnapshotThumbnail snapshotId={snapshot.snapshotId} />
               <div className="snapshot-card-topline">
                 <strong>{snapshot.site.name}</strong>
-                <time dateTime={snapshot.createdAt}>{new Date(snapshot.createdAt).toLocaleString()}</time>
+                <time dateTime={snapshot.createdAt}>{new Date(snapshot.createdAt).toLocaleString(intlLocale(locale))}</time>
               </div>
               <p>{snapshot.fileName}</p>
-              {snapshot.missionId && <p className="snapshot-mission-id">Mission: {snapshot.missionId}</p>}
+              {snapshot.missionId && <p className="snapshot-mission-id">{t("snap.mission", { id: snapshot.missionId })}</p>}
               <dl className="snapshot-meta">
-                <div><dt>Date and time</dt><dd>{new Date(snapshot.dateTime).toLocaleString()}</dd></div>
-                <div><dt>Direction</dt><dd>{snapshot.view.azimuth.toFixed(0)}° / Alt {snapshot.view.altitude.toFixed(0)}°</dd></div>
-                <div><dt>Field of view</dt><dd>{snapshot.view.fieldOfView.toFixed(0)}°</dd></div>
-                <div><dt>Image</dt><dd>{snapshot.width} × {snapshot.height}</dd></div>
+                <div><dt>{t("snap.dateTime")}</dt><dd>{new Date(snapshot.dateTime).toLocaleString(intlLocale(locale))}</dd></div>
+                <div><dt>{t("snap.direction")}</dt><dd>{snapshot.view.azimuth.toFixed(0)}° / Alt {snapshot.view.altitude.toFixed(0)}°</dd></div>
+                <div><dt>{t("snap.fieldOfView")}</dt><dd>{snapshot.view.fieldOfView.toFixed(0)}°</dd></div>
+                <div><dt>{t("snap.image")}</dt><dd>{snapshot.width} × {snapshot.height}</dd></div>
               </dl>
               <div className="btn-row">
-                <button type="button" onClick={() => void downloadSnapshot(snapshot.snapshotId)}>Download again</button>
-                {!isCloudSnapshot(snapshot.snapshotId) && <button type="button" onClick={() => remove(snapshot.snapshotId)}>Delete</button>}
+                <button type="button" onClick={() => void downloadSnapshot(snapshot.snapshotId)}>{t("snap.download")}</button>
+                {!isCloudSnapshot(snapshot.snapshotId) && <button type="button" onClick={() => remove(snapshot.snapshotId)}>{t("snap.delete")}</button>}
               </div>
-              {isCloudSnapshot(snapshot.snapshotId) && <span className="snapshot-cloud-badge">Cloud saved · immutable</span>}
+              {isCloudSnapshot(snapshot.snapshotId) && <span className="snapshot-cloud-badge">{t("snap.cloudBadge")}</span>}
             </article>
           ))}
         </div>

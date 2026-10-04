@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useStarViewer } from "../../state/context";
 import { useObservation } from "../../state/observation";
 import { useProposals } from "../../state/proposals";
+import { useLocale, intlLocale } from "../../i18n";
 import {
   acceptedStarIds,
   detectPlanStale,
@@ -15,6 +16,7 @@ export function ProposalReviewCard({ onCommitted }: { onCommitted: () => void })
   const { settings } = useStarViewer();
   const { activeSite } = useObservation();
   const { proposal, decideItem, commit } = useProposals();
+  const { t, locale } = useLocale();
   const [committing, setCommitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,24 +41,24 @@ export function ProposalReviewCard({ onCommitted }: { onCommitted: () => void })
       await commit(proposal, accepted);
       onCommitted();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not commit the proposal.");
+      setError(err instanceof Error ? err.message : t("proposal.error"));
     } finally {
       setCommitting(false);
     }
   };
 
   return (
-    <section className="proposal-card" aria-label="Proposed plan">
+    <section className="proposal-card" aria-label={t("proposal.title")}>
       <div className="proposal-card-header">
-        <h3>Proposed plan</h3>
+        <h3>{t("proposal.title")}</h3>
         {staleReasons.length > 0 && (
           <span className="proposal-stale-badge" role="status">
-            Stale: {staleReasons.map((reason) => reason.field).join(", ")} changed
+            {t("proposal.stale", { fields: staleReasons.map((reason) => reason.field).join(", ") })}
           </span>
         )}
       </div>
       <p className="proposal-meta">
-        {proposal.siteSnapshot.name} · {new Date(proposal.dateTime).toLocaleString()} ·
+        {proposal.siteSnapshot.name} · {new Date(proposal.dateTime).toLocaleString(intlLocale(locale))} ·
         magnitude ≤ {proposal.maxMagnitude}
       </p>
       <ul className="proposal-items">
@@ -82,7 +84,7 @@ export function ProposalReviewCard({ onCommitted }: { onCommitted: () => void })
           onClick={handleCommit}
           disabled={committing || accepted.length === 0}
         >
-          {committing ? "Creating Mission…" : `Commit ${accepted.length} item(s) as Mission`}
+          {committing ? t("proposal.committing") : t("proposal.commit", { count: accepted.length })}
         </button>
       </div>
     </section>

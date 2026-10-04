@@ -12,6 +12,7 @@ import { ObservationPlanSummary } from "./ObservationPlanSummary";
 import { ProposalReviewCard } from "./ProposalReviewCard";
 import type { SiteEditorErrors } from "./SiteEditor";
 import { isValidTimeZone } from "../../astronomy/timezones";
+import { useLocale, type LocaleState } from "../../i18n";
 
 interface ObservationPlanScreenProps {
   onOpenSky: () => void;
@@ -20,6 +21,7 @@ interface ObservationPlanScreenProps {
 
 export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationPlanScreenProps) {
   const { settings, updateSettings } = useStarViewer();
+  const { t } = useLocale();
   const {
     activeSite,
     activeMissionId,
@@ -50,7 +52,7 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
     setManualOpen(true);
   };
 
-  const siteErrors = validateSite(draft.site);
+  const siteErrors = validateSite(draft.site, t);
   const updateDraft = (patch: Partial<PlanDraft>) => {
     setDraft((previous) => {
       const next = { ...previous, ...patch };
@@ -123,7 +125,7 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
               cloudAuthenticated={cloudAuthenticated}
               cloudIdentityError={cloudIdentityError}
               cloudError={cloudError}
-              submitLabel={activeMission === null ? "Create Mission" : "Create revised Mission"}
+              submitLabel={activeMission === null ? t("plan.createMission") : t("plan.createRevised")}
             />
           </div>
         )}
@@ -132,13 +134,13 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
   );
 }
 
-function validateSite(site: ObservationSite): SiteEditorErrors | null {
+function validateSite(site: ObservationSite, t: LocaleState["t"]): SiteEditorErrors | null {
   const errors: SiteEditorErrors = {};
-  if (!site.name.trim()) errors.name = "Enter a site name";
-  if (!Number.isFinite(site.latitude)) errors.latitude = "Latitude must be a number";
-  else if (site.latitude < -90 || site.latitude > 90) errors.latitude = "Latitude must be between -90 and 90";
-  if (!Number.isFinite(site.longitude)) errors.longitude = "Longitude must be a number";
-  else if (site.longitude < -180 || site.longitude > 180) errors.longitude = "Longitude must be between -180 and 180";
-  if (site.timeZone !== undefined && site.timeZone !== "" && !isValidTimeZone(site.timeZone)) errors.timeZone = "Time Zone must be a valid IANA identifier";
+  if (!site.name.trim()) errors.name = t("plan.errorName");
+  if (!Number.isFinite(site.latitude)) errors.latitude = t("plan.errorLatitudeNumber");
+  else if (site.latitude < -90 || site.latitude > 90) errors.latitude = t("plan.errorLatitudeRange");
+  if (!Number.isFinite(site.longitude)) errors.longitude = t("plan.errorLongitudeNumber");
+  else if (site.longitude < -180 || site.longitude > 180) errors.longitude = t("plan.errorLongitudeRange");
+  if (site.timeZone !== undefined && site.timeZone !== "" && !isValidTimeZone(site.timeZone)) errors.timeZone = t("plan.errorTimeZone");
   return Object.keys(errors).length === 0 ? null : errors;
 }

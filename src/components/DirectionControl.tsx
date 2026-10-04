@@ -1,25 +1,27 @@
 import { useStarViewer } from "../state/context";
+import { useLocale, type MessageKey } from "../i18n";
 
-const CARDINALS: Array<{ key: string; azimuth: number; label: string }> = [
-  { key: "N", azimuth: 0, label: "North" },
-  { key: "E", azimuth: 90, label: "East" },
-  { key: "S", azimuth: 180, label: "South" },
-  { key: "W", azimuth: 270, label: "West" },
+const CARDINALS: Array<{ key: string; azimuth: number; labelKey: MessageKey }> = [
+  { key: "N", azimuth: 0, labelKey: "dir.north" },
+  { key: "E", azimuth: 90, labelKey: "dir.east" },
+  { key: "S", azimuth: 180, labelKey: "dir.south" },
+  { key: "W", azimuth: 270, labelKey: "dir.west" },
 ];
 
 export function DirectionControl() {
   const { settings, updateSettings, errors } = useStarViewer();
+  const { t } = useLocale();
 
   return (
     <div className="field">
       <span className="field-label">
-        Direction
+        {t("panel.direction")}
         <span className="field-value">
           {Math.round(settings.azimuth)}° {cardinalName(settings.azimuth)}
         </span>
       </span>
 
-      <div className="compass" role="group" aria-label="Cardinal directions">
+      <div className="compass" role="group" aria-label={t("panel.directions")}>
         {CARDINALS.map((c) => (
           <button
             key={c.key}
@@ -30,7 +32,7 @@ export function DirectionControl() {
             onClick={() => updateSettings({ azimuth: c.azimuth })}
           >
             {c.key}
-            <span className="compass-btn-label">{c.label}</span>
+            <span className="compass-btn-label">{t(c.labelKey)}</span>
           </button>
         ))}
       </div>

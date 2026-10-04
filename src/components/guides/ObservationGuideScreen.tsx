@@ -4,6 +4,7 @@ import type { ObservationGuideModel } from "../../guides/types";
 import { MissionSkySnapshot } from "./MissionSkySnapshot";
 import { GuideNotes } from "./GuideNotes";
 import { GuideTargetTable } from "./GuideTargetTable";
+import { useLocale } from "../../i18n";
 
 interface ObservationGuideScreenProps {
   guide: ObservationGuideModel | null;
@@ -12,6 +13,7 @@ interface ObservationGuideScreenProps {
 }
 
 export function ObservationGuideScreen({ guide, onOpenObserve, onGeneratePdf }: ObservationGuideScreenProps) {
+  const { t } = useLocale();
   const [pdfStatus, setPdfStatus] = useState<string | null>(null);
   useEffect(() => {
     if (!guide) return;
@@ -24,11 +26,11 @@ export function ObservationGuideScreen({ guide, onOpenObserve, onGeneratePdf }: 
     return (
       <main className="workflow-page">
         <div className="workflow-container workflow-empty-page">
-          <section className="workflow-card workflow-empty-card" aria-label="No observation guide">
-            <span className="en">Observation guide</span>
-            <h1>No observation guide</h1>
-            <p>Create a Mission first, then prepare an observation guide.</p>
-            <button type="button" className="primary" onClick={onOpenObserve}>Back to Observe</button>
+          <section className="workflow-card workflow-empty-card" aria-label={t("guide.noGuide")}>
+            <span className="en">{t("guide.kicker")}</span>
+            <h1>{t("guide.noGuide")}</h1>
+            <p>{t("guide.noGuideHint")}</p>
+            <button type="button" className="primary" onClick={onOpenObserve}>{t("guide.backToObserve")}</button>
           </section>
         </div>
       </main>
@@ -39,18 +41,18 @@ export function ObservationGuideScreen({ guide, onOpenObserve, onGeneratePdf }: 
   const generatePdf = async () => {
     try {
       const result = await onGeneratePdf();
-      setPdfStatus(result ? `Saved: ${result.fileName}` : "Could not generate the PDF");
+      setPdfStatus(result ? t("guide.pdfSaved", { name: result.fileName }) : t("guide.pdfFailed"));
     } catch {
-      setPdfStatus("Could not generate the PDF");
+      setPdfStatus(t("guide.pdfFailed"));
     }
   };
   return (
     <main className="guide-page">
       <div className="guide-actions screen-only">
-        <button type="button" className="primary" onClick={() => void generatePdf()}>Save PDF directly</button>
-        <button type="button" className="primary" onClick={printGuide}>Print / save PDF</button>
-        <button type="button" onClick={onOpenObserve}>Back to Observe</button>
-        <span>Direct PDF saving does not open the print dialog.</span>
+        <button type="button" className="primary" onClick={() => void generatePdf()}>{t("guide.savePdf")}</button>
+        <button type="button" className="primary" onClick={printGuide}>{t("guide.printPdf")}</button>
+        <button type="button" onClick={onOpenObserve}>{t("guide.backToObserve")}</button>
+        <span>{t("guide.pdfNote")}</span>
         {pdfStatus && <span role="status">{pdfStatus}</span>}
       </div>
       <article className="observation-guide" aria-label="Observation Guide">

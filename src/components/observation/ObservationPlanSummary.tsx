@@ -7,6 +7,7 @@ import type { ObservationMission } from "../../types/observation";
 import { RecoveryCodePanel } from "./RecoveryCodePanel";
 import { useAgentActivity } from "../../state/agentActivity";
 import { useWebMcp } from "../../state/webmcp";
+import { useLocale, intlLocale, type Locale, type LocaleState } from "../../i18n";
 
 export function ObservationPlanSummary({
   mission,
@@ -27,6 +28,7 @@ export function ObservationPlanSummary({
 }) {
   const { planActivity } = useAgentActivity();
   const { availability } = useWebMcp();
+  const { t, locale } = useLocale();
   const [now, setNow] = useState(() => Date.now());
   const attributed = planActivity?.missionId === mission.id ? planActivity : null;
   useEffect(() => {
@@ -48,29 +50,42 @@ export function ObservationPlanSummary({
       <section className={highlighted ? "plan-summary plan-summary-highlighted" : "plan-summary"} aria-labelledby="observation-plan-title">
         <div className="workflow-hero plan-summary-hero">
           <div>
-            <span className="en">Active Mission</span>
-            <h1 id="observation-plan-title">Observation Plan</h1>
-            {attributed !== null && <p className="plan-activity">Created via WebMCP · {relativeTime(attributed.createdAt, now)}<br />{attributed.targetCount} targets selected for {attributed.siteName}</p>}
-            {attributed !== null && <span className="plan-live-announcement" aria-live="polite" aria-atomic="true">WebMCP created an observation Mission with {attributed.targetCount} targets.</span>}
+            <span className="en">{t("plan.activeMission")}</span>
+            <h1 id="observation-plan-title">{t("plan.title")}</h1>
+            {attributed !== null && (
+              <p className="plan-activity">
+                {t("plan.createdVia", { time: relativeTime(attributed.createdAt, now, t, locale) })}
+                <br />
+                {t("plan.createdDetail", { count: attributed.targetCount, site: attributed.siteName })}
+              </p>
+            )}
+            {attributed !== null && (
+              <span className="plan-live-announcement" aria-live="polite" aria-atomic="true">
+                {t("plan.createdAnnouncement", { count: attributed.targetCount })}
+              </span>
+            )}
           </div>
-          <span className={`sky-status-badge sky-status-${availability}`}><span className="sky-status-dot" aria-hidden="true" />{availability === "unknown" ? "Checking WebMCP…" : availability === "ready" ? "WebMCP ready" : "WebMCP unavailable"}</span>
+          <span className={`sky-status-badge sky-status-${availability}`}>
+            <span className="sky-status-dot" aria-hidden="true" />
+            {availability === "unknown" ? t("webmcp.checking") : availability === "ready" ? t("webmcp.ready") : t("webmcp.unavailable")}
+          </span>
         </div>
 
         <section className="plan-context-card" aria-labelledby="mission-context-title">
-          <h2 id="mission-context-title">Mission context</h2>
+          <h2 id="mission-context-title">{t("plan.missionContext")}</h2>
           <dl className="mission-context-list">
-            <ContextRow label="Mission" value={mission.id} selectable />
-            <ContextRow label="Site" value={mission.siteSnapshot.name} />
-            <ContextRow label="Coordinates" value={`${mission.siteSnapshot.latitude.toFixed(4)}, ${mission.siteSnapshot.longitude.toFixed(4)}`} />
-            <ContextRow label="Date & Time" value={formatMissionDateTime(mission.dateTime, mission)} />
-            <ContextRow label="Magnitude Limit" value={`Up to magnitude ${mission.maxMagnitude}`} />
-            <ContextRow label="Targets" value={`${mission.targets.length} stars`} />
-            <ContextRow label="Created" value={formatCreatedAt(mission.createdAt)} />
+            <ContextRow label={t("plan.mission")} value={mission.id} selectable />
+            <ContextRow label={t("plan.site")} value={mission.siteSnapshot.name} />
+            <ContextRow label={t("plan.coordinates")} value={`${mission.siteSnapshot.latitude.toFixed(4)}, ${mission.siteSnapshot.longitude.toFixed(4)}`} />
+            <ContextRow label={t("plan.dateTime")} value={formatMissionDateTime(mission.dateTime, mission)} />
+            <ContextRow label={t("plan.magnitudeLimit")} value={t("plan.upToMagnitude", { mag: mission.maxMagnitude })} />
+            <ContextRow label={t("plan.targets")} value={t("plan.targetsCount", { count: mission.targets.length })} />
+            <ContextRow label={t("plan.created")} value={formatCreatedAt(mission.createdAt, locale)} />
           </dl>
         </section>
 
         <section className="plan-targets-section" aria-labelledby="plan-targets-title">
-          <h2 id="plan-targets-title">Targets</h2>
+          <h2 id="plan-targets-title">{t("plan.targets")}</h2>
           <ul className="plan-target-list">
             {mission.targets.map((target, index) => {
               const star = STAR_BY_ID.get(target.starId);
@@ -79,15 +94,15 @@ export function ObservationPlanSummary({
                   <div className="plan-target-card-heading">
                     <div>
                       <h3>{star?.name ?? target.starId}</h3>
-                      {index === 0 && <span className="primary-target-label">Primary target</span>}
+                      {index === 0 && <span className="primary-target-label">{t("plan.primaryTarget")}</span>}
                     </div>
-                    <strong>{target.predictedVisible ? "Visible" : "Not visible"}</strong>
+                    <strong>{target.predictedVisible ? t("status.visible") : t("status.notVisible")}</strong>
                   </div>
                   <dl className="plan-target-facts">
-                    <ContextRow label="Magnitude" value={target.predictedMagnitude.toFixed(2)} />
-                    <ContextRow label="Altitude" value={`${Math.round(target.predictedAltitude)}°`} />
-                    <ContextRow label="Direction" value={formatDirection(target.predictedAzimuth)} />
-                    <ContextRow label="Prediction" value={target.predictedVisible ? "Visible" : "Not visible"} />
+                    <ContextRow label={t("plan.magnitude")} value={target.predictedMagnitude.toFixed(2)} />
+                    <ContextRow label={t("panel.altitude")} value={`${Math.round(target.predictedAltitude)}°`} />
+                    <ContextRow label={t("panel.direction")} value={formatDirection(target.predictedAzimuth)} />
+                    <ContextRow label={t("plan.prediction")} value={target.predictedVisible ? t("status.visible") : t("status.notVisible")} />
                   </dl>
                 </li>
               );
@@ -96,13 +111,13 @@ export function ObservationPlanSummary({
         </section>
 
         <div className="plan-actions">
-          <button type="button" className="primary" disabled={!hasCatalogTarget} onClick={onShowTargetSky}>Show target sky</button>
-          <button type="button" onClick={onStartObserving}>Start observing</button>
-          <button type="button" aria-expanded={manualOpen} aria-controls="plan-manual-editor" onClick={onEdit}>{manualOpen ? "Done editing" : "Edit manually"}</button>
-          <button type="button" onClick={() => downloadFile(`${mission.id}.ics`, missionToIcs(mission), "text/calendar")}>Export .ics</button>
-          <button type="button" onClick={() => downloadFile(`${mission.id}-targets.csv`, missionTargetsToCsv(mission), "text/csv")}>Export .csv</button>
+          <button type="button" className="primary" disabled={!hasCatalogTarget} onClick={onShowTargetSky}>{t("plan.showTargetSky")}</button>
+          <button type="button" onClick={onStartObserving}>{t("plan.startObserving")}</button>
+          <button type="button" aria-expanded={manualOpen} aria-controls="plan-manual-editor" onClick={onEdit}>{manualOpen ? t("plan.doneEditing") : t("plan.editManually")}</button>
+          <button type="button" onClick={() => downloadFile(`${mission.id}.ics`, missionToIcs(mission), "text/calendar")}>{t("plan.exportIcs")}</button>
+          <button type="button" onClick={() => downloadFile(`${mission.id}-targets.csv`, missionTargetsToCsv(mission), "text/csv")}>{t("plan.exportCsv")}</button>
         </div>
-        {!hasCatalogTarget && <p className="workflow-note">The target Sky is unavailable because this Mission has no matching catalog star.</p>}
+        {!hasCatalogTarget && <p className="workflow-note">{t("plan.noCatalogTarget")}</p>}
       </section>
       {recoveryCode !== null && <RecoveryCodePanel recoveryCode={recoveryCode} clearRecoveryCode={onClearRecoveryCode} />}
     </>
@@ -122,12 +137,12 @@ function ContextRow({ label, value, selectable = false }: { label: string; value
   return <div className="mission-context-row"><dt>{label}</dt><dd className={selectable ? "selectable-value" : undefined}>{value}</dd></div>;
 }
 
-function formatCreatedAt(value: string): string {
+function formatCreatedAt(value: string, locale: Locale): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(date);
+  return new Intl.DateTimeFormat(intlLocale(locale), { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
-function relativeTime(timestamp: number, now: number): string {
-  return now - timestamp < 60_000 ? "just now" : formatCreatedAt(new Date(timestamp).toISOString());
+function relativeTime(timestamp: number, now: number, t: LocaleState["t"], locale: Locale): string {
+  return now - timestamp < 60_000 ? t("ctx.justNow") : formatCreatedAt(new Date(timestamp).toISOString(), locale);
 }

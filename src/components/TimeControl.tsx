@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useStarViewer } from "../state/context";
+import { useLocale } from "../i18n";
 
 function toLocalInputValue(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -10,6 +11,7 @@ function toLocalInputValue(d: Date): string {
 
 export function TimeControl() {
   const { settings, updateSettings } = useStarViewer();
+  const { t } = useLocale();
   const [playing, setPlaying] = useState(false);
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -41,7 +43,7 @@ export function TimeControl() {
   return (
     <div className="field time-control">
       <span className="field-label">
-        Date and time
+        {t("time.label")}
       </span>
       <input
         type="datetime-local"
@@ -55,13 +57,13 @@ export function TimeControl() {
         }}
       />
       <div className="btn-row">
-        <button type="button" onClick={() => shift(-6)} title="6 hours earlier">
+        <button type="button" onClick={() => shift(-6)} title={t("time.earlier", { hours: 6 })}>
           −6h
         </button>
-        <button type="button" onClick={() => shift(-3)} title="3 hours earlier">
+        <button type="button" onClick={() => shift(-3)} title={t("time.earlier", { hours: 3 })}>
           −3h
         </button>
-        <button type="button" onClick={() => shift(-1)} title="1 hour earlier">
+        <button type="button" onClick={() => shift(-1)} title={t("time.earlier", { hours: 1 })}>
           −1h
         </button>
         <button
@@ -72,15 +74,15 @@ export function TimeControl() {
             updateSettings({ datetime: new Date() });
           }}
         >
-          NOW {h}:{String(m).padStart(2, "0")}
+          {t("time.now")} {h}:{String(m).padStart(2, "0")}
         </button>
-        <button type="button" onClick={() => shift(1)} title="1 hour later">
+        <button type="button" onClick={() => shift(1)} title={t("time.later", { hours: 1 })}>
           +1h
         </button>
-        <button type="button" onClick={() => shift(3)} title="3 hours later">
+        <button type="button" onClick={() => shift(3)} title={t("time.later", { hours: 3 })}>
           +3h
         </button>
-        <button type="button" onClick={() => shift(6)} title="6 hours later">
+        <button type="button" onClick={() => shift(6)} title={t("time.later", { hours: 6 })}>
           +6h
         </button>
       </div>
@@ -89,11 +91,11 @@ export function TimeControl() {
           type="button"
           className={playing ? "primary" : undefined}
           onClick={() => setPlaying((p) => !p)}
-          title="Advance one simulated hour per second to observe star motion (§24)"
+          title={t("time.playTitle")}
         >
-          {playing ? "❚❚ Pause" : "▶ Play (1h/s)"}
+          {playing ? t("time.pause") : t("time.play")}
         </button>
-        {playing && <span className="panel-note play-note">Playing time…</span>}
+        {playing && <span className="panel-note play-note">{t("time.playing")}</span>}
       </div>
     </div>
   );

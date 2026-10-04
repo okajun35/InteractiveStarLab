@@ -3,6 +3,15 @@ import { useSimulation } from "../state/simulation";
 import { useStarViewer } from "../state/context";
 import { MAGNITUDE_LAYERS } from "../astronomy/magnitude";
 import { countByLayer } from "../astronomy/layerCounts";
+import { useLocale, type MessageKey } from "../i18n";
+
+const LAYER_LABELS: Record<(typeof MAGNITUDE_LAYERS)[number]["id"], MessageKey> = {
+  first: "layer.first",
+  second: "layer.second",
+  third: "layer.third",
+  fourth: "layer.fourth",
+  faint: "layer.faint",
+};
 
 /**
  * "Stars by Brightness" panel (spec §6–§8).
@@ -12,6 +21,7 @@ import { countByLayer } from "../astronomy/layerCounts";
 export function MagnitudeLayers() {
   const { layers, setLayerEnabled, enableAll } = useSimulation();
   const { horizontal, settings } = useStarViewer();
+  const { t } = useLocale();
 
   const counts = useMemo(
     () => countByLayer(horizontal, settings),
@@ -21,13 +31,13 @@ export function MagnitudeLayers() {
   return (
     <fieldset className="panel-group">
       <legend>
-        Stars by brightness
+        {t("layers.legend")}
         <span className="panel-group-actions">
           <button type="button" onClick={() => enableAll(true)}>
-            Enable all
+            {t("layers.enableAll")}
           </button>
           <button type="button" onClick={() => enableAll(false)}>
-            Disable all
+            {t("layers.disableAll")}
           </button>
         </span>
       </legend>
@@ -39,7 +49,7 @@ export function MagnitudeLayers() {
             onChange={(e) => setLayerEnabled(l.id, e.target.checked)}
           />
           <span className="layer-dot" data-mag={l.id} aria-hidden="true" />
-          <span className="layer-name">{l.name}</span>
+          <span className="layer-name">{t(LAYER_LABELS[l.id])}</span>
           <span className="layer-range en">
             {Number.isFinite(l.min)
               ? `mag ${l.min.toFixed(1)}–${l.max.toFixed(1)}`
@@ -49,7 +59,7 @@ export function MagnitudeLayers() {
         </label>
       ))}
       <p className="panel-note">
-        Counts show stars currently in the field of view. Enabling faint stars can increase the count quickly.
+        {t("layers.note")}
       </p>
     </fieldset>
   );

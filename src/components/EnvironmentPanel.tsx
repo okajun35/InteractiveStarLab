@@ -1,21 +1,18 @@
 import type { LightPollution } from "../types/astronomy";
-import {
-  useSimulation,
-  LIGHT_POLLUTION_LABELS,
-} from "../state/simulation";
+import { useSimulation } from "../state/simulation";
 import {
   LIMITING_MAGNITUDE_RANGE,
   lightPollutionLimit,
   OBSERVER_SENSITIVITY_RANGE,
-  OBSERVER_SENSITIVITY_LABELS,
 } from "../astronomy/magnitude";
+import { useLocale, type MessageKey } from "../i18n";
 
-const LEVEL_ORDER: LightPollution[] = [
-  "city-center",
-  "urban",
-  "suburban",
-  "dark-sky",
-  "perfect",
+const LEVEL_ORDER: Array<{ level: LightPollution; labelKey: MessageKey }> = [
+  { level: "city-center", labelKey: "lp.city-center" },
+  { level: "urban", labelKey: "lp.urban" },
+  { level: "suburban", labelKey: "lp.suburban" },
+  { level: "dark-sky", labelKey: "lp.dark-sky" },
+  { level: "perfect", labelKey: "lp.perfect" },
 ];
 
 /**
@@ -33,44 +30,45 @@ export function EnvironmentPanel() {
     observerSensitivity,
     setObserverSensitivity,
   } = useSimulation();
+  const { t } = useLocale();
 
   const SENS_PRESETS = [
-    { value: OBSERVER_SENSITIVITY_RANGE.min, label: OBSERVER_SENSITIVITY_LABELS.dull },
-    { value: 0, label: OBSERVER_SENSITIVITY_LABELS.typical },
-    { value: OBSERVER_SENSITIVITY_RANGE.max, label: OBSERVER_SENSITIVITY_LABELS.sharp },
-  ] as const;
+    { value: OBSERVER_SENSITIVITY_RANGE.min, labelKey: "sens.dull" as const },
+    { value: 0, labelKey: "sens.typical" as const },
+    { value: OBSERVER_SENSITIVITY_RANGE.max, labelKey: "sens.sharp" as const },
+  ];
 
   return (
     <fieldset className="panel-group">
       <legend>
-        Environment simulation
+        {t("env.legend")}
       </legend>
 
       {/* Daylight (spec §13-§14) */}
       <div className="field">
         <span className="field-label">
-          Daylight
+          {t("env.daylight")}
         </span>
-        <div className="seg-group" role="group" aria-label="Daylight mode">
+        <div className="seg-group" role="group" aria-label={t("env.daylightGroup")}>
           <button
             type="button"
             className={settings.daylightMode === "real" ? "seg active" : "seg"}
             onClick={() => setDaylightMode("real")}
           >
-            ☀ REAL daylight
+            {t("env.daylightReal")}
           </button>
           <button
             type="button"
             className={settings.daylightMode === "removed" ? "seg active" : "seg"}
             onClick={() => setDaylightMode("removed")}
-            title="Virtual view with sky brightness removed while keeping the date and star positions unchanged (§14)"
+            title={t("env.daylightRemovedTitle")}
           >
-            🌌 What-if: dark sky
+            {t("env.daylightRemoved")}
           </button>
         </div>
         {settings.daylightMode === "removed" && (
           <p className="panel-note">
-            The time, Sun, and star positions stay the same; only sky brightness is ignored.
+            {t("env.daylightRemovedNote")}
           </p>
         )}
       </div>
@@ -78,49 +76,49 @@ export function EnvironmentPanel() {
       {/* Light pollution presets (spec §16-§17) */}
       <div className="field">
         <span className="field-label">
-          Light pollution
+          {t("env.lightPollution")}
           <span className="field-value">
-            limit ≈ {settings.limitingMagnitude.toFixed(1)}
+            {t("env.limit", { mag: settings.limitingMagnitude.toFixed(1) })}
           </span>
         </span>
-        <div className="seg-group cols-5" role="group" aria-label="Light pollution level">
+        <div className="seg-group cols-5" role="group" aria-label={t("env.lightPollutionGroup")}>
           {LEVEL_ORDER.map((lv) => (
             <button
-              key={lv}
+              key={lv.level}
               type="button"
-              className={settings.lightPollution === lv ? "seg active" : "seg"}
-              onClick={() => setLightPollution(lv)}
-              title={LIGHT_POLLUTION_LABELS[lv]}
+              className={settings.lightPollution === lv.level ? "seg active" : "seg"}
+              onClick={() => setLightPollution(lv.level)}
+              title={t(lv.labelKey)}
             >
-              {LIGHT_POLLUTION_LABELS[lv]}
-              <span className="seg-sub">{lightPollutionLimit(lv).toFixed(1)}</span>
+              {t(lv.labelKey)}
+              <span className="seg-sub">{lightPollutionLimit(lv.level).toFixed(1)}</span>
             </button>
           ))}
         </div>
         <p className="panel-note">
-          Educational approximation (§17): faint stars become harder to see as the sky gets brighter.
+          {t("env.lightPollutionNote")}
         </p>
       </div>
 
       {/* Observer sensitivity (spec §20 — distinct from visual acuity). */}
       <div className="field">
         <span className="field-label">
-        Observer sensitivity
+          {t("env.sensitivity")}
           <span className="field-value">
             {observerSensitivity > 0 ? "+" : ""}
             {observerSensitivity.toFixed(2)}
           </span>
         </span>
-        <div className="seg-group cols-3" role="group" aria-label="Observer sensitivity">
+        <div className="seg-group cols-3" role="group" aria-label={t("env.sensitivityGroup")}>
           {SENS_PRESETS.map((p) => (
             <button
               key={p.value}
               type="button"
               className={observerSensitivity === p.value ? "seg active" : "seg"}
               onClick={() => setObserverSensitivity(p.value)}
-              title={p.label}
+              title={t(p.labelKey)}
             >
-              {p.label}
+              {t(p.labelKey)}
               <span className="seg-sub">{p.value > 0 ? "+" : ""}{p.value.toFixed(1)}</span>
             </button>
           ))}
@@ -134,26 +132,26 @@ export function EnvironmentPanel() {
           onChange={(e) => setObserverSensitivity(Number(e.target.value))}
         />
         <span className="range-ends">
-          <span>Less sensitive</span>
-          <span>Typical</span>
-          <span>More sensitive</span>
+          <span>{t("env.sensLess")}</span>
+          <span>{t("env.sensTypical")}</span>
+          <span>{t("env.sensMore")}</span>
         </span>
         <p className="panel-note">
-          This separate educational model adjusts the limiting magnitude by ±0.5; it is not a visual-acuity value (§20).
+          {t("env.sensitivityNote")}
         </p>
       </div>
 
       {/* Advanced: limiting magnitude (spec §19) */}
       <details className="advanced">
         <summary>
-          Advanced: set limiting magnitude directly
+          {t("env.advanced")}
         </summary>
         <div className="field">
           <span className="field-label">
-            Limiting magnitude
+            {t("env.limitingMagnitude")}
             <span className="field-value">
               {settings.limitingMagnitude.toFixed(1)}
-              {customLimitingMagnitude ? " (custom)" : ""}
+              {customLimitingMagnitude ? ` ${t("env.custom")}` : ""}
             </span>
           </span>
           <input
@@ -165,8 +163,8 @@ export function EnvironmentPanel() {
             onChange={(e) => setLimitingMagnitude(Number(e.target.value))}
           />
           <span className="range-ends">
-            <span>1.0 brightest stars only</span>
-            <span>6.5 nearly all stars</span>
+            <span>{t("env.rangeBright")}</span>
+            <span>{t("env.rangeAll")}</span>
           </span>
         </div>
       </details>
@@ -178,8 +176,8 @@ export function EnvironmentPanel() {
           checked={settings.showHiddenStars}
           onChange={(e) => setShowHiddenStars(e.target.checked)}
         />
-        <span className="en">Show hidden stars</span>
-        <span>Show existing but invisible stars faintly</span>
+        <span className="en">{t("env.showHidden")}</span>
+        <span>{t("env.showHiddenHint")}</span>
       </label>
     </fieldset>
   );

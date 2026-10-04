@@ -44,3 +44,8 @@ export function detectLocale(
     ? "ja"
     : "en";
 }
+
+/** BCP-47 tag for Intl formatters so UI dates/times follow the app locale. */
+export function intlLocale(locale: Locale): string {
+  return locale === "ja" ? "ja-JP" : "en-US";
+}

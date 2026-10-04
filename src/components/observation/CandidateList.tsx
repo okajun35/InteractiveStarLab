@@ -1,4 +1,5 @@
 import type { ObservationCandidate } from "../../types/observation";
+import { useLocale } from "../../i18n";
 
 interface CandidateListProps {
   candidates: ObservationCandidate[];
@@ -7,6 +8,7 @@ interface CandidateListProps {
 }
 
 export function CandidateList({ candidates, selectedIds, onToggle }: CandidateListProps) {
+  const { t } = useLocale();
   const selected = new Set(selectedIds);
   const atCapacity = selectedIds.length >= 5;
 
@@ -14,19 +16,19 @@ export function CandidateList({ candidates, selectedIds, onToggle }: CandidateLi
     <section className="workflow-card candidate-card" aria-labelledby="candidate-list-title">
       <div className="workflow-card-heading">
         <div>
-          <span className="en">Visible candidates</span>
-          <h2 id="candidate-list-title">Observation candidates</h2>
+          <span className="en">{t("plan.candidatesKicker")}</span>
+          <h2 id="candidate-list-title">{t("plan.candidates")}</h2>
         </div>
-        <span className="selection-count">{selectedIds.length} / 5 selected</span>
+        <span className="selection-count">{t("plan.candidatesSelected", { count: selectedIds.length })}</span>
       </div>
 
       {candidates.length === 0 ? (
         <div className="workflow-empty">
-          <p>No stars match these conditions.</p>
-          <p className="workflow-note">Try changing the date, site, or magnitude limit.</p>
+          <p>{t("plan.noCandidates")}</p>
+          <p className="workflow-note">{t("plan.noCandidatesHint")}</p>
         </div>
       ) : (
-        <div className="candidate-list" role="list" aria-label="Observation candidates">
+        <div className="candidate-list" role="list" aria-label={t("plan.candidates")}>
           {candidates.map((candidate) => {
             const isSelected = selected.has(candidate.starId);
             return (

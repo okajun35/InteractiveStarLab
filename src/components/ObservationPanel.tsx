@@ -3,9 +3,11 @@ import { DirectionControl } from "./DirectionControl";
 import { TimeControl } from "./TimeControl";
 import { DisplayOptions } from "./DisplayOptions";
 import { applyPlace, PLACE_PRESETS } from "../astronomy/directions";
+import { useLocale } from "../i18n";
 
 export function ObservationPanel() {
   const { settings, updateSettings, errors } = useStarViewer();
+  const { t } = useLocale();
 
   const currentPlace = PLACE_PRESETS.find(
     (p) =>
@@ -14,15 +16,15 @@ export function ObservationPanel() {
   );
 
   return (
-    <section className="panel" aria-label="Observation settings">
+    <section className="panel" aria-label={t("panel.title")}>
       <h2 className="panel-title">
-        Location
+        {t("panel.location")}
       </h2>
 
       <div className="field-row">
         <label className="field">
           <span className="field-label">
-            Latitude
+            {t("panel.latitude")}
           </span>
           <input
             type="number"
@@ -38,7 +40,7 @@ export function ObservationPanel() {
         </label>
         <label className="field">
           <span className="field-label">
-            Longitude
+            {t("panel.longitude")}
           </span>
           <input
             type="number"
@@ -60,7 +62,7 @@ export function ObservationPanel() {
 
       <div className="field">
         <span className="field-label">
-          Place presets
+          {t("panel.placePresets")}
         </span>
         <select
           className="place-select"
@@ -71,7 +73,7 @@ export function ObservationPanel() {
           }}
         >
           <option value="custom" disabled>
-            Custom location
+            {t("panel.customLocation")}
           </option>
           {PLACE_PRESETS.map((p) => (
             <option key={p.id} value={p.id}>
@@ -87,7 +89,7 @@ export function ObservationPanel() {
 
       <div className="field">
         <span className="field-label">
-          Altitude
+          {t("panel.altitude")}
           <span className="field-value">{Math.round(settings.altitude)}°</span>
         </span>
         <input
@@ -103,7 +105,7 @@ export function ObservationPanel() {
 
       <div className="field">
         <span className="field-label">
-          Field of view
+          {t("panel.fieldOfView")}
           <span className="field-value">{Math.round(settings.fieldOfView)}°</span>
         </span>
         <input

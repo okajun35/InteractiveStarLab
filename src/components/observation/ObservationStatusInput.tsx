@@ -1,4 +1,5 @@
 import type { ObservationStatus } from "../../types/observation";
+import { useLocale, type MessageKey } from "../../i18n";
 
 interface ObservationStatusInputProps {
   starId: string;
@@ -6,10 +7,10 @@ interface ObservationStatusInputProps {
   onChange: (status: ObservationStatus) => void;
 }
 
-const OPTIONS: Array<{ status: ObservationStatus; label: string }> = [
-  { status: "visible", label: "Visible" },
-  { status: "not_visible", label: "Not Visible" },
-  { status: "unsure", label: "Unsure" },
+const OPTIONS: Array<{ status: ObservationStatus; labelKey: MessageKey }> = [
+  { status: "visible", labelKey: "status.visible" },
+  { status: "not_visible", labelKey: "status.notVisible" },
+  { status: "unsure", labelKey: "status.unsure" },
 ];
 
 export function ObservationStatusInput({
@@ -17,8 +18,9 @@ export function ObservationStatusInput({
   status,
   onChange,
 }: ObservationStatusInputProps) {
+  const { t } = useLocale();
   return (
-    <div className="observation-status" role="group" aria-label={`${starId} observation result`}>
+    <div className="observation-status" role="group" aria-label={t("status.resultAria", { name: starId })}>
       {OPTIONS.map((option) => (
         <button
           key={option.status}
@@ -27,7 +29,7 @@ export function ObservationStatusInput({
           aria-pressed={status === option.status}
           onClick={() => onChange(option.status)}
         >
-          {option.label}
+          {t(option.labelKey)}
         </button>
       ))}
     </div>

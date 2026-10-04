@@ -2,6 +2,17 @@ import { useState } from "react";
 import { EXPERIMENTS, type ExperimentDef } from "../state/experiments";
 import { useSimulation } from "../state/simulation";
 import { useStarViewer } from "../state/context";
+import { useLocale, type MessageKey } from "../i18n";
+
+type ExperimentId = ExperimentDef["id"];
+
+function experimentKey(id: ExperimentId, part: "title" | "q" | "x"): MessageKey {
+  return `exp.${id}.${part}` as MessageKey;
+}
+
+function guessKey(id: ExperimentId, index: number): MessageKey {
+  return `exp.${id}.g${index}` as MessageKey;
+}
 
 /**
  * What-If experiments (spec §28–§31).
@@ -20,6 +31,7 @@ export function ExperimentPanel() {
     setCompareKind,
   } = useSimulation();
   const { settings, updateSettings } = useStarViewer();
+  const { t } = useLocale();
 
   const [guessByExp, setGuessByExp] = useState<Record<string, number>>({});
   const [openId, setOpenId] = useState<string | null>(null);
@@ -54,7 +66,7 @@ export function ExperimentPanel() {
     return (
       <fieldset className="panel-group experiment-active">
         <legend>
-          Experiment: {active.title}
+          {t("exp.activePrefix", { title: t(experimentKey(active.id, "title")) })}
         </legend>
 
         {experimentGuess && (
@@ -63,19 +75,18 @@ export function ExperimentPanel() {
               experimentGuess.correct ? "exp-guess-result ok" : "exp-guess-result no"
             }
           >
-            Your guess: {active.guesses[experimentGuess.picked]}
-            {experimentGuess.correct ? " (correct)" : " (not this time)"}
+            {t("exp.yourGuess", { guess: t(guessKey(active.id, experimentGuess.picked)) })}
+            {experimentGuess.correct ? ` ${t("exp.correct")}` : ` ${t("exp.incorrect")}`}
           </p>
         )}
 
-        <p className="exp-explain">{active.explanation}</p>
+        <p className="exp-explain">{t(experimentKey(active.id, "x"))}</p>
 
         <button type="button" className="primary" onClick={closeExperiment}>
-          Close experiment and restore previous state
+          {t("exp.close")}
         </button>
         <p className="panel-note">
-          The experiment result remains active until you close it. You can change
-          the date, location, layers, and light pollution in the panels to the left.
+          {t("exp.activeNote")}
         </p>
       </fieldset>
     );
@@ -84,7 +95,7 @@ export function ExperimentPanel() {
   return (
     <fieldset className="panel-group">
       <legend>
-        What-if experiments
+        {t("exp.legend")}
       </legend>
 
       {EXPERIMENTS.map((def) => {
@@ -97,15 +108,15 @@ export function ExperimentPanel() {
               onClick={() => setOpenId(open ? null : def.id)}
               aria-expanded={open}
             >
-              {def.title}
+              {t(experimentKey(def.id, "title"))}
               <span className="exp-arrow" aria-hidden="true">
                 {open ? "−" : "+"}
               </span>
             </button>
             {open && (
               <div className="exp-detail">
-                <p className="exp-guess-q">{def.guessQuestion}</p>
-                {def.guesses.map((g, i) => (
+                <p className="exp-guess-q">{t(experimentKey(def.id, "q"))}</p>
+                {def.guesses.map((_, i) => (
                   <label key={i} className="exp-guess">
                     <input
                       type="radio"
@@ -115,7 +126,7 @@ export function ExperimentPanel() {
                         setGuessByExp((prev) => ({ ...prev, [def.id]: i }))
                       }
                     />
-                    {g}
+                    {t(guessKey(def.id, i))}
                   </label>
                 ))}
                 <button
@@ -123,7 +134,7 @@ export function ExperimentPanel() {
                   className="primary"
                   onClick={() => applyExperiment(def)}
                 >
-                  Run experiment
+                  {t("exp.run")}
                 </button>
               </div>
             )}

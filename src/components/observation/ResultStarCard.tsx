@@ -1,4 +1,5 @@
 import type { ObservationStatus, ObservationTarget } from "../../types/observation";
+import { useLocale } from "../../i18n";
 
 interface ResultStarCardProps {
   target: ObservationTarget;
@@ -13,13 +14,14 @@ export function ResultStarCard({
   englishName,
   status,
 }: ResultStarCardProps) {
+  const { t } = useLocale();
   const isMatch = target.predictedVisible
     ? status === "visible"
     : status === "not_visible";
   const isUnsure = status === "unsure";
   const stateClass = isUnsure ? "result-uncertain" : isMatch ? "result-match" : "result-mismatch";
   const statusLabel =
-    status === "visible" ? "Visible" : status === "not_visible" ? "Not Visible" : "Unsure";
+    status === "visible" ? t("status.visible") : status === "not_visible" ? t("status.notVisible") : t("status.unsure");
 
   return (
     <article className={`result-star-card ${stateClass}`}>
@@ -30,24 +32,24 @@ export function ResultStarCard({
         </div>
         <span className="result-state">
           {isUnsure ? "?" : isMatch ? "✓" : "!"}
-          <span>{isUnsure ? "Undetermined" : isMatch ? "Match" : "Mismatch"}</span>
+          <span>{isUnsure ? t("results.undetermined") : isMatch ? t("results.match") : t("results.mismatch")}</span>
         </span>
       </div>
       <div className="result-star-details">
         <div>
-          <span className="en">Prediction</span>
-          <strong>{target.predictedVisible ? "Visible" : "Not Visible"}</strong>
+          <span className="en">{t("results.prediction")}</span>
+          <strong>{target.predictedVisible ? t("status.visible") : t("status.notVisible")}</strong>
           <small>Alt {Math.round(target.predictedAltitude)}° · Az {Math.round(target.predictedAzimuth)}°</small>
         </div>
         <div>
-          <span className="en">Observation</span>
+          <span className="en">{t("results.observation")}</span>
           <strong>{statusLabel}</strong>
         </div>
       </div>
       {target.predictedVisible && status === "not_visible" && (
         <div className="possible-reasons">
-          <strong>Possible reasons</strong>
-          <span>Clouds, light pollution, obstructions, viewing direction, or eye fatigue may be factors.</span>
+          <strong>{t("results.possibleReasons")}</strong>
+          <span>{t("results.reasonsDetail")}</span>
         </div>
       )}
     </article>

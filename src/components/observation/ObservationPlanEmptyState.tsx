@@ -1,33 +1,33 @@
 import { useWebMcp } from "../../state/webmcp";
+import { useLocale, type LocaleState } from "../../i18n";
 
 export function ObservationPlanEmptyState({ onEdit, manualOpen }: { onEdit: () => void; manualOpen: boolean }) {
   const { availability } = useWebMcp();
+  const { t } = useLocale();
   const unavailable = availability === "unavailable" || availability === "error";
   return (
-    <section className="workflow-card plan-empty-state" aria-label="No active Mission">
+    <section className="workflow-card plan-empty-state" aria-label={t("plan.noMission")}>
       <div className="plan-empty-heading">
         <div>
-          <span className="en">Observation Plan</span>
-          <h1>Observation Plan</h1>
+          <span className="en">{t("plan.kicker")}</span>
+          <h1>{t("plan.title")}</h1>
         </div>
-        <StatusBadge availability={availability} />
+        <StatusBadge availability={availability} t={t} />
       </div>
-      <h2>No active Mission</h2>
-      <p>{unavailable
-        ? "WebMCP unavailable. Manual planning is still available."
-        : "Ask your AI agent to create a plan for a place and time, or create one manually."}</p>
+      <h2>{t("plan.noMission")}</h2>
+      <p>{unavailable ? t("plan.noMissionManual") : t("plan.noMissionAgent")}</p>
       <div className="plan-example">
-        <span className="en">Example</span>
-        <q>Create a three-star observation plan for Sydney tonight.</q>
+        <span className="en">{t("plan.example")}</span>
+        <q>{t("plan.exampleText")}</q>
       </div>
       <button type="button" className="primary" aria-expanded={manualOpen} aria-controls="plan-manual-editor" onClick={onEdit}>
-        {manualOpen ? "Done editing" : "Edit manually"}
+        {manualOpen ? t("plan.doneEditing") : t("plan.editManually")}
       </button>
     </section>
   );
 }
 
-function StatusBadge({ availability }: { availability: "unknown" | "ready" | "unavailable" | "error" }) {
-  const label = availability === "unknown" ? "Checking WebMCP…" : availability === "ready" ? "WebMCP ready" : "WebMCP unavailable";
+function StatusBadge({ availability, t }: { availability: "unknown" | "ready" | "unavailable" | "error"; t: LocaleState["t"] }) {
+  const label = availability === "unknown" ? t("webmcp.checking") : availability === "ready" ? t("webmcp.ready") : t("webmcp.unavailable");
   return <span className={`sky-status-badge sky-status-${availability}`}><span className="sky-status-dot" aria-hidden="true" />{label}</span>;
 }

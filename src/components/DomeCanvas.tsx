@@ -16,8 +16,8 @@ import {
   type DomeView,
 } from "../astronomy/dome";
 import { STAR_BY_ID } from "../astronomy/stars";
-import { TWILIGHT_LABELS } from "../astronomy/twilight";
 import type { Star } from "../types/astronomy";
+import { useLocale, type MessageKey } from "../i18n";
 import type { StarCanvasMetrics } from "./StarCanvas";
 
 interface DomeCanvasProps {
@@ -53,6 +53,7 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
   const { registerCanvas, captureSnapshot, downloadRecord } = useSnapshots();
+  const { t } = useLocale();
 
   const [domeView, setDomeView] = useState<DomeView>(() => ({
     rotationDeg: settings.azimuth,
@@ -265,8 +266,8 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
         type="button"
         className="snapshot-btn"
         onClick={takeSnapshot}
-        title="Save a sky snapshot as PNG"
-        aria-label="Save sky snapshot as PNG"
+        title={t("canvas.snapshotTitle")}
+        aria-label={t("canvas.snapshotTitle")}
       >
         <svg
           width="16"
@@ -282,7 +283,7 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
           <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
           <circle cx="12" cy="13" r="4" />
         </svg>
-        Snapshot
+        {t("canvas.snapshot")}
       </button>
       <div className="canvas-hud" aria-hidden="true">
         <span className="canvas-hud-heading">
@@ -290,12 +291,12 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
           {sim.daylightMode === "real" ? (
             <span className="canvas-hud-stage">
               {" "}
-              <span>{TWILIGHT_LABELS[scene.twilightStage]}</span>
+              <span>{t(`twilight.${scene.twilightStage}` as MessageKey)}</span>
             </span>
           ) : ""}
         </span>
         <span className="canvas-hud-count">
-          {`Visible ${scene.visibleCount} / In dome ${scene.inViewCount}`}
+          {t("canvas.visibleInDome", { visible: scene.visibleCount, total: scene.inViewCount })}
         </span>
       </div>
     </div>

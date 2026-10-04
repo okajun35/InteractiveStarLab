@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ObservationMission } from "../../types/observation";
 import { CloudApplicationError } from "../../cloud/errors";
 import { normalizeRecoveryCode } from "../../cloud/recoveryCode";
+import { useLocale } from "../../i18n";
 
 interface RecoveryCodePanelProps {
   recoveryCode: string;
@@ -9,6 +10,7 @@ interface RecoveryCodePanelProps {
 }
 
 export function RecoveryCodePanel({ recoveryCode, clearRecoveryCode }: RecoveryCodePanelProps) {
+  const { t } = useLocale();
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
   const copyCode = async () => {
@@ -25,19 +27,19 @@ export function RecoveryCodePanel({ recoveryCode, clearRecoveryCode }: RecoveryC
     <section className="recovery-code-panel" aria-labelledby="recovery-code-title">
       <div className="workflow-card-heading">
         <div>
-          <span className="en">Mission recovery code</span>
-          <h2 id="recovery-code-title">Store your Recovery Code</h2>
+          <span className="en">{t("recovery.kicker")}</span>
+          <h2 id="recovery-code-title">{t("recovery.title")}</h2>
         </div>
       </div>
-      <p>Use this code to restore the Mission on another device. It will not be shown again after this panel is closed.</p>
-      <div className="recovery-code-value" aria-label="Mission Recovery Code">
+      <p>{t("recovery.body")}</p>
+      <div className="recovery-code-value" aria-label={t("recovery.codeAria")}>
         <code>{recoveryCode}</code>
-        <button type="button" onClick={() => void copyCode()}>Copy</button>
+        <button type="button" onClick={() => void copyCode()}>{t("recovery.copy")}</button>
       </div>
-      {copyState === "copied" && <p className="recovery-code-status" role="status">Recovery Code copied.</p>}
-      {copyState === "failed" && <p className="cloud-error" role="alert">Could not copy the code. Save it manually in a secure place.</p>}
-      <p className="workflow-note">Anyone with this code can view and update the Mission. Share it carefully.</p>
-      <button type="button" className="recovery-code-dismiss" onClick={clearRecoveryCode}>Acknowledge and close</button>
+      {copyState === "copied" && <p className="recovery-code-status" role="status">{t("recovery.copied")}</p>}
+      {copyState === "failed" && <p className="cloud-error" role="alert">{t("recovery.copyFailed")}</p>}
+      <p className="workflow-note">{t("recovery.shareNote")}</p>
+      <button type="button" className="recovery-code-dismiss" onClick={clearRecoveryCode}>{t("recovery.dismiss")}</button>
     </section>
   );
 }
@@ -48,13 +50,14 @@ interface RecoveryMissionFormProps {
 }
 
 export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMissionFormProps) {
+  const { t } = useLocale();
   const [recoveryCodeInput, setRecoveryCodeInput] = useState("");
   const [restoring, setRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const submit = () => {
     if (normalizeRecoveryCode(recoveryCodeInput) === null) {
-      setError("This Recovery Code is invalid or unavailable.");
+      setError(t("recovery.invalid"));
       return;
     }
     setRestoring(true);
@@ -63,7 +66,7 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
       setRecoveryCodeInput("");
       onRestored(mission);
     }).catch((restoreError: unknown) => {
-      setError(recoveryErrorMessage(restoreError));
+      setError(recoveryErrorMessage(restoreError, t));
     }).finally(() => setRestoring(false));
   };
 
@@ -71,13 +74,13 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
     <section className="workflow-card recovery-restore-card" aria-labelledby="restore-mission-title">
       <div className="workflow-card-heading">
         <div>
-          <span className="en">Restore a Mission</span>
-          <h2 id="restore-mission-title">Restore Mission with a Recovery Code</h2>
+          <span className="en">{t("recovery.restoreKicker")}</span>
+          <h2 id="restore-mission-title">{t("recovery.restoreTitle")}</h2>
         </div>
       </div>
-      <p>Enter a Recovery Code issued on another device to add that Mission to your history.</p>
+      <p>{t("recovery.restoreBody")}</p>
       <div className="recovery-restore-form">
-        <label htmlFor="mission-recovery-code">Recovery Code</label>
+        <label htmlFor="mission-recovery-code">{t("recovery.codeLabel")}</label>
         <div className="recovery-restore-input-row">
           <input
             id="mission-recovery-code"
@@ -92,7 +95,7 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
             spellCheck={false}
           />
           <button type="button" className="primary" disabled={restoring || recoveryCodeInput.trim() === ""} onClick={submit}>
-            {restoring ? "Restoring…" : "Restore Mission"}
+            {restoring ? t("recovery.restoring") : t("recovery.restore")}
           </button>
         </div>
       </div>
@@ -101,10 +104,10 @@ export function RecoveryMissionForm({ restoreMission, onRestored }: RecoveryMiss
   );
 }
 
-function recoveryErrorMessage(error: unknown): string {
+function recoveryErrorMessage(error: unknown, t: ReturnType<typeof useLocale>["t"]): string {
   if (error instanceof CloudApplicationError) {
-    if (error.code === "RESTORE_CODE_INVALID") return "This Recovery Code is invalid or unavailable.";
-    if (error.code === "CLOUD_NOT_CONFIGURED") return "Mission restoration is unavailable because cloud storage is not configured.";
+    if (error.code === "RESTORE_CODE_INVALID") return t("recovery.invalid");
+    if (error.code === "CLOUD_NOT_CONFIGURED") return t("recovery.cloudMissing");
   }
-  return "Could not restore the Mission. Please try again later.";
+  return t("recovery.failed");
 }

@@ -8,10 +8,16 @@ import {
   buildSkyContextModel,
   buildCurrentSkyRows,
   valuesEqual,
+  type SkyContextField,
   type SkyContextModel,
   type SkyContextRow,
   type SkySceneMetrics,
 } from "../sky/contextModel";
+import { useLocale, intlLocale, type Locale, type LocaleState, type MessageKey } from "../i18n";
+
+function fieldLabelKey(field: SkyContextField): MessageKey {
+  return `ctx.${field}` as MessageKey;
+}
 
 export function SkyContextPanel({ metrics, compact = false }: { metrics: SkySceneMetrics | null; compact?: boolean }) {
   const { settings: observation, options, skyMode } = useStarViewer();
@@ -19,6 +25,7 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
   const { activeSite } = useObservation();
   const { availability } = useWebMcp();
   const { skyActivity } = useAgentActivity();
+  const { t, locale } = useLocale();
   const [now, setNow] = useState(() => Date.now());
   const model = useMemo<SkyContextModel>(
     () => buildSkyContextModel({
@@ -49,22 +56,31 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
   const currentSkyRows = buildCurrentSkyRows(model, skyActivity);
   const announcement = skyActivity === null || effectiveChanges.length === 0
     ? ""
-    : `WebMCP updated ${effectiveChanges.length} sky setting${effectiveChanges.length === 1 ? "" : "s"}: ${effectiveChanges.map((change) => rowForChange(model, change.field)?.label ?? change.field).join(", ")}.`;
+    : effectiveChanges.length === 1
+      ? t("ctx.announcementOne", { fields: labelForChange(model, effectiveChanges[0].field, t) })
+      : t("ctx.announcement", {
+        count: effectiveChanges.length,
+        fields: effectiveChanges.map((change) => labelForChange(model, change.field, t)).join(", "),
+      });
 
   return (
     <section className={compact ? "sky-context-panel sky-context-panel-compact" : "sky-context-panel"} aria-labelledby="live-context-title">
       <div className="sky-context-status-row">
-        <h2 id="live-context-title">{compact ? "Current sky" : "Live Observation Context"}</h2>
-        <StatusBadge availability={availability} />
+        <h2 id="live-context-title">{compact ? t("ctx.titleCompact") : t("ctx.title")}</h2>
+        <StatusBadge availability={availability} t={t} />
       </div>
       {availability === "unavailable" || availability === "error" ? (
-        <p className="sky-fallback-note">Manual controls are still available.</p>
+        <p className="sky-fallback-note">{t("ctx.manualNote")}</p>
       ) : null}
       {skyActivity !== null && (
-        <div className="sky-activity-summary" aria-label="Latest WebMCP activity">
-          <strong>Updated via WebMCP · {relativeActivityTime(skyActivity.updatedAt, now)}</strong>
+        <div className="sky-activity-summary" aria-label={t("ctx.activityAria")}>
+          <strong>{t("ctx.updatedVia")} · {relativeActivityTime(skyActivity.updatedAt, now, t, locale)}</strong>
           {effectiveChanges.length > 0 && (
-            <span>{effectiveChanges.length} setting{effectiveChanges.length === 1 ? "" : "s"} updated</span>
+            <span>
+              {effectiveChanges.length === 1
+                ? t("ctx.settingsUpdatedOne")
+                : t("ctx.settingsUpdated", { count: effectiveChanges.length })}
+            </span>
           )}
         </div>
       )}
@@ -72,30 +88,30 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
         {announcement}
       </div>
       {compact ? (
-          <ContextSection title="Current sky" rows={currentSkyRows} activity={skyActivity} now={now} />
+          <ContextSection title={t("ctx.titleCompact")} rows={currentSkyRows} activity={skyActivity} now={now} t={t} />
       ) : (
         <>
-          <ContextSection title="Observation Context" rows={model.observation} activity={skyActivity} now={now} />
-          <ContextSection title="Visibility" rows={model.visibility} activity={skyActivity} now={now} />
-          <ContextSection title="Display" rows={model.display} activity={skyActivity} now={now} />
+          <ContextSection title={t("ctx.observation")} rows={model.observation} activity={skyActivity} now={now} t={t} />
+          <ContextSection title={t("ctx.visibility")} rows={model.visibility} activity={skyActivity} now={now} t={t} />
+          <ContextSection title={t("ctx.display")} rows={model.display} activity={skyActivity} now={now} t={t} />
         </>
       )}
       {model.compareLabel !== null && (
         <div className="sky-context-compare-row">
-          <span>View Mode</span>
-          <strong>Comparison — {model.compareLabel}</strong>
+          <span>{t("ctx.viewMode")}</span>
+          <strong>{t("ctx.comparing", { label: model.compareLabel })}</strong>
         </div>
       )}
     </section>
   );
 }
 
-function StatusBadge({ availability }: { availability: ReturnType<typeof useWebMcp>["availability"] }) {
+function StatusBadge({ availability, t }: { availability: ReturnType<typeof useWebMcp>["availability"]; t: LocaleState["t"] }) {
   const label = availability === "unknown"
-    ? "Checking WebMCP…"
+    ? t("webmcp.checking")
     : availability === "ready"
-      ? "WebMCP ready"
-      : "WebMCP unavailable";
+      ? t("webmcp.ready")
+      : t("webmcp.unavailable");
   return (
     <span className={`sky-status-badge sky-status-${availability}`}>
       <span className="sky-status-dot" aria-hidden="true" />
@@ -109,11 +125,13 @@ function ContextSection({
   rows,
   activity,
   now,
+  t,
 }: {
   title: string;
   rows: SkyContextRow[];
   activity: ReturnType<typeof useAgentActivity>["skyActivity"];
   now: number;
+  t: LocaleState["t"];
 }) {
   return (
     <section className="sky-context-section" aria-labelledby={`sky-context-${title.toLowerCase().replace(/ /g, "-")}`}>
@@ -127,10 +145,10 @@ function ContextSection({
           const showChange = change !== undefined && currentMatches && elapsed < 5000;
           return (
             <div className={highlighted ? "sky-context-row changed" : "sky-context-row"} key={row.field}>
-              <dt>{row.label}</dt>
+              <dt>{t(fieldLabelKey(row.field))}</dt>
               <dd>
                 <span>{row.value}</span>
-                {showChange && <small className="sky-context-diff">Updated via WebMCP</small>}
+                {showChange && <small className="sky-context-diff">{t("ctx.updatedVia")}</small>}
               </dd>
             </div>
           );
@@ -140,11 +158,18 @@ function ContextSection({
   );
 }
 
-function rowForChange(model: SkyContextModel, field: Parameters<typeof valuesEqual>[0] & string) {
-  return [...model.observation, ...model.visibility, ...model.display].find((row) => row.field === field);
+function labelForChange(
+  model: SkyContextModel,
+  field: SkyContextField,
+  t: LocaleState["t"],
+): string {
+  const row = [...model.observation, ...model.visibility, ...model.display].find(
+    (item) => item.field === field,
+  );
+  return row === undefined ? field : t(fieldLabelKey(row.field));
 }
 
-function relativeActivityTime(timestamp: number, now: number): string {
-  if (now - timestamp < 60_000) return "just now";
-  return new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(timestamp);
+function relativeActivityTime(timestamp: number, now: number, t: LocaleState["t"], locale: Locale): string {
+  if (now - timestamp < 60_000) return t("ctx.justNow");
+  return new Intl.DateTimeFormat(intlLocale(locale), { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(timestamp);
 }

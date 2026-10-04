@@ -1,5 +1,11 @@
 import { useSimulation, LIGHT_POLLUTION_LABELS } from "../state/simulation";
-import { TIME_BASIS_LABELS, type TimeBasis } from "../astronomy/timezones";
+import type { TimeBasis } from "../astronomy/timezones";
+import { useLocale, type MessageKey } from "../i18n";
+
+const TIME_BASIS_KEYS: Record<TimeBasis, MessageKey> = {
+  "same-local-time": "timeBasis.same-local-time",
+  "same-utc-instant": "timeBasis.same-utc-instant",
+};
 
 /**
  * Before/After compare (spec §21, §22, §47).
@@ -13,19 +19,20 @@ export function ComparePanel() {
     timeBasis,
     setTimeBasis,
   } = useSimulation();
+  const { t } = useLocale();
 
-  const kinds = [
-    { id: "daylight" as const, label: "Daylight REAL vs REMOVED" },
-    { id: "light-pollution" as const, label: "City vs Dark Sky" },
-    { id: "location" as const, label: "Tokyo vs Sydney" },
+  const kinds: Array<{ id: "daylight" | "light-pollution" | "location"; labelKey: MessageKey }> = [
+    { id: "daylight", labelKey: "cmp.daylight" },
+    { id: "light-pollution", labelKey: "cmp.lightPollution" },
+    { id: "location", labelKey: "cmp.location" },
   ];
 
   return (
     <fieldset className="panel-group">
       <legend>
-        Before / After
+        {t("cmp.legend")}
       </legend>
-      <div className="seg-group cols-3" role="group" aria-label="Comparison type">
+      <div className="seg-group cols-3" role="group" aria-label={t("cmp.group")}>
         {kinds.map((k) => (
           <button
             key={k.id}
@@ -35,17 +42,17 @@ export function ComparePanel() {
               setCompareKind(compare?.kind === k.id ? null : k.id)
             }
           >
-            {k.label}
+            {t(k.labelKey)}
           </button>
         ))}
       </div>
       {compare?.kind === "location" && (
         <div className="field">
         <span className="field-label">
-            Time basis
+            {t("cmp.timeBasis")}
           </span>
-          <div className="seg-group" role="group" aria-label="Time basis">
-            {(Object.keys(TIME_BASIS_LABELS) as TimeBasis[]).map((k) => (
+          <div className="seg-group" role="group" aria-label={t("cmp.timeBasis")}>
+            {(Object.keys(TIME_BASIS_KEYS) as TimeBasis[]).map((k) => (
               <button
                 key={k}
                 type="button"
@@ -53,21 +60,18 @@ export function ComparePanel() {
                 // setTimeBasis atomically re-applies the active location compare.
                 onClick={() => setTimeBasis(k)}
               >
-                {TIME_BASIS_LABELS[k]}
+                {t(TIME_BASIS_KEYS[k])}
               </button>
             ))}
           </div>
           <p className="panel-note">
-            {timeBasis === "same-local-time"
-              ? "Compare the sky at the same local time on both sides (§27)."
-              : "Compare the sky at the same UTC instant on both sides."}
+            {timeBasis === "same-local-time" ? t("cmp.noteLocal") : t("cmp.noteUtc")}
           </p>
         </div>
       )}
       {compare && (
         <p className="panel-note">
-          Comparing {compare.baseLabel} and {compare.changedLabel} side by side.
-          Date, direction, and field of view are matched on both sides (§22).
+          {t("cmp.active", { base: compare.baseLabel, changed: compare.changedLabel })}
         </p>
       )}
     </fieldset>

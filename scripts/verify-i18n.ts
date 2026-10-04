@@ -7,7 +7,12 @@
  */
 import { en } from "../src/i18n/en";
 import { ja } from "../src/i18n/ja";
-import { detectLocale, readStoredLocale, writeStoredLocale } from "../src/i18n/locale";
+import {
+  detectLocale,
+  intlLocale,
+  readStoredLocale,
+  writeStoredLocale,
+} from "../src/i18n/locale";
 
 let failures = 0;
 function check(name: string, ok: boolean, detail = ""): void {
@@ -39,6 +44,36 @@ function check(name: string, ok: boolean, detail = ""): void {
     ),
   );
   check("i18n: nav labels exist", en["nav.sky"] === "Sky" && ja["nav.sky"].length > 0);
+  check(
+    "i18n: workflow namespaces exist",
+    [
+      "plan.createMission",
+      "plan.candidatesSelected",
+      "run.save",
+      "results.expected",
+      "history.starsCount",
+      "recovery.invalid",
+      "snap.cloudBadge",
+      "proposal.commit",
+      "status.visible",
+      "guide.pdfSaved",
+      "ctx.activityAria",
+    ].every(
+      (key) =>
+        typeof en[key as keyof typeof en] === "string" &&
+        typeof ja[key as keyof typeof en] === "string",
+    ),
+  );
+  check(
+    "i18n: interpolation placeholders are non-empty after substitution",
+    en["plan.upToMagnitude"].includes("{mag}") &&
+      en["proposal.commit"].includes("{count}") &&
+      en["recovery.invalid"].length > 0,
+  );
+  check(
+    "i18n: intlLocale maps locales to BCP-47 tags",
+    intlLocale("en") === "en-US" && intlLocale("ja") === "ja-JP",
+  );
 }
 
 // ---- detection -------------------------------------------------------------------

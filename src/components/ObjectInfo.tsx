@@ -4,13 +4,32 @@ import { useSimulation } from "../state/simulation";
 import { createContext } from "../astronomy/observer";
 import { sunPosition } from "../astronomy/sun";
 import { evaluateStar, reasonLabel } from "../astronomy/visibilityModel";
-import { MAGNITUDE_LAYERS, LIGHT_POLLUTION_LABELS, layerOf } from "../astronomy/magnitude";
+import { MAGNITUDE_LAYERS, layerOf } from "../astronomy/magnitude";
+import type { LightPollution } from "../types/astronomy";
 import { CONSTELLATIONS, STARS } from "../astronomy/stars";
+import { useLocale, type MessageKey } from "../i18n";
+
+const LP_KEYS: Record<LightPollution, MessageKey> = {
+  "city-center": "lp.city-center",
+  urban: "lp.urban",
+  suburban: "lp.suburban",
+  "dark-sky": "lp.dark-sky",
+  perfect: "lp.perfect",
+};
+
+const LAYER_NAME_KEYS: Record<(typeof MAGNITUDE_LAYERS)[number]["id"], MessageKey> = {
+  first: "layer.first",
+  second: "layer.second",
+  third: "layer.third",
+  fourth: "layer.fourth",
+  faint: "layer.faint",
+};
 
 export function ObjectInfo() {
   const { settings, selectedStar, selectStar, selectedSun, selectSun, horizontal } =
     useStarViewer();
   const { layers, settings: sim } = useSimulation();
+  const { t } = useLocale();
 
   const sun = useMemo(() => {
     try {
@@ -22,16 +41,16 @@ export function ObjectInfo() {
 
   if (selectedSun) {
     return (
-      <section className="object-info" aria-label="Selected object">
+      <section className="object-info" aria-label={t("obj.aria")}>
         <div className="object-info-head">
           <div className="object-name">
-            <span className="object-name-main">Sun</span>
-            <span className="object-name-sub">Star (G2V)</span>
+            <span className="object-name-main">{t("obj.sun")}</span>
+            <span className="object-name-sub">{t("obj.sunType")}</span>
           </div>
           <button
             type="button"
             onClick={() => selectSun(false)}
-            aria-label="Close"
+            aria-label={t("obj.close")}
           >
             ×
           </button>
@@ -39,22 +58,20 @@ export function ObjectInfo() {
         <dl>
           <div>
             <dt>
-              Altitude
+              {t("obj.altitude")}
             </dt>
             <dd>{sun ? `${sun.altitude.toFixed(1)}°` : "—"}</dd>
           </div>
           <div>
             <dt>
-              Azimuth
+              {t("obj.azimuth")}
             </dt>
             <dd>{sun ? `${sun.azimuth.toFixed(1)}°` : "—"}</dd>
           </div>
         </dl>
         {sun && (
           <p className="object-info-hint">
-            {sun.altitude > 0
-              ? "The Sun is above the horizon. Daylight makes stars harder to see."
-              : "The Sun is below the horizon, so stars may be visible in the night sky."}
+            {sun.altitude > 0 ? t("obj.sunAboveHint") : t("obj.sunBelowHint")}
           </p>
         )}
       </section>
@@ -63,8 +80,8 @@ export function ObjectInfo() {
 
   if (!selectedStar) {
     return (
-      <section className="object-info empty" aria-label="Selected object">
-        Select a star to view its details
+      <section className="object-info empty" aria-label={t("obj.aria")}>
+        {t("obj.empty")}
       </section>
     );
   }
@@ -86,32 +103,34 @@ export function ObjectInfo() {
     : [];
   const brightest = constellationStars.slice().sort((a, b) => a.magnitude - b.magnitude)[0];
 
+  const layerId = layerOf(selectedStar.magnitude);
+
   return (
-    <section className="object-info" aria-label="Selected object">
+    <section className="object-info" aria-label={t("obj.aria")}>
       <div className="object-info-head">
         <div className="object-name">
           <span className="object-name-main">{selectedStar.name}</span>
         </div>
-        <button type="button" onClick={() => selectStar(null)} aria-label="Close">
+        <button type="button" onClick={() => selectStar(null)} aria-label={t("obj.close")}>
           ×
         </button>
       </div>
       <dl>
         <div>
           <dt>
-            Magnitude
+            {t("obj.magnitude")}
           </dt>
           <dd>{selectedStar.magnitude.toFixed(2)}</dd>
         </div>
         <div>
           <dt>
-            Brightness group
+            {t("obj.brightnessGroup")}
           </dt>
-          <dd>{MAGNITUDE_LAYERS.find((layer) => layer.id === layerOf(selectedStar.magnitude))?.name}</dd>
+          <dd>{t(LAYER_NAME_KEYS[layerId])}</dd>
         </div>
         <div>
           <dt>
-            Constellation
+            {t("obj.constellation")}
           </dt>
           <dd>
             {constellation
@@ -122,40 +141,40 @@ export function ObjectInfo() {
         {pos && (
           <div>
             <dt>
-              Exists above horizon
+              {t("obj.aboveHorizon")}
             </dt>
-            <dd>{pos.altitude >= 0 ? "Yes" : "No"}</dd>
+            <dd>{pos.altitude >= 0 ? t("obj.yes") : t("obj.no")}</dd>
           </div>
         )}
         {pos && (
           <div>
             <dt>
-              Visible in simulation
+              {t("obj.visibleSim")}
             </dt>
             <dd className={status.state === "visible" ? "vis-ok" : "vis-hidden"}>
-              {status.state === "visible" ? "Yes" : "No"}
+              {status.state === "visible" ? t("obj.yes") : t("obj.no")}
             </dd>
           </div>
         )}
         {pos && status.state === "hidden" && (
           <div>
             <dt>
-              Reason
+              {t("obj.reason")}
             </dt>
-            <dd>{reasonLabel(status.reason, sim.daylightMode)}</dd>
+            <dd>{reasonText(status.reason, sim.daylightMode, t)}</dd>
           </div>
         )}
         {pos && (
           <>
             <div>
               <dt>
-              Altitude
+              {t("obj.altitude")}
               </dt>
               <dd>{pos.altitude.toFixed(1)}°</dd>
             </div>
             <div>
               <dt>
-              Azimuth
+              {t("obj.azimuth")}
               </dt>
               <dd>{pos.azimuth.toFixed(1)}°</dd>
             </div>
@@ -170,17 +189,32 @@ export function ObjectInfo() {
           </h3>
           {brightest && (
             <p>
-              Brightest star: {brightest.name} (mag {brightest.magnitude.toFixed(1)})
+              {t("obj.brightestStar", { name: brightest.name, mag: brightest.magnitude.toFixed(1) })}
             </p>
           )}
-          <p>{constellation.description ?? "No description available."}</p>
+          <p>{constellation.description ?? t("obj.noDescription")}</p>
         </aside>
       )}
 
       <p className="object-info-hint">
-        Light pollution: {LIGHT_POLLUTION_LABELS[sim.lightPollution]} (limit ≈{" "}
-        {sim.limitingMagnitude.toFixed(1)}) / Daylight mode: {sim.daylightMode === "real" ? "REAL" : "REMOVED"}
+        {t("obj.hint", {
+          level: t(LP_KEYS[sim.lightPollution]),
+          mag: sim.limitingMagnitude.toFixed(1),
+          mode: sim.daylightMode === "real" ? t("obj.real") : t("obj.removed"),
+        })}
       </p>
     </section>
   );
+}
+
+function reasonText(
+  reason: Parameters<typeof reasonLabel>[0],
+  daylightMode: Parameters<typeof reasonLabel>[1],
+  t: (key: MessageKey) => string,
+): string {
+  // `reasonLabel` keeps the canonical English text; the UI maps it to the
+  // active locale via the same two reasons the helper distinguishes.
+  if (reason === "below-horizon") return t("reason.belowHorizon");
+  void daylightMode;
+  return t("reason.tooFaint");
 }

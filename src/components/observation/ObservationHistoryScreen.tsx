@@ -3,6 +3,7 @@ import { compareObservationRecord } from "../../observation/comparison";
 import { sortObservationRecords } from "../../observation/history";
 import { useObservation } from "../../state/observation";
 import { RecoveryMissionForm } from "./RecoveryCodePanel";
+import { useLocale, intlLocale, type Locale } from "../../i18n";
 
 interface ObservationHistoryScreenProps {
   onOpenResults: () => void;
@@ -12,6 +13,7 @@ interface ObservationHistoryScreenProps {
 
 export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenPlan }: ObservationHistoryScreenProps) {
   const { records, selectRecord, restoreMission } = useObservation();
+  const { t, locale } = useLocale();
   const sortedRecords = useMemo(() => sortObservationRecords(records), [records]);
 
   return (
@@ -19,12 +21,12 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
       <div className="workflow-container">
         <div className="workflow-hero">
           <div>
-            <span className="en">Observation history</span>
-            <h1>Observation history</h1>
-            <p>Review past Missions and observation results.</p>
+            <span className="en">{t("history.kicker")}</span>
+            <h1>{t("history.title")}</h1>
+            <p>{t("history.lead")}</p>
           </div>
           <button type="button" className="primary" onClick={onOpenPlan}>
-            New Mission
+            {t("history.newMission")}
           </button>
         </div>
 
@@ -34,14 +36,14 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
         />
 
         {sortedRecords.length === 0 ? (
-          <section className="workflow-card workflow-empty-card history-empty" aria-label="No observation history">
-            <span className="en">No observation history</span>
-            <h2>No observation history yet</h2>
-            <p>Select stars in Plan to record your first observation.</p>
-            <button type="button" className="primary" onClick={onOpenPlan}>Go to Plan</button>
+          <section className="workflow-card workflow-empty-card history-empty" aria-label={t("history.empty")}>
+            <span className="en">{t("history.empty")}</span>
+            <h2>{t("history.emptyTitle")}</h2>
+            <p>{t("history.emptyHint")}</p>
+            <button type="button" className="primary" onClick={onOpenPlan}>{t("history.goToPlan")}</button>
           </section>
         ) : (
-          <section className="history-list" aria-label="Observation history list">
+          <section className="history-list" aria-label={t("history.listAria")}>
             {sortedRecords.map((record) => {
               const summary = compareObservationRecord(record);
               return (
@@ -56,7 +58,7 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
                 >
                   <span className="history-row-main">
                     <strong>{record.siteSnapshot.name}</strong>
-                    <span>{formatDateTime(record.dateTime)} · {record.targets.length} stars</span>
+                    <span>{formatDateTime(record.dateTime, locale)} · {t("history.starsCount", { count: record.targets.length })}</span>
                   </span>
                   <span className="history-row-result">
                     <span className="history-visible">✓ {summary.visible}</span>
@@ -74,10 +76,10 @@ export function ObservationHistoryScreen({ onOpenResults, onOpenObserve, onOpenP
   );
 }
 
-function formatDateTime(value: string): string {
+function formatDateTime(value: string, locale: Locale): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
