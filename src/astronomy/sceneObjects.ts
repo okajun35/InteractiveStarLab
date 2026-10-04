@@ -205,6 +205,7 @@ export function buildSharedSceneObjects(
   width: number,
   height: number,
   sun: { azimuth: number; altitude: number },
+  options: { mapMode?: boolean } = {},
 ): SharedSceneObjects {
   const ctx = createContext(settings);
   const rot = horizonMatrix(ctx);
@@ -314,7 +315,11 @@ export function buildSharedSceneObjects(
 
   // --- dense star field --------------------------------------------------------
   const denseStars: SceneDenseStar[] = [];
-  const cap = simulation.daylightMode === "real" ? twilightCap(sun.altitude) : null;
+  // Map mode (the all-sky dome) is a chart of what exists, not a visibility
+  // simulation — the twilight cut that hides faint stars by day does not apply.
+  const cap = !options.mapMode && simulation.daylightMode === "real"
+    ? twilightCap(sun.altitude)
+    : null;
   const limit = effectiveLimitingMagnitude(
     simulation.limitingMagnitude,
     simulation.observerSensitivity,

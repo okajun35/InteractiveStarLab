@@ -212,7 +212,7 @@ export function buildDomeScene(
 
   let shared = emptySharedObjects(sun.altitude);
   try {
-    shared = buildSharedSceneObjects(settings, simulation, projector, width, height, sun);
+    shared = buildSharedSceneObjects(settings, simulation, projector, width, height, sun, { mapMode: true });
   } catch {
     // Keep a safe scene on invalid input.
   }

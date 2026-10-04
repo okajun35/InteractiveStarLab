@@ -240,6 +240,34 @@ const wholeSky: DomeView = { rotationDeg: 0, zoom: 1 };
   );
 }
 
+// Map mode: the dome is a chart of what exists, so the daylight twilight cap
+// that empties the dense field in the windowed simulation does not apply.
+{
+  const noon = { ...settings, datetime: new Date(Date.UTC(2026, 7, 28, 4, 0, 0)) }; // 13:00 JST
+  const daySim: SimulationSettings = { ...nightSim, daylightMode: "real" };
+  const layers = { first: true, second: true, third: true, fourth: true, faint: true };
+  const dayScene = buildDomeScene(
+    horizontalStars(noon, STARS),
+    CONSTELLATIONS,
+    noon,
+    layers,
+    daySim,
+    W,
+    H,
+    wholeSky,
+  );
+  check(
+    "dome scene: daylight still shows the dense field (map mode)",
+    dayScene.denseStars.length > 500,
+    `${dayScene.denseStars.length} dense stars at noon`,
+  );
+  check(
+    "dome scene: daylight still reports the day phase",
+    dayScene.skyPhase === "day",
+    dayScene.skyPhase,
+  );
+}
+
 if (failures > 0) {
   console.log(`\n${failures} check(s) FAILED`);
   process.exit(1);
