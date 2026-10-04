@@ -17,6 +17,22 @@ function scanFile(path: string): string[] {
     .flatMap((line, index) => japanesePattern.test(line) ? [`${relative(root, path)}:${index + 1}: ${line.trim()}`] : []);
 }
 
+const binaryExtensions = new Set([
+  ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".icns", ".bmp",
+  ".pdf", ".zip", ".gz", ".br", ".woff", ".woff2", ".ttf", ".otf",
+  ".mp4", ".webm", ".mov", ".mp3", ".wav", ".db", ".sqlite",
+]);
+
+function isBinaryFile(path: string): boolean {
+  if (binaryExtensions.has(path.slice(path.lastIndexOf(".")).toLowerCase())) return true;
+  try {
+    const head = readFileSync(path).subarray(0, 8192);
+    return head.includes(0);
+  } catch {
+    return false;
+  }
+}
+
 const targets = trackedFiles().map((file) => join(root, file));
 if (existsSync(join(root, "dist"))) {
   const distFiles = execFileSync("find", [join(root, "dist"), "-type", "f"], { cwd: root })
@@ -24,7 +40,7 @@ if (existsSync(join(root, "dist"))) {
   targets.push(...distFiles);
 }
 
-const findings = targets.flatMap(scanFile);
+const findings = targets.filter((path) => !isBinaryFile(path)).flatMap(scanFile);
 if (findings.length > 0) {
   console.error("Japanese characters found:");
   console.error(findings.join("\n"));
