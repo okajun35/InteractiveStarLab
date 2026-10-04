@@ -11,6 +11,7 @@ import { registerObservationWriteTools } from "../mcp/observationWriteTools";
 import { registerSkyControlTools } from "../mcp/skyControlTools";
 import { registerSnapshotTools } from "../mcp/snapshotTools";
 import { createObservationPlanFromStarIds } from "../mcp/services";
+import type { SkySelection } from "../mcp/describeView";
 import { getModelContext, type WebMcpAvailability } from "../mcp/webmcp";
 import { useNavigation } from "./navigation";
 import { useSnapshots } from "./snapshots";
@@ -50,7 +51,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
     cloudAuthenticated,
     selectRecord,
   } = useObservation();
-  const { settings: observation, options, updateSettings, updateOptions, flyToView, skyMode, setSkyMode } = useStarViewer();
+  const { settings: observation, options, updateSettings, updateOptions, flyToView, skyMode, setSkyMode, selectedStar, selectedSun, skyActions } = useStarViewer();
   const {
     settings: simulation,
     layers,
@@ -64,7 +65,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const { setView } = useNavigation();
   const { captureSnapshot, downloadRecord, snapshots, getSnapshot, isCloudSnapshot, getSnapshotStoragePath, getSnapshotAccessUrl } = useSnapshots();
   const { prepareGuide, selectedGuide, generatePdfForGuide } = useGuides();
-  const { reportSkyMutation, reportPlanMissionCreated } = useAgentActivity();
+  const { reportSkyMutation, reportPlanMissionCreated, getLatestMetrics } = useAgentActivity();
   const siteRef = useRef(activeSite);
   const observationRef = useRef(observation);
   const simulationRef = useRef(simulation);
@@ -108,6 +109,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const activeMissionIdRef = useRef(activeMissionId);
   const reportSkyMutationRef = useRef(reportSkyMutation);
   const reportPlanMissionCreatedRef = useRef(reportPlanMissionCreated);
+  const selectionRef = useRef<SkySelection | null>(null);
+  const skyActionsRef = useRef(skyActions);
+  const getLatestMetricsRef = useRef(getLatestMetrics);
   siteRef.current = activeSite;
   observationRef.current = observation;
   simulationRef.current = simulation;
@@ -151,6 +155,13 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   activeMissionIdRef.current = activeMissionId;
   reportSkyMutationRef.current = reportSkyMutation;
   reportPlanMissionCreatedRef.current = reportPlanMissionCreated;
+  selectionRef.current = selectedStar !== null
+    ? { kind: "star", id: selectedStar.id, name: selectedStar.name }
+    : selectedSun
+      ? { kind: "sun", name: "Sun" }
+      : null;
+  skyActionsRef.current = skyActions;
+  getLatestMetricsRef.current = getLatestMetrics;
 
   const [availability, setAvailability] = useState<WebMcpAvailability>("unknown");
   const registeredToolNames = useMemo(
@@ -158,6 +169,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "get_observation_site",
       "predict_visible_stars",
       "get_current_sky_state",
+      "describe_current_view",
       "create_observation_plan",
       "open_plan_view",
       "restore_observation_mission",
@@ -197,6 +209,10 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         getSimulationSettings: () => simulationRef.current,
         getLayers: () => layersRef.current,
         getDisplayOptions: () => optionsRef.current,
+        getSkyMode: () => skyModeRef.current,
+        getSelection: () => selectionRef.current,
+        getSkyActions: () => skyActionsRef.current,
+        getSceneMetrics: () => getLatestMetricsRef.current(),
       },
       { signal: controller.signal },
     )

@@ -492,10 +492,15 @@ console.log("\nAll WebMCP domain checks passed.");
     getSimulationSettings: () => simulation,
     getLayers: () => ({ first: true, second: true, third: false, fourth: false, faint: false }),
     getDisplayOptions: () => ({ stars: true, starNames: true, constellationLines: true, constellationNames: true }),
+    getSkyMode: () => "window",
+    getSelection: () => ({ kind: "star", id: "vega", name: "Vega" }),
+    getSkyActions: () => [{ type: "select", label: "Selected Vega", at: 1000 }],
+    getSceneMetrics: () => ({ mode: "single", visibleCount: 42 }),
   }, { signal: controller.signal });
 
   const names = registered.map((tool) => tool.name).sort();
-  check("MCP-B1: registers the three read tools", JSON.stringify(names) === JSON.stringify([
+  check("MCP-B1: registers the four read tools", JSON.stringify(names) === JSON.stringify([
+    "describe_current_view",
     "get_current_sky_state",
     "get_observation_site",
     "predict_visible_stars",
@@ -519,6 +524,17 @@ console.log("\nAll WebMCP domain checks passed.");
   check("MCP-B2: predict tool returns structured success", predictionResult.ok === true && predictionResult.data.stars.length > 0);
   const invalidResult = JSON.parse(String(await predictTool.execute({ dateTime: "bad", maxMagnitude: 2 })));
   check("MCP-B2: invalid read input returns a failure envelope", invalidResult.ok === false && invalidResult.error.code === "INVALID_ARGUMENT");
+
+  const describeTool = registered.find((tool) => tool.name === "describe_current_view")!;
+  const described = JSON.parse(String(await describeTool.execute({})));
+  check("MCP-B3: describe_current_view returns a success envelope", described.ok === true);
+  check("MCP-B3: describe reports view, selection, and recent actions",
+    described.data.view.azimuth === 180 &&
+    described.data.skyMode === "window" &&
+    described.data.selection.name === "Vega" &&
+    described.data.recentActions.length === 1 &&
+    typeof described.data.summary === "string" &&
+    Array.isArray(described.data.caveats));
 }
 
 // MCP-C: Agent-created plans are persisted through the app callback and move

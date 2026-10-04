@@ -34,7 +34,7 @@ const DEFAULT_VIEW = {
   fieldOfView: 80,
 } as const;
 
-function assertSite(site: ObservationSite): void {
+export function assertSite(site: ObservationSite): void {
   if (
     !site.id ||
     !site.name ||

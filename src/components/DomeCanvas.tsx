@@ -48,6 +48,7 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
     selectedStar,
     selectedSun,
     selectSun,
+    recordSkyAction,
   } = useStarViewer();
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
@@ -73,6 +74,11 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
   optionsRef.current = options;
   const dragRef = useRef<DragState | null>(null);
   const metricsKeyRef = useRef<string | null>(null);
+  const domeViewRef = useRef(domeView);
+  domeViewRef.current = domeView;
+  const recordRef = useRef(recordSkyAction);
+  recordRef.current = recordSkyAction;
+  const zoomLogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -80,6 +86,11 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
       setDomeView((prev) => zoomDomeView(prev, event.deltaY));
+      if (zoomLogTimerRef.current !== null) clearTimeout(zoomLogTimerRef.current);
+      zoomLogTimerRef.current = setTimeout(() => {
+        zoomLogTimerRef.current = null;
+        recordRef.current("zoom", `Zoomed dome to ×${domeViewRef.current.zoom.toFixed(1)}`);
+      }, 600);
     };
     canvas.addEventListener("wheel", onWheel, { passive: false });
     return () => canvas.removeEventListener("wheel", onWheel);
@@ -177,6 +188,10 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
     e.currentTarget.releasePointerCapture(e.pointerId);
     if (drag.moved) {
       e.currentTarget.style.cursor = "grab";
+      recordRef.current(
+        "pan",
+        `Rotated dome to ${Math.round(domeViewRef.current.rotationDeg)}°`,
+      );
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
@@ -229,7 +244,10 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerLeave}
-        onDoubleClick={() => setDomeView({ rotationDeg: settings.azimuth, zoom: 1 })}
+        onDoubleClick={() => {
+          setDomeView({ rotationDeg: settings.azimuth, zoom: 1 });
+          recordRef.current("reset", "Reset dome view");
+        }}
       />
       {hover !== null && (
         <div

@@ -3,6 +3,7 @@ import type {
   DisplayOptions,
   HorizontalStar,
   ObservationSettings,
+  SkyMode,
   SkyView,
   Star,
 } from "../types/astronomy";
@@ -10,6 +11,16 @@ import { CONSTELLATIONS, STARS } from "../astronomy/stars";
 import { horizontalStars } from "../astronomy/coordinates";
 import { buildSkyView } from "../astronomy/visibility";
 import { fieldErrors, LIMITS, type FieldErrors } from "../astronomy/validation";
+import {
+  readSkyShareFromLocation,
+  sharedObservationPatch,
+} from "../sky/shareUrl";
+import {
+  pushSkyAction,
+  type SkyAction,
+} from "../sky/skyActions";
+
+export type { SkyMode };
 
 const DEFAULT_SETTINGS: ObservationSettings = {
   latitude: 35.6812,
@@ -38,8 +49,6 @@ export interface FlyRequest {
   patch: Partial<ObservationSettings>;
 }
 
-export type SkyMode = "window" | "dome";
-
 export interface StarViewerState {
   settings: ObservationSettings;
   updateSettings: (patch: Partial<ObservationSettings>) => void;
@@ -64,6 +73,12 @@ export interface StarViewerState {
   selectStar: (star: Star | null) => void;
   selectedSun: boolean;
   selectSun: (selected: boolean) => void;
+  /**
+   * The human's recent sky interactions (newest last, capped at
+   * SKY_ACTION_LIMIT). Read by the describe_current_view tool.
+   */
+  skyActions: SkyAction[];
+  recordSkyAction: (type: string, label: string) => void;
   errors: FieldErrors | null;
   horizontal: HorizontalStar[];
   version: number;
@@ -72,18 +87,26 @@ export interface StarViewerState {
 const StarViewerContext = createContext<StarViewerState | null>(null);
 
 export function StarViewerProvider({ children }: { children: React.ReactNode }) {
+  // State carried in a `#sky=` share link is applied once, at mount.
+  const sharedRef = useRef<ReturnType<typeof readSkyShareFromLocation> | undefined>(undefined);
+  if (sharedRef.current === undefined) {
+    sharedRef.current = readSkyShareFromLocation();
+  }
+  const shared = sharedRef.current;
+
   const [settings, setSettings] = useState<ObservationSettings>(
-    () => ({ ...DEFAULT_SETTINGS }),
+    () => ({ ...DEFAULT_SETTINGS, ...sharedObservationPatch(shared?.observation) }),
   );
   const [options, setOptions] = useState<DisplayOptions>(
-    () => ({ ...DEFAULT_OPTIONS }),
+    () => ({ ...DEFAULT_OPTIONS, ...shared?.display }),
   );
   const [selectedStar, setSelectedStar] = useState<Star | null>(null);
   const [selectedSun, setSelectedSun] = useState(false);
   const [version, setVersion] = useState(0);
   const [flyRequest, setFlyRequest] = useState<FlyRequest | null>(null);
   const flyIdRef = useRef(0);
-  const [skyMode, setSkyMode] = useState<SkyMode>("window");
+  const [skyMode, setSkyMode] = useState<SkyMode>(shared?.skyMode ?? "window");
+  const [skyActions, setSkyActions] = useState<SkyAction[]>([]);
 
   const errors = useMemo(() => fieldErrors(settings), [settings]);
 
@@ -120,17 +143,29 @@ export function StarViewerProvider({ children }: { children: React.ReactNode }) 
       selectStar: (star) => {
         setSelectedStar(star);
         setSelectedSun(false);
+        setSkyActions((log) => pushSkyAction(
+          log,
+          "select",
+          star === null ? "Cleared selection" : `Selected ${star.name}`,
+        ));
       },
       selectedSun,
       selectSun: (selected) => {
         setSelectedSun(selected);
         setSelectedStar(null);
+        if (selected) {
+          setSkyActions((log) => pushSkyAction(log, "select", "Selected the Sun"));
+        }
+      },
+      skyActions,
+      recordSkyAction: (type, label) => {
+        setSkyActions((log) => pushSkyAction(log, type, label));
       },
       errors,
       horizontal,
       version,
     }),
-    [settings, options, selectedStar, selectedSun, errors, horizontal, version, flyRequest, skyMode],
+    [settings, options, selectedStar, selectedSun, errors, horizontal, version, flyRequest, skyMode, skyActions],
   );
 
   return (

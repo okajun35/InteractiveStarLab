@@ -23,6 +23,8 @@ export interface AgentActivityState {
   reportSkyMutation: (report: { toolName: string; changes: SkyFieldChange[]; at?: number }) => void;
   reportPlanMissionCreated: (activity: { missionId: string; targetCount: number; siteName: string }) => void;
   reportSceneMetrics: (metrics: SkySceneMetrics) => void;
+  /** Latest metrics reported by a canvas — read by describe_current_view. */
+  getLatestMetrics: () => SkySceneMetrics | null;
 }
 
 const AgentActivityContext = createContext<AgentActivityState | null>(null);
@@ -127,9 +129,11 @@ export function AgentActivityProvider({ children }: { children: React.ReactNode 
     });
   }, []);
 
+  const getLatestMetrics = useCallback(() => latestMetricsRef.current, []);
+
   const value = useMemo<AgentActivityState>(
-    () => ({ skyActivity, planActivity, reportSkyMutation, reportPlanMissionCreated, reportSceneMetrics }),
-    [skyActivity, planActivity, reportSkyMutation, reportPlanMissionCreated, reportSceneMetrics],
+    () => ({ skyActivity, planActivity, reportSkyMutation, reportPlanMissionCreated, reportSceneMetrics, getLatestMetrics }),
+    [skyActivity, planActivity, reportSkyMutation, reportPlanMissionCreated, reportSceneMetrics, getLatestMetrics],
   );
 
   return <AgentActivityContext.Provider value={value}>{children}</AgentActivityContext.Provider>;

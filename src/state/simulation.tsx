@@ -20,6 +20,7 @@ import {
   type MagnitudeLayer,
 } from "../astronomy/magnitude";
 import { PLACE_PRESETS } from "../astronomy/directions";
+import { readSkyShareFromLocation } from "../sky/shareUrl";
 import { sameLocalTimeInstant, sameUtcInstant, type TimeBasis } from "../astronomy/timezones";
 import type { StarLayerState } from "../astronomy/visibilityModel";
 import { useStarViewer } from "./context";
@@ -148,11 +149,17 @@ export function SimulationProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const sharedRef = useRef<ReturnType<typeof readSkyShareFromLocation> | undefined>(undefined);
+  if (sharedRef.current === undefined) {
+    sharedRef.current = readSkyShareFromLocation();
+  }
+  const shared = sharedRef.current;
   const [layers, setLayers] = useState<StarLayerState>(() => ({
     ...DEFAULT_LAYERS,
+    ...shared?.layers,
   }));
   const [settings, setSettings] =
-    useState<SimulationSettings>(() => ({ ...DEFAULT_SETTINGS }));
+    useState<SimulationSettings>(() => ({ ...DEFAULT_SETTINGS, ...shared?.simulation }));
   // Observation datetime (for the location compare's time basis, §27).
   const observation = useStarViewer().settings;
   // Track the last applied preset to detect "custom" limiting magnitude (§19).

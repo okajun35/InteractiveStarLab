@@ -6,6 +6,7 @@ import { ObservationProvider } from "./state/observation";
 import { useObservation } from "./state/observation";
 import { StarCanvas } from "./components/StarCanvas";
 import { DomeCanvas } from "./components/DomeCanvas";
+import { SkyShareButton } from "./components/SkyShareButton";
 import { ObservationPanel } from "./components/ObservationPanel";
 import { MagnitudeLayers } from "./components/MagnitudeLayers";
 import { EnvironmentPanel } from "./components/EnvironmentPanel";
@@ -58,7 +59,7 @@ function useElementSize() {
 function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetrics) => void }) {
   const { ref, width, height } = useElementSize();
   const { compare } = useSimulation();
-  const { settings: observation, skyMode, setSkyMode } = useStarViewer();
+  const { settings: observation, skyMode, setSkyMode, recordSkyAction } = useStarViewer();
   const observationDatetime = observation.datetime;
 
   const baseOverride: SceneOverride = useMemo(
@@ -137,7 +138,10 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
           type="button"
           className={skyMode === "window" ? "sky-mode-btn active" : "sky-mode-btn"}
           aria-pressed={skyMode === "window"}
-          onClick={() => setSkyMode("window")}
+          onClick={() => {
+            setSkyMode("window");
+            recordSkyAction("mode", "Switched to the window view");
+          }}
         >
           Window
         </button>
@@ -145,10 +149,14 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
           type="button"
           className={skyMode === "dome" ? "sky-mode-btn active" : "sky-mode-btn"}
           aria-pressed={skyMode === "dome"}
-          onClick={() => setSkyMode("dome")}
+          onClick={() => {
+            setSkyMode("dome");
+            recordSkyAction("mode", "Switched to the all-sky dome view");
+          }}
         >
           All sky
         </button>
+        <SkyShareButton />
       </div>
       {skyMode === "dome" ? (
         <DomeCanvas

@@ -2,8 +2,15 @@ import type {
   DisplayOptions,
   ObservationSettings,
   SimulationSettings,
+  SkyMode,
 } from "../types/astronomy";
 import type { StarLayerState } from "../astronomy/visibilityModel";
+import type { SkySceneMetrics } from "../sky/contextModel";
+import type { SkyAction } from "../sky/skyActions";
+import {
+  describeCurrentView,
+  type SkySelection,
+} from "./describeView";
 import {
   getCurrentSkyState,
   predictVisibleStars,
@@ -33,6 +40,10 @@ export interface ReadToolState {
   getSimulationSettings: () => SimulationSettings;
   getLayers: () => StarLayerState;
   getDisplayOptions: () => DisplayOptions;
+  getSkyMode: () => SkyMode;
+  getSelection: () => SkySelection | null;
+  getSkyActions: () => readonly SkyAction[];
+  getSceneMetrics: () => SkySceneMetrics | null;
 }
 
 const EMPTY_SCHEMA = {
@@ -107,6 +118,31 @@ function getCurrentSkyStateTool(state: ReadToolState): WebMcpTool {
   };
 }
 
+function describeCurrentViewTool(state: ReadToolState): WebMcpTool {
+  return {
+    name: "describe_current_view",
+    title: "Describe current view",
+    description: "Describes what the human is currently looking at: site, date/time, camera direction and field of view, sky projection mode, display layers, scene counts and objects in frame, the current selection, and a log of the human's recent interactions. Read-only.",
+    inputSchema: EMPTY_SCHEMA,
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
+    execute: (input) => safeExecute(() => {
+      const object = assertObject(input);
+      assertOnlyKeys(object, []);
+      return describeCurrentView({
+        site: { ...state.getObservationSite() },
+        observation: state.getObservationSettings(),
+        simulation: state.getSimulationSettings(),
+        layers: state.getLayers(),
+        displayOptions: state.getDisplayOptions(),
+        skyMode: state.getSkyMode(),
+        selection: state.getSelection(),
+        actions: state.getSkyActions(),
+        metrics: state.getSceneMetrics(),
+      });
+    }),
+  };
+}
+
 export async function registerReadTools(
   modelContext: WebMcpModelContext,
   state: ReadToolState,
@@ -115,4 +151,5 @@ export async function registerReadTools(
   await modelContext.registerTool(getObservationSiteTool(state), options);
   await modelContext.registerTool(predictVisibleStarsTool(state), options);
   await modelContext.registerTool(getCurrentSkyStateTool(state), options);
+  await modelContext.registerTool(describeCurrentViewTool(state), options);
 }

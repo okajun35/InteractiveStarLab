@@ -21,6 +21,7 @@ import {
   type ViewAngles,
 } from "../astronomy/interaction";
 import { STAR_BY_ID } from "../astronomy/stars";
+import { formatHeading } from "../astronomy/visibility";
 import { TWILIGHT_LABELS } from "../astronomy/twilight";
 import type { Star } from "../types/astronomy";
 
@@ -73,6 +74,7 @@ export function StarCanvas({
     updateSettings,
     flyRequest,
     completeFly,
+    recordSkyAction,
   } = useStarViewer();
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
@@ -103,6 +105,9 @@ export function StarCanvas({
   completeFlyRef.current = completeFly;
   const flyRequestRef = useRef(flyRequest);
   flyRequestRef.current = flyRequest;
+  const recordRef = useRef(recordSkyAction);
+  recordRef.current = recordSkyAction;
+  const zoomLogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dragRef = useRef<DragState | null>(null);
   const metricsKeyRef = useRef<string | null>(null);
 
@@ -179,6 +184,11 @@ export function StarCanvas({
       const fov = zoomFov(current.fieldOfView, event.deltaY);
       if (fov !== current.fieldOfView) {
         updateSettingsRef.current({ fieldOfView: fov });
+        if (zoomLogTimerRef.current !== null) clearTimeout(zoomLogTimerRef.current);
+        zoomLogTimerRef.current = setTimeout(() => {
+          zoomLogTimerRef.current = null;
+          recordRef.current("zoom", `Zoomed to ${Math.round(fov)}° field of view`);
+        }, 600);
       }
     };
     canvas.addEventListener("wheel", onWheel, { passive: false });
@@ -301,6 +311,11 @@ export function StarCanvas({
     e.currentTarget.releasePointerCapture(e.pointerId);
     if (drag.moved) {
       e.currentTarget.style.cursor = "grab";
+      const view = settingsRef.current;
+      recordRef.current(
+        "pan",
+        `Panned to ${formatHeading(view.azimuth)} / ${Math.round(view.altitude)}° altitude`,
+      );
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();

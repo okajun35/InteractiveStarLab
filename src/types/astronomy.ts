@@ -111,6 +111,9 @@ export interface SimulationSettings {
   showHiddenStars: boolean;
 }
 
+/** Projection mode for the main sky canvas. */
+export type SkyMode = "window" | "dome";
+
 export type HideReason = "below-horizon" | "daylight" | "light-pollution";
 
 export type StarStatus =
