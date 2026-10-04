@@ -73,8 +73,15 @@ export function drawScene(
   if (options.denseStars) drawDenseStars(ctx, scene.denseStars);
 
   if (options.stars) {
+    // In dome mode hundreds of per-star glow gradients would turn the field
+    // into white noise — draw flat dots like the dense catalog and keep the
+    // halo pass only for the brightest stars.
     for (let i = scene.stars.length - 1; i >= 0; i -= 1) {
-      drawStar(ctx, scene.stars[i], showHiddenStars);
+      if (dome !== null) {
+        drawFlatStar(ctx, scene.stars[i], showHiddenStars);
+      } else {
+        drawStar(ctx, scene.stars[i], showHiddenStars);
+      }
     }
     drawBrightStarHalos(ctx, scene.stars, showHiddenStars);
   }
@@ -101,7 +108,9 @@ export function drawScene(
     height,
   });
 
-  if (options.starNames) {
+  // At the whole-sky scale star names become noise (the reference renderer
+  // suppresses them past ~90°) — only constellation names stay.
+  if (options.starNames && scene.fovDeg <= 100) {
     ctx.textAlign = "center";
     for (const s of scene.stars) {
       if (s.status.state === "hidden") continue;
@@ -336,6 +345,39 @@ export function drawStar(
     ctx.stroke();
     ctx.setLineDash([]);
   }
+}
+
+/**
+ * Flat star dot for dome mode: same colour, no radial glow. Hidden stars keep
+ * the "exists but invisible" affordance, just dimmer.
+ */
+function drawFlatStar(
+  ctx: CanvasRenderingContext2D,
+  star: SceneStar,
+  showHiddenStars: boolean,
+): void {
+  if (star.status.state === "disabled") return;
+  const isHidden = star.status.state === "hidden";
+  if (isHidden && !showHiddenStars) return;
+  const r = starRadius(star.star.magnitude);
+  if (isHidden) {
+    ctx.fillStyle = "rgba(160, 170, 190, 0.28)";
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, Math.max(r * 0.7, 0.5), 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.35)";
+    ctx.setLineDash([2, 2]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, r + 2.5, 0, TAU);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    return;
+  }
+  ctx.fillStyle = star.color;
+  ctx.beginPath();
+  ctx.arc(star.x, star.y, Math.max(r * 0.7, 0.6), 0, TAU);
+  ctx.fill();
 }
 
 /** A soft halo on the brightest named stars: what makes a canvas read as sky. */

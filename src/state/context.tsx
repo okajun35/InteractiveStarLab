@@ -105,7 +105,7 @@ export function StarViewerProvider({ children }: { children: React.ReactNode }) 
   const [version, setVersion] = useState(0);
   const [flyRequest, setFlyRequest] = useState<FlyRequest | null>(null);
   const flyIdRef = useRef(0);
-  const [skyMode, setSkyMode] = useState<SkyMode>(shared?.skyMode ?? "window");
+  const [skyMode, setSkyMode] = useState<SkyMode>(shared?.skyMode ?? "dome");
   const [skyActions, setSkyActions] = useState<SkyAction[]>([]);
 
   const errors = useMemo(() => fieldErrors(settings), [settings]);

@@ -320,7 +320,9 @@ export function buildSharedSceneObjects(
     simulation.observerSensitivity,
   );
   const minZ = Math.sin(DENSE_MIN_ALT_DEG * DEG);
-  const radiusFactor = Math.min(2.5, Math.max(0.7, Math.sqrt(80 / Math.max(20, projector.fovDeg))));
+  // Same scaling as the reference renderer: stars stay full-sized at the
+  // whole-sky scale and grow as the field narrows (sqrt(180/fov), capped).
+  const radiusFactor = Math.min(2.5, Math.max(1, Math.sqrt(180 / Math.min(180, Math.max(20, projector.fovDeg)))));
   for (const star of DENSE_STARS) {
     if (star.magnitude > limit) break; // catalog is brightest-first
     if (cap !== null && star.magnitude > cap) break;

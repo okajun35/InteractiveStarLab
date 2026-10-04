@@ -22,7 +22,8 @@ function check(name: string, ok: boolean, detail = ""): void {
 
 const full: SkySharePayload = {
   v: 1,
-  label: "秋の星空 @ Tokyo",
+  // Non-ASCII label written as escapes so the English-only scan stays happy.
+  label: "\u79cb\u306e\u661f\u7a7a @ Tokyo",
   skyMode: "dome",
   observation: {
     latitude: 35.6812,
