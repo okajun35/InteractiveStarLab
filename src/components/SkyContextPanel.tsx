@@ -14,7 +14,7 @@ import {
 } from "../sky/contextModel";
 
 export function SkyContextPanel({ metrics, compact = false }: { metrics: SkySceneMetrics | null; compact?: boolean }) {
-  const { settings: observation, options } = useStarViewer();
+  const { settings: observation, options, skyMode } = useStarViewer();
   const { settings: simulation, layers, compare } = useSimulation();
   const { activeSite } = useObservation();
   const { availability } = useWebMcp();
@@ -27,10 +27,11 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
       simulation,
       layers,
       displayOptions: options,
+      skyMode,
       metrics,
       compareLabel: compare?.changedLabel ?? null,
     }),
-    [activeSite, observation, simulation, layers, options, metrics, compare],
+    [activeSite, observation, simulation, layers, options, skyMode, metrics, compare],
   );
 
   useEffect(() => {

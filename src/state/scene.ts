@@ -9,6 +9,7 @@ import { CONSTELLATIONS, STARS } from "../astronomy/stars";
 import { horizontalStars } from "../astronomy/coordinates";
 import { fieldErrors } from "../astronomy/validation";
 import { buildSkyScene, type SkyScene } from "../astronomy/visibility";
+import { buildDomeScene, type DomeView } from "../astronomy/dome";
 
 export interface SceneOverride {
   observation?: Partial<ObservationSettings>;
@@ -60,4 +61,24 @@ export function useScene(
     override,
     // Object identity of the override (stable per-compare render)
   ]);
+}
+
+/**
+ * The whole-sky dome variant of useScene. Dome view state (rotation/zoom)
+ * stays local to the dome canvas — mission data and view settings are
+ * untouched by it.
+ */
+export function useDomeScene(
+  width: number,
+  height: number,
+  view: DomeView,
+): SkyScene {
+  const { settings, errors, horizontal } = useStarViewer();
+  const { layers, settings: sim } = useSimulation();
+
+  return useMemo(() => {
+    const w = errors || width <= 0 || height <= 0 ? 0 : width;
+    const h = errors || width <= 0 || height <= 0 ? 0 : height;
+    return buildDomeScene(horizontal, CONSTELLATIONS, settings, layers, sim, w, h, view);
+  }, [settings, horizontal, layers, sim, width, height, errors, view]);
 }

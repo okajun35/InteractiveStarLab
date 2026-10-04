@@ -5,6 +5,7 @@ import { SimulationProvider, useSimulation } from "./state/simulation";
 import { ObservationProvider } from "./state/observation";
 import { useObservation } from "./state/observation";
 import { StarCanvas } from "./components/StarCanvas";
+import { DomeCanvas } from "./components/DomeCanvas";
 import { ObservationPanel } from "./components/ObservationPanel";
 import { MagnitudeLayers } from "./components/MagnitudeLayers";
 import { EnvironmentPanel } from "./components/EnvironmentPanel";
@@ -57,7 +58,7 @@ function useElementSize() {
 function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetrics) => void }) {
   const { ref, width, height } = useElementSize();
   const { compare } = useSimulation();
-  const { settings: observation } = useStarViewer();
+  const { settings: observation, skyMode, setSkyMode } = useStarViewer();
   const observationDatetime = observation.datetime;
 
   const baseOverride: SceneOverride = useMemo(
@@ -131,11 +132,37 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
 
   return (
     <div className="app-canvas" ref={ref}>
-      <StarCanvas
-        width={width}
-        height={height}
-        onMetricsChange={(metrics) => onMetricsChange({ mode: "single", visibleCount: metrics.visibleCount })}
-      />
+      <div className="sky-mode-toggle" role="group" aria-label="Sky view mode">
+        <button
+          type="button"
+          className={skyMode === "window" ? "sky-mode-btn active" : "sky-mode-btn"}
+          aria-pressed={skyMode === "window"}
+          onClick={() => setSkyMode("window")}
+        >
+          Window
+        </button>
+        <button
+          type="button"
+          className={skyMode === "dome" ? "sky-mode-btn active" : "sky-mode-btn"}
+          aria-pressed={skyMode === "dome"}
+          onClick={() => setSkyMode("dome")}
+        >
+          All sky
+        </button>
+      </div>
+      {skyMode === "dome" ? (
+        <DomeCanvas
+          width={width}
+          height={height}
+          onMetricsChange={(metrics) => onMetricsChange({ mode: "single", visibleCount: metrics.visibleCount })}
+        />
+      ) : (
+        <StarCanvas
+          width={width}
+          height={height}
+          onMetricsChange={(metrics) => onMetricsChange({ mode: "single", visibleCount: metrics.visibleCount })}
+        />
+      )}
     </div>
   );
 }
