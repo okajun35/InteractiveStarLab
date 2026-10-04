@@ -9,6 +9,7 @@ import type { ObservationSite } from "../../types/observation";
 import { ObservationPlanEmptyState } from "./ObservationPlanEmptyState";
 import { ObservationPlanEditor } from "./ObservationPlanEditor";
 import { ObservationPlanSummary } from "./ObservationPlanSummary";
+import { ProposalReviewCard } from "./ProposalReviewCard";
 import type { SiteEditorErrors } from "./SiteEditor";
 import { isValidTimeZone } from "../../astronomy/timezones";
 
@@ -95,6 +96,7 @@ export function ObservationPlanScreen({ onOpenSky, onOpenObserve }: ObservationP
   return (
     <main className="workflow-page">
       <div className="workflow-container plan-container">
+        <ProposalReviewCard onCommitted={onOpenObserve} />
         {activeMission === null ? (
           <ObservationPlanEmptyState onEdit={() => (manualOpen ? setManualOpen(false) : openEditor())} manualOpen={manualOpen} />
         ) : (

@@ -19,6 +19,8 @@ import { useSnapshots } from "./snapshots";
 import { useGuides } from "./guides";
 import { registerGuideTools } from "../mcp/guideTools";
 import { registerRecoveryTools } from "../mcp/recoveryTools";
+import { registerProposalTools } from "../mcp/proposalTools";
+import { useProposals } from "./proposals";
 import { useAgentActivity } from "./agentActivity";
 
 export interface WebMcpState {
@@ -70,6 +72,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const { captureSnapshot, downloadRecord, snapshots, getSnapshot, isCloudSnapshot, getSnapshotStoragePath, getSnapshotAccessUrl } = useSnapshots();
   const { prepareGuide, selectedGuide, generatePdfForGuide } = useGuides();
   const { reportSkyMutation, reportPlanMissionCreated, getLatestMetrics } = useAgentActivity();
+  const { proposal, propose, commit } = useProposals();
   const siteRef = useRef(activeSite);
   const observationRef = useRef(observation);
   const simulationRef = useRef(simulation);
@@ -117,6 +120,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const selectionRef = useRef<SkySelection | null>(null);
   const skyActionsRef = useRef(skyActions);
   const getLatestMetricsRef = useRef(getLatestMetrics);
+  const proposalRef = useRef(proposal);
+  const proposeRef = useRef(propose);
+  const commitProposalRef = useRef(commit);
   siteRef.current = activeSite;
   observationRef.current = observation;
   simulationRef.current = simulation;
@@ -168,6 +174,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       : null;
   skyActionsRef.current = skyActions;
   getLatestMetricsRef.current = getLatestMetrics;
+  proposalRef.current = proposal;
+  proposeRef.current = propose;
+  commitProposalRef.current = commit;
 
   const [availability, setAvailability] = useState<WebMcpAvailability>("unknown");
   const [harnessTools, setHarnessTools] = useState<readonly WebMcpTool[]>([]);
@@ -179,6 +188,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
       "describe_current_view",
       "get_night_ephemeris",
       "rank_nights",
+      "propose_plan",
+      "commit_proposal",
+      "plan_stale",
       "create_observation_plan",
       "open_plan_view",
       "restore_observation_mission",
@@ -359,6 +371,17 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
           isCloudSnapshot: (snapshotId) => isCloudSnapshotRef.current(snapshotId),
           getSnapshotStoragePath: (snapshotId) => getSnapshotStoragePathRef.current(snapshotId),
           getSnapshotAccessUrl: (snapshotId) => getSnapshotAccessUrlRef.current(snapshotId),
+        },
+        { signal: controller.signal },
+      ))
+      .then(() => registerProposalTools(
+        target,
+        {
+          getObservationSite: () => siteRef.current,
+          getObservationDateTime: () => observationRef.current.datetime,
+          getProposal: () => proposalRef.current,
+          propose: (next) => proposeRef.current(next),
+          commitProposal: (proposalToCommit, starIds) => commitProposalRef.current(proposalToCommit, starIds),
         },
         { signal: controller.signal },
       ))

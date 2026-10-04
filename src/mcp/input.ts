@@ -74,3 +74,17 @@ export function safeExecute<T>(operation: () => T): string {
     return toolFailure(code, message);
   }
 }
+
+export function safeExecuteAsync<T>(operation: () => Promise<T>): Promise<string> {
+  return operation()
+    .then((value) => toolSuccess(value))
+    .catch((error) => {
+      const message = error instanceof Error ? error.message : "Tool input is invalid";
+      const code = error instanceof ToolExecutionError
+        ? error.code
+        : error instanceof Error && error.name === "MissionNotFoundError"
+          ? "MISSION_NOT_FOUND"
+          : "INVALID_ARGUMENT";
+      return toolFailure(code, message);
+    });
+}

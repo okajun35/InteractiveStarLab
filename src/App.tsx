@@ -31,6 +31,7 @@ import { AuthProvider } from "./state/auth";
 import { AgentActivityProvider, useAgentActivity } from "./state/agentActivity";
 import type { SkySceneMetrics } from "./sky/contextModel";
 import { SkySidebar } from "./components/SkySidebar";
+import { ProposalProvider } from "./state/proposals";
 
 function useElementSize() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -395,6 +396,7 @@ export default function App() {
         <SimulationProvider>
           <ObservationProvider>
             <NavigationProvider>
+              <ProposalProvider>
               <GuideProvider>
                 <SnapshotProvider>
                   <AgentActivityProvider>
@@ -404,6 +406,7 @@ export default function App() {
                   </AgentActivityProvider>
                 </SnapshotProvider>
               </GuideProvider>
+              </ProposalProvider>
             </NavigationProvider>
           </ObservationProvider>
         </SimulationProvider>
