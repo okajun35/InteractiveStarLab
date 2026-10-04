@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
 import type {
   DisplayOptions,
   HorizontalStar,
@@ -25,13 +25,39 @@ const DEFAULT_OPTIONS: DisplayOptions = {
   starNames: true,
   constellationLines: true,
   constellationNames: true,
+  milkyWay: true,
+  denseStars: true,
+  deepSky: true,
+  nightMode: false,
 };
 
 const EMPTY_VIEW: SkyView = { stars: [], lines: [], labels: [], heading: "" };
 
+export interface FlyRequest {
+  id: number;
+  patch: Partial<ObservationSettings>;
+}
+
+export type SkyMode = "window" | "dome";
+
 export interface StarViewerState {
   settings: ObservationSettings;
   updateSettings: (patch: Partial<ObservationSettings>) => void;
+  /**
+   * Which projection the main sky tab uses: the classic azimuth/altitude
+   * window or the stereographic whole-sky dome. Purely a view mode — it
+   * never alters observation settings or mission data.
+   */
+  skyMode: SkyMode;
+  setSkyMode: (mode: SkyMode) => void;
+  /**
+   * Agent-directed view moves: azimuth/altitude/fieldOfView patches routed
+   * here animate the camera instead of snapping. The canvas consumes the
+   * request and calls completeFly when the move finishes or is cancelled.
+   */
+  flyRequest: FlyRequest | null;
+  flyToView: (patch: Partial<ObservationSettings>) => void;
+  completeFly: (id: number) => void;
   options: DisplayOptions;
   updateOptions: (patch: Partial<DisplayOptions>) => void;
   selectedStar: Star | null;
@@ -55,6 +81,9 @@ export function StarViewerProvider({ children }: { children: React.ReactNode }) 
   const [selectedStar, setSelectedStar] = useState<Star | null>(null);
   const [selectedSun, setSelectedSun] = useState(false);
   const [version, setVersion] = useState(0);
+  const [flyRequest, setFlyRequest] = useState<FlyRequest | null>(null);
+  const flyIdRef = useRef(0);
+  const [skyMode, setSkyMode] = useState<SkyMode>("window");
 
   const errors = useMemo(() => fieldErrors(settings), [settings]);
 
@@ -75,6 +104,16 @@ export function StarViewerProvider({ children }: { children: React.ReactNode }) 
         setSettings((prev) => ({ ...prev, ...patch }));
         setVersion((v) => v + 1);
       },
+      skyMode,
+      setSkyMode,
+      flyRequest,
+      flyToView: (patch) => {
+        flyIdRef.current += 1;
+        setFlyRequest({ id: flyIdRef.current, patch });
+      },
+      completeFly: (id) => {
+        setFlyRequest((prev) => (prev !== null && prev.id === id ? null : prev));
+      },
       options,
       updateOptions: (patch) => setOptions((prev) => ({ ...prev, ...patch })),
       selectedStar,
@@ -91,7 +130,7 @@ export function StarViewerProvider({ children }: { children: React.ReactNode }) 
       horizontal,
       version,
     }),
-    [settings, options, selectedStar, selectedSun, errors, horizontal, version],
+    [settings, options, selectedStar, selectedSun, errors, horizontal, version, flyRequest, skyMode],
   );
 
   return (

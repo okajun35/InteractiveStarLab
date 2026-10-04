@@ -1,15 +1,25 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStarViewer } from "../state/context";
 import { useSimulation } from "../state/simulation";
 import { useObservation } from "../state/observation";
 import { useSnapshots } from "../state/snapshots";
 import { useScene, type SceneOverride } from "../state/scene";
-import { starRadius } from "./starSize";
 import {
   drawScene,
   drawSun,
   type StarCanvasOptions,
 } from "./starRender";
+import {
+  FLY_MS,
+  hitTestScene,
+  interpolateViewAngles,
+  panViewAngles,
+  reticlePulse,
+  viewMoveNeeded,
+  zoomFov,
+  type SceneHit,
+  type ViewAngles,
+} from "../astronomy/interaction";
 import { STAR_BY_ID } from "../astronomy/stars";
 import { TWILIGHT_LABELS } from "../astronomy/twilight";
 import type { Star } from "../types/astronomy";
@@ -33,6 +43,16 @@ interface StarCanvasProps {
   onMetricsChange?: (metrics: StarCanvasMetrics) => void;
 }
 
+interface DragState {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  startView: ViewAngles;
+  moved: boolean;
+}
+
+const DRAG_THRESHOLD_PX = 4;
+
 export function StarCanvas({
   width,
   height,
@@ -50,12 +70,17 @@ export function StarCanvas({
     selectedStar,
     selectedSun,
     selectSun,
+    updateSettings,
+    flyRequest,
+    completeFly,
   } = useStarViewer();
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
   const { registerCanvas, captureSnapshot, downloadRecord } = useSnapshots();
 
   const scene = useScene(width, height, override);
+  const [hover, setHover] = useState<{ x: number; y: number; hit: SceneHit } | null>(null);
+  const [pulse, setPulse] = useState(1);
 
   useEffect(() => {
     if (compact) return;
@@ -70,7 +95,95 @@ export function StarCanvas({
   simRef.current = sim;
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+  const updateSettingsRef = useRef(updateSettings);
+  updateSettingsRef.current = updateSettings;
+  const completeFlyRef = useRef(completeFly);
+  completeFlyRef.current = completeFly;
+  const flyRequestRef = useRef(flyRequest);
+  flyRequestRef.current = flyRequest;
+  const dragRef = useRef<DragState | null>(null);
   const metricsKeyRef = useRef<string | null>(null);
+
+  // Agent-directed fly-to: consume flyRequest, ease the camera to the target,
+  // then ripple the reticle so the human sees where the agent pointed.
+  useEffect(() => {
+    const request = flyRequest;
+    if (request === null) return;
+
+    const patch = request.patch;
+    const current = settingsRef.current;
+    const from: ViewAngles = {
+      azimuthDeg: current.azimuth,
+      altitudeDeg: current.altitude,
+      fovDeg: current.fieldOfView,
+    };
+    const to: ViewAngles = {
+      azimuthDeg: patch.azimuth ?? from.azimuthDeg,
+      altitudeDeg: patch.altitude ?? from.altitudeDeg,
+      fovDeg: patch.fieldOfView ?? from.fovDeg,
+    };
+
+    if (!viewMoveNeeded(from, to)) {
+      updateSettingsRef.current({
+        azimuth: to.azimuthDeg,
+        altitude: to.altitudeDeg,
+        fieldOfView: to.fovDeg,
+      });
+      completeFlyRef.current(request.id);
+      return;
+    }
+
+    let raf = 0;
+    let arrived = false;
+    const start = performance.now();
+    const tick = (now: number) => {
+      // A newer request or a human drag takes over: stop silently.
+      if (flyRequestRef.current === null || flyRequestRef.current.id !== request.id) return;
+      const elapsed = now - start;
+      if (elapsed < FLY_MS) {
+        const view = interpolateViewAngles(from, to, elapsed / FLY_MS);
+        updateSettingsRef.current({
+          azimuth: view.azimuthDeg,
+          altitude: view.altitudeDeg,
+          fieldOfView: view.fovDeg,
+        });
+      } else {
+        if (!arrived) {
+          arrived = true;
+          updateSettingsRef.current({
+            azimuth: to.azimuthDeg,
+            altitude: to.altitudeDeg,
+            fieldOfView: to.fovDeg,
+          });
+          completeFlyRef.current(request.id);
+        }
+        const next = reticlePulse(elapsed - FLY_MS);
+        setPulse(next);
+        if (next >= 1) return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [flyRequest]);
+
+  // Wheel zoom needs a non-passive listener to suppress page scroll.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas === null) return;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const current = settingsRef.current;
+      const fov = zoomFov(current.fieldOfView, event.deltaY);
+      if (fov !== current.fieldOfView) {
+        updateSettingsRef.current({ fieldOfView: fov });
+      }
+    };
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", onWheel);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,6 +204,7 @@ export function StarCanvas({
       options as StarCanvasOptions,
       sim.showHiddenStars,
       selectedStar?.id,
+      pulse,
     );
 
     const metricsKey = `${scene.visibleCount}:${scene.inViewCount}`;
@@ -119,32 +233,94 @@ export function StarCanvas({
     width,
     height,
     onMetricsChange,
+    pulse,
   ]);
 
-  const findHit = (px: number, py: number): { kind: "star" | "sun"; id?: string } | null => {
-    const s = sceneRef.current;
-    const simState = simRef.current;
-    const opts = optionsRef.current;
+  const findHit = (px: number, py: number): SceneHit | null =>
+    hitTestScene(sceneRef.current, px, py, {
+      starsEnabled: optionsRef.current.stars,
+      showHiddenStars: simRef.current.showHiddenStars,
+    });
 
-    // Sun first (bigger target, spec §15).
-    if (s.sunX !== null && s.sunY !== null && Math.hypot(s.sunX - px, s.sunY - py) <= 26) {
-      return { kind: "sun" };
-    }
-    if (!opts.stars) return null;
+  const cancelFly = () => {
+    const active = flyRequestRef.current;
+    if (active !== null) completeFlyRef.current(active.id);
+  };
 
-    let bestId: string | null = null;
-    let bestDist = Infinity;
-    for (const star of s.stars) {
-      if (star.status.state === "disabled") continue;
-      if (star.status.state === "hidden" && !simState.showHiddenStars) continue;
-      const dist = Math.hypot(star.x - px, star.y - py);
-      const reach = starRadius(star.star.magnitude) + 6;
-      if (dist <= reach && dist < bestDist) {
-        bestId = star.star.id;
-        bestDist = dist;
+  const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.button !== 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX - rect.left,
+      startY: e.clientY - rect.top,
+      startView: {
+        azimuthDeg: settingsRef.current.azimuth,
+        altitudeDeg: settingsRef.current.altitude,
+        fovDeg: settingsRef.current.fieldOfView,
+      },
+      moved: false,
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    const drag = dragRef.current;
+    if (drag !== null && drag.pointerId === e.pointerId) {
+      const dx = px - drag.startX;
+      const dy = py - drag.startY;
+      if (!drag.moved && Math.hypot(dx, dy) >= DRAG_THRESHOLD_PX) {
+        drag.moved = true;
+        cancelFly();
+        setHover(null);
+      }
+      if (drag.moved) {
+        const view = panViewAngles(drag.startView, dx, dy, height);
+        updateSettingsRef.current({
+          azimuth: view.azimuthDeg,
+          altitude: view.altitudeDeg,
+        });
+        e.currentTarget.style.cursor = "grabbing";
+        return;
       }
     }
-    return bestId ? { kind: "star", id: bestId } : null;
+
+    const hit = findHit(px, py);
+    e.currentTarget.style.cursor = hit ? "pointer" : "grab";
+    setHover(hit === null ? null : { x: px, y: py, hit });
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    if (drag === null || drag.pointerId !== e.pointerId) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    if (drag.moved) {
+      e.currentTarget.style.cursor = "grab";
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const hit = findHit(e.clientX - rect.left, e.clientY - rect.top);
+    if (hit === null) return;
+    if (hit.kind === "sun") {
+      selectSun(true);
+      return;
+    }
+    if (hit.kind === "star") {
+      selectStar(starById(hit.id));
+    }
+  };
+
+  const onPointerLeave = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    e.currentTarget.style.cursor = "default";
+    setHover(null);
+    if (dragRef.current !== null) {
+      dragRef.current = null;
+    }
   };
 
   const takeSnapshot = async () => {
@@ -175,26 +351,24 @@ export function StarCanvas({
       <canvas
         ref={canvasRef}
         className="star-canvas"
-        style={{ width, height }}
-        onPointerMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const hit = findHit(e.clientX - rect.left, e.clientY - rect.top);
-          e.currentTarget.style.cursor = hit ? "pointer" : "default";
-        }}
-        onPointerLeave={(e) => {
-          e.currentTarget.style.cursor = "default";
-        }}
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const hit = findHit(e.clientX - rect.left, e.clientY - rect.top);
-          if (hit === null) return;
-          if (hit.kind === "sun") {
-            selectSun(true);
-            return;
-          }
-          selectStar(starById(hit.id ?? null));
-        }}
+        style={{ width, height, touchAction: "none" }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerLeave}
       />
+      {hover !== null && (
+        <div
+          className="star-canvas-tooltip"
+          style={{
+            left: Math.min(hover.x + 12, width - 140),
+            top: Math.max(hover.y - 30, 4),
+          }}
+        >
+          {hover.hit.label}
+          {hover.hit.kind === "star" ? ` · mag ${hover.hit.magnitude.toFixed(1)}` : ""}
+        </div>
+      )}
       {!compact && (
         <button
           type="button"

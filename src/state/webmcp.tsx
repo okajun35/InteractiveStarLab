@@ -50,7 +50,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
     cloudAuthenticated,
     selectRecord,
   } = useObservation();
-  const { settings: observation, options, updateSettings, updateOptions } = useStarViewer();
+  const { settings: observation, options, updateSettings, updateOptions, flyToView, skyMode, setSkyMode } = useStarViewer();
   const {
     settings: simulation,
     layers,
@@ -75,6 +75,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   const missionsRef = useRef(missions);
   const updateActiveSiteRef = useRef(updateActiveSite);
   const updateSettingsRef = useRef(updateSettings);
+  const flyToViewRef = useRef(flyToView);
+  const skyModeRef = useRef(skyMode);
+  const setSkyModeRef = useRef(setSkyMode);
   const updateOptionsRef = useRef(updateOptions);
   const setLayerEnabledRef = useRef(setLayerEnabled);
   const setDaylightModeRef = useRef(setDaylightMode);
@@ -115,6 +118,9 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
   missionsRef.current = missions;
   updateActiveSiteRef.current = updateActiveSite;
   updateSettingsRef.current = updateSettings;
+  flyToViewRef.current = flyToView;
+  skyModeRef.current = skyMode;
+  setSkyModeRef.current = setSkyMode;
   updateOptionsRef.current = updateOptions;
   setLayerEnabledRef.current = setLayerEnabled;
   setDaylightModeRef.current = setDaylightMode;
@@ -252,7 +258,19 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
           getObservationSite: () => siteRef.current,
           getObservationSettings: () => observationRef.current,
           updateObservationSite: (patch) => updateActiveSiteRef.current(patch),
-          updateObservationSettings: (patch) => updateSettingsRef.current(patch),
+          updateObservationSettings: (patch) => {
+            // View angles fly the camera so a human watching the sky sees
+            // the agent move it; site/time changes still apply instantly.
+            const { azimuth, altitude, fieldOfView, ...rest } = patch;
+            if (Object.keys(rest).length > 0) updateSettingsRef.current(rest);
+            const view: Record<string, number> = {};
+            if (azimuth !== undefined) view.azimuth = azimuth;
+            if (altitude !== undefined) view.altitude = altitude;
+            if (fieldOfView !== undefined) view.fieldOfView = fieldOfView;
+            if (Object.keys(view).length > 0) flyToViewRef.current(view);
+          },
+          getSkyMode: () => skyModeRef.current,
+          setSkyMode: (mode) => setSkyModeRef.current(mode),
           getDisplayOptions: () => optionsRef.current,
           getLayers: () => layersRef.current,
           getSimulationSettings: () => simulationRef.current,
