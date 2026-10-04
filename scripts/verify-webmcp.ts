@@ -499,11 +499,13 @@ console.log("\nAll WebMCP domain checks passed.");
   }, { signal: controller.signal });
 
   const names = registered.map((tool) => tool.name).sort();
-  check("MCP-B1: registers the four read tools", JSON.stringify(names) === JSON.stringify([
+  check("MCP-B1: registers the six read tools", JSON.stringify(names) === JSON.stringify([
     "describe_current_view",
     "get_current_sky_state",
+    "get_night_ephemeris",
     "get_observation_site",
     "predict_visible_stars",
+    "rank_nights",
   ]));
   check("MCP-B1: passes an AbortSignal to registration", receivedSignal === controller.signal);
   check("MCP-B1: read tools are annotated read-only", registered.every((tool) => tool.annotations?.readOnlyHint === true));

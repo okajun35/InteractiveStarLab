@@ -80,7 +80,7 @@ The most natural unanswered question in an observation-planning app is
 - Typed message dictionaries: `src/i18n/en.ts` as the key source of truth,
   `src/i18n/ja.ts` constrained by `typeof en` so missing keys are compile
   errors — no PO/gettext toolchain.
-- `LocaleProvider` + `t()` helper, EN/日本語 header toggle, `localStorage`
+- `LocaleProvider` + `t()` helper, EN/JA header toggle, `localStorage`
   persistence, `navigator.language` initial detection.
 - WebMCP tool descriptions, summaries, guide PDFs, and spec references
   remain English-only.
