@@ -59,8 +59,9 @@ export function drawScene(
   if (options.constellationLines) {
     // Keep constellation lines as a stable sky reference. Hidden-star
     // simulation affects stars, but does not make the proven line drawing
-    // disappear or fade.
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
+    // disappear or fade. Amber marks the annotation layer, distinct from
+    // the blue-white of the sky data itself.
+    ctx.strokeStyle = "rgba(255, 180, 84, 0.18)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (const line of scene.lines) {
@@ -142,11 +143,12 @@ export function drawScene(
 
   if (options.constellationNames) {
     ctx.textAlign = "center";
-    ctx.font = "600 11px sans-serif";
+    ctx.font = `10px ${MONO}`;
     for (const label of scene.labels) {
       const f = label.factor ?? 1;
-      ctx.fillStyle = `rgba(148, 163, 184, ${0.8 * f})`;
-      place(label.name, label.x - ctx.measureText(label.name).width / 2, label.y, false);
+      ctx.fillStyle = `rgba(255, 180, 84, ${0.35 * f})`;
+      const text = label.name.toUpperCase();
+      place(text, label.x - ctx.measureText(text).width / 2, label.y, false);
     }
   }
 
