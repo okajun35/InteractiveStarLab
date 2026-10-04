@@ -1338,6 +1338,32 @@ button[aria-label="Close"] {
   background: rgba(96, 165, 250, 0.15);
 }
 
+.app-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+}
+
+.app-lang-btn {
+  padding: 3px 8px;
+  border-color: transparent;
+  background: transparent;
+  font-size: 0.78em;
+  color: var(--muted);
+  border-radius: 6px;
+}
+
+.app-lang-btn.active {
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(96, 165, 250, 0.15);
+}
+
 .workflow-page {
   flex: 1;
   min-height: 0;

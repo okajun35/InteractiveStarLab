@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useWebMcp } from "../state/webmcp";
+import { useLocale } from "../i18n";
 
 /**
  * In-app harness for the page's WebMCP tools. The tools are captured locally at
@@ -8,6 +9,7 @@ import { useWebMcp } from "../state/webmcp";
  */
 export function AgentHarness() {
   const { harnessTools, availability } = useWebMcp();
+  const { t } = useLocale();
   const [toolName, setToolName] = useState("");
   const [inputText, setInputText] = useState("{}");
   const [running, setRunning] = useState(false);
@@ -44,19 +46,19 @@ export function AgentHarness() {
   };
 
   return (
-    <section className="agent-harness" aria-label="Agent harness">
+    <section className="agent-harness" aria-label={t("harness.toggle")}>
       <button
         type="button"
         className="agent-harness-toggle"
         aria-expanded={expanded}
         onClick={() => setExpanded((value) => !value)}
       >
-        Agent harness {availability !== "ready" ? "· local" : ""}
+        {t("harness.toggle")} {availability !== "ready" ? "· local" : ""}
       </button>
       {expanded && (
         <div className="agent-harness-body">
           <label className="agent-harness-field">
-            <span>Tool</span>
+            <span>{t("harness.tool")}</span>
             <select
               value={selected?.name ?? ""}
               onChange={(event) => setToolName(event.target.value)}
@@ -72,7 +74,7 @@ export function AgentHarness() {
             <p className="agent-harness-description">{selected.description}</p>
           )}
           <label className="agent-harness-field">
-            <span>Input JSON</span>
+            <span>{t("harness.input")}</span>
             <textarea
               rows={3}
               value={inputText}
@@ -81,7 +83,7 @@ export function AgentHarness() {
             />
           </label>
           <button type="button" onClick={run} disabled={running || selected === undefined}>
-            {running ? "Running…" : "Run tool"}
+            {running ? t("harness.running") : t("harness.run")}
           </button>
           {output !== null && (
             <pre className="agent-harness-output" aria-live="polite">

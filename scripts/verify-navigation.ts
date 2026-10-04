@@ -1,4 +1,5 @@
 import { PRIMARY_NAV_ITEMS, RECORD_NAV_ITEMS, isRecordView } from "../src/navigation/navigationModel";
+import { en, type MessageKey } from "../src/i18n/en";
 
 let failures = 0;
 function check(name: string, ok: boolean, detail = ""): void {
@@ -12,7 +13,12 @@ check("NAV-1: primary navigation keeps the observation cycle and Sky", JSON.stri
 check("NAV-1: record navigation contains history and snapshots", JSON.stringify(recordViews) === JSON.stringify(["history", "snapshots"]), recordViews.join(","));
 check("NAV-2: navigation views are unique", new Set([...primaryViews, ...recordViews]).size === 6);
 check("NAV-2: record view detection is limited to secondary views", isRecordView("history") && isRecordView("snapshots") && !isRecordView("sky") && !isRecordView("results"));
-check("NAV-3: every item has an English label", [...PRIMARY_NAV_ITEMS, ...RECORD_NAV_ITEMS].every((item) => item.label.length > 0));
+check(
+  "NAV-3: every nav view has a localized label",
+  [...PRIMARY_NAV_ITEMS, ...RECORD_NAV_ITEMS].every(
+    (item) => typeof en[`nav.${item.view}` as MessageKey] === "string",
+  ),
+);
 
 if (failures > 0) {
   console.log(`\n${failures} check(s) FAILED`);

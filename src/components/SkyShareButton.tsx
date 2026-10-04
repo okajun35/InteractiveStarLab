@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useStarViewer } from "../state/context";
 import { useSimulation } from "../state/simulation";
 import { encodeSkyShare } from "../sky/shareUrl";
+import { useLocale } from "../i18n";
 
 /**
  * Copies a shareable URL that carries the full viewer state in its `#sky=`
@@ -11,6 +12,7 @@ import { encodeSkyShare } from "../sky/shareUrl";
 export function SkyShareButton() {
   const { settings, options, skyMode } = useStarViewer();
   const { settings: sim, layers } = useSimulation();
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
 
   const share = async () => {
@@ -35,13 +37,13 @@ export function SkyShareButton() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      window.prompt("Copy this link:", url);
+      window.prompt(t("share.prompt"), url);
     }
   };
 
   return (
     <button type="button" className="sky-share-btn" onClick={share}>
-      {copied ? "Copied!" : "Share"}
+      {copied ? t("share.copied") : t("share.button")}
     </button>
   );
 }

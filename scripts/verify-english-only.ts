@@ -17,6 +17,12 @@ function scanFile(path: string): string[] {
     .flatMap((line, index) => japanesePattern.test(line) ? [`${relative(root, path)}:${index + 1}: ${line.trim()}`] : []);
 }
 
+/**
+ * Japanese is allowed only in the checked-in ja dictionary. Everything else —
+ * docs, tool descriptions, generated guides — stays English-only.
+ */
+const exemptSourceFiles = new Set(["src/i18n/ja.ts"]);
+
 const binaryExtensions = new Set([
   ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".icns", ".bmp",
   ".pdf", ".zip", ".gz", ".br", ".woff", ".woff2", ".ttf", ".otf",
@@ -33,12 +39,11 @@ function isBinaryFile(path: string): boolean {
   }
 }
 
-const targets = trackedFiles().map((file) => join(root, file));
-if (existsSync(join(root, "dist"))) {
-  const distFiles = execFileSync("find", [join(root, "dist"), "-type", "f"], { cwd: root })
-    .toString("utf8").split(/\r?\n/).filter(Boolean);
-  targets.push(...distFiles);
-}
+const targets = trackedFiles()
+  .filter((file) => !exemptSourceFiles.has(file))
+  .map((file) => join(root, file));
+// dist/ is generated from the sources scanned above and legitimately bundles
+// the ja dictionary, so it is excluded rather than exempted per line.
 
 const findings = targets.filter((path) => !isBinaryFile(path)).flatMap(scanFile);
 if (findings.length > 0) {

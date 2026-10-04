@@ -32,6 +32,7 @@ import { AgentActivityProvider, useAgentActivity } from "./state/agentActivity";
 import type { SkySceneMetrics } from "./sky/contextModel";
 import { SkySidebar } from "./components/SkySidebar";
 import { ProposalProvider } from "./state/proposals";
+import { LocaleProvider, useLocale } from "./i18n";
 
 function useElementSize() {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -61,6 +62,7 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
   const { ref, width, height } = useElementSize();
   const { compare } = useSimulation();
   const { settings: observation, skyMode, setSkyMode, recordSkyAction } = useStarViewer();
+  const { t } = useLocale();
   const observationDatetime = observation.datetime;
 
   const baseOverride: SceneOverride = useMemo(
@@ -134,7 +136,7 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
 
   return (
     <div className="app-canvas" ref={ref}>
-      <div className="sky-mode-toggle" role="group" aria-label="Sky view mode">
+      <div className="sky-mode-toggle" role="group" aria-label={t("sky.mode.group")}>
         <button
           type="button"
           className={skyMode === "window" ? "sky-mode-btn active" : "sky-mode-btn"}
@@ -144,7 +146,7 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
             recordSkyAction("mode", "Switched to the window view");
           }}
         >
-          Window
+          {t("sky.mode.window")}
         </button>
         <button
           type="button"
@@ -155,7 +157,7 @@ function SkyArea({ onMetricsChange }: { onMetricsChange: (metrics: SkySceneMetri
             recordSkyAction("mode", "Switched to the all-sky dome view");
           }}
         >
-          All sky
+          {t("sky.mode.allSky")}
         </button>
         <SkyShareButton />
       </div>
@@ -259,6 +261,7 @@ function AppShell() {
   const { view, setView } = useNavigation();
   const { activeMissionId, missions } = useObservation();
   const { selectedGuide, getGuideForMission, prepareGuide, selectGuide, generatePdf } = useGuides();
+  const { t, locale, setLocale } = useLocale();
   const [recordsOpen, setRecordsOpen] = useState(false);
   const [skyPresentation, setSkyPresentation] = useState<"agent" | "manual">("agent");
   const recordsMenuRef = useRef<HTMLDivElement | null>(null);
@@ -303,9 +306,9 @@ function AppShell() {
       <header className="app-header">
         <div className="app-header-topline">
           <h1>
-            <span className="en">Interactive Star Lab</span>
+            <span className="en">{t("app.title")}</span>
             <span className="app-header-sub">
-              <span className="en">Explore the sky</span> — Change the conditions and observe
+              <span className="en">{t("app.tagline")}</span> — {t("app.taglineHint")}
             </span>
           </h1>
           <nav className="app-nav" aria-label="Application">
@@ -318,7 +321,7 @@ function AppShell() {
                   onClick={() => navigate(item.view)}
                   key={item.view}
                 >
-                  {item.label}
+                  {t(`nav.${item.view}`)}
                 </button>
               ))}
             </div>
@@ -331,10 +334,10 @@ function AppShell() {
                 aria-expanded={recordsOpen}
                 onClick={() => setRecordsOpen((open) => !open)}
               >
-                Records <span className="app-nav-chevron" aria-hidden="true">⌄</span>
+                {t("nav.records")} <span className="app-nav-chevron" aria-hidden="true">⌄</span>
               </button>
               {recordsOpen && (
-                <div className="app-nav-menu" role="menu" aria-label="Records">
+                <div className="app-nav-menu" role="menu" aria-label={t("nav.records")}>
                   {RECORD_NAV_ITEMS.map((item) => (
                     <button
                       type="button"
@@ -344,11 +347,24 @@ function AppShell() {
                       onClick={() => navigate(item.view)}
                       key={item.view}
                     >
-                      {item.label}
+                      {t(`nav.${item.view}`)}
                     </button>
                   ))}
                 </div>
               )}
+            </div>
+            <div className="app-lang-toggle" role="group" aria-label={t("lang.group")}>
+              {(["en", "ja"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={locale === option ? "app-lang-btn active" : "app-lang-btn"}
+                  aria-pressed={locale === option}
+                  onClick={() => setLocale(option)}
+                >
+                  {option === "en" ? t("lang.english") : t("lang.japanese")}
+                </button>
+              ))}
             </div>
           </nav>
         </div>
@@ -401,7 +417,9 @@ export default function App() {
                 <SnapshotProvider>
                   <AgentActivityProvider>
                     <WebMcpProvider>
-                      <AppShell />
+                      <LocaleProvider>
+                        <AppShell />
+                      </LocaleProvider>
                     </WebMcpProvider>
                   </AgentActivityProvider>
                 </SnapshotProvider>
