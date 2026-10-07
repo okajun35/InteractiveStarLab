@@ -3,7 +3,7 @@ import { shouldShowStarName } from "../astronomy/stars";
 import { labelPlacer, LABEL_LINE_HEIGHT } from "./labelPlacer";
 import { rgba, mixRgb } from "../astronomy/skyPalette";
 import type { SceneBody, SceneMessier, SceneMilkyWay } from "../astronomy/sceneObjects";
-import type { SceneStar, SkyScene } from "../astronomy/visibility";
+import type { SceneLabel, SceneStar, SkyScene } from "../astronomy/visibility";
 import type { StarStatus } from "../types/astronomy";
 
 const TAU = Math.PI * 2;
@@ -41,6 +41,8 @@ export function drawScene(
   showHiddenStars: boolean,
   selectedStarId?: string | null,
   reticlePulse = 1,
+  /** Resolves a constellation label's display text (e.g. localized name). */
+  labelNamer?: (label: SceneLabel) => string,
 ): void {
   const dome = scene.dome ?? null;
   drawSkyBackground(ctx, width, height, scene);
@@ -147,7 +149,7 @@ export function drawScene(
     for (const label of scene.labels) {
       const f = label.factor ?? 1;
       ctx.fillStyle = `rgba(255, 180, 84, ${0.35 * f})`;
-      const text = label.name.toUpperCase();
+      const text = labelNamer !== undefined ? labelNamer(label) : label.name.toUpperCase();
       place(text, label.x - ctx.measureText(text).width / 2, label.y, false);
     }
   }

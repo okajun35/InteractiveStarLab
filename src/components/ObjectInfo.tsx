@@ -8,6 +8,7 @@ import { MAGNITUDE_LAYERS, layerOf } from "../astronomy/magnitude";
 import type { LightPollution } from "../types/astronomy";
 import { CONSTELLATIONS, STARS } from "../astronomy/stars";
 import { useLocale, type MessageKey } from "../i18n";
+import { constellationDisplayName } from "../data/constellationNamesJa";
 
 const LP_KEYS: Record<LightPollution, MessageKey> = {
   "city-center": "lp.city-center",
@@ -29,7 +30,7 @@ export function ObjectInfo() {
   const { settings, selectedStar, selectStar, selectedSun, selectSun, horizontal } =
     useStarViewer();
   const { layers, settings: sim } = useSimulation();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const sun = useMemo(() => {
     try {
@@ -134,7 +135,7 @@ export function ObjectInfo() {
           </dt>
           <dd>
             {constellation
-              ? constellation.name
+              ? constellationDisplayName(constellation.id, constellation.name, locale)
               : selectedStar.constellation ?? "—"}
           </dd>
         </div>
@@ -185,7 +186,8 @@ export function ObjectInfo() {
       {constellation && (
         <aside className="constellation-card">
           <h3>
-            {constellation.name}
+            {constellationDisplayName(constellation.id, constellation.name, locale)}
+            {locale === "ja" && ` (${constellation.name})`}
           </h3>
           {brightest && (
             <p>

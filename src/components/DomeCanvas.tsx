@@ -18,6 +18,7 @@ import {
 import { STAR_BY_ID } from "../astronomy/stars";
 import type { Star } from "../types/astronomy";
 import { useLocale, type MessageKey } from "../i18n";
+import { constellationDisplayName } from "../data/constellationNamesJa";
 import type { StarCanvasMetrics } from "./StarCanvas";
 
 interface DomeCanvasProps {
@@ -53,7 +54,7 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
   const { registerCanvas, captureSnapshot, downloadRecord } = useSnapshots();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const [domeView, setDomeView] = useState<DomeView>(() => ({
     rotationDeg: settings.azimuth,
@@ -116,6 +117,8 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
       options as StarCanvasOptions,
       sim.showHiddenStars,
       selectedStar?.id,
+      undefined,
+      (label) => constellationDisplayName(label.constellationId, label.name, locale),
     );
 
     const metricsKey = `${scene.visibleCount}:${scene.inViewCount}`;
@@ -143,6 +146,7 @@ export function DomeCanvas({ width, height, onMetricsChange }: DomeCanvasProps) 
     width,
     height,
     onMetricsChange,
+    locale,
   ]);
 
   const findHit = (px: number, py: number): SceneHit | null =>

@@ -1,0 +1,112 @@
+/**
+ * Japanese constellation names keyed by IAU three-letter abbreviation
+ * (the `id` field of src/data/constellations.json). This file is exempted
+ * from the English-only scan alongside src/i18n/ja.ts.
+ */
+import type { Locale } from "../i18n/locale";
+
+export const CONSTELLATION_NAMES_JA: Record<string, string> = {
+  AND: "アンドロメダ座",
+  ANT: "ポンプ座",
+  APS: "ふうちょう座",
+  AQR: "みずがめ座",
+  AQL: "わし座",
+  ARA: "さいだん座",
+  ARI: "おひつじ座",
+  AUR: "ぎょしゃ座",
+  BOO: "うしかい座",
+  CAE: "ちょうこくぐ座",
+  CAM: "きりん座",
+  CNC: "かに座",
+  CVN: "りょうけん座",
+  CMA: "おおいぬ座",
+  CMI: "こいぬ座",
+  CAP: "やぎ座",
+  CAR: "りゅうこつ座",
+  CAS: "カシオペヤ座",
+  CEN: "ケンタウルス座",
+  CEP: "ケフェウス座",
+  CET: "くじら座",
+  CHA: "カメレオン座",
+  CIR: "コンパス座",
+  COL: "はと座",
+  COM: "かみのけ座",
+  CRA: "みなみのかんむり座",
+  CRB: "かんむり座",
+  CRV: "からす座",
+  CRT: "コップ座",
+  CRU: "みなみじゅうじ座",
+  CYG: "はくちょう座",
+  DEL: "いるか座",
+  DOR: "かじき座",
+  DRA: "りゅう座",
+  EQU: "こうま座",
+  ERI: "エリダヌス座",
+  FOR: "ろ座",
+  GEM: "ふたご座",
+  GRU: "つる座",
+  HER: "ヘルクレス座",
+  HOR: "ろけい座",
+  HYA: "うみへび座",
+  HYI: "みずへび座",
+  IND: "インディアン座",
+  LAC: "とかげ座",
+  LEO: "しし座",
+  LMI: "こじし座",
+  LEP: "うさぎ座",
+  LIB: "てんびん座",
+  LUP: "おおかみ座",
+  LYN: "やまねこ座",
+  LYR: "こと座",
+  MEN: "テーブル座",
+  MIC: "けんびきょう座",
+  MON: "いっかくじゅう座",
+  MUS: "はえ座",
+  NOR: "じょうぎ座",
+  OCT: "はちぶんぎ座",
+  OPH: "へびつかい座",
+  ORI: "オリオン座",
+  PAV: "くじゃく座",
+  PEG: "ペガスス座",
+  PER: "ペルセウス座",
+  PHE: "ほうおう座",
+  PIC: "がか座",
+  PSC: "うお座",
+  PSA: "みなみのうお座",
+  PUP: "とも座",
+  PYX: "らしんばん座",
+  RET: "レチクル座",
+  SGE: "や座",
+  SGR: "いて座",
+  SCO: "さそり座",
+  SCL: "ちょうこくしつ座",
+  SCT: "たて座",
+  SER: "へび座",
+  SEX: "ろくぶんぎ座",
+  TAU: "おうし座",
+  TEL: "ぼうえんきょう座",
+  TRI: "さんかく座",
+  TRA: "みなみのさんかく座",
+  TUC: "きょしちょう座",
+  UMA: "おおぐま座",
+  UMI: "こぐま座",
+  VEL: "ほ座",
+  VIR: "おとめ座",
+  VOL: "とびうお座",
+  VUL: "こぎつね座",
+};
+
+/**
+ * Returns the display name for a constellation: the Japanese name when the
+ * locale is `ja` and a translation exists, otherwise the Latin name.
+ */
+export function constellationDisplayName(
+  constellationId: string,
+  latinName: string,
+  locale: Locale,
+): string {
+  if (locale === "ja") {
+    return CONSTELLATION_NAMES_JA[constellationId.toUpperCase()] ?? latinName;
+  }
+  return latinName;
+}

@@ -24,6 +24,7 @@ import { STAR_BY_ID } from "../astronomy/stars";
 import { formatHeading } from "../astronomy/visibility";
 import type { Star } from "../types/astronomy";
 import { useLocale, type MessageKey } from "../i18n";
+import { constellationDisplayName } from "../data/constellationNamesJa";
 
 export interface StarCanvasMetrics {
   visibleCount: number;
@@ -79,7 +80,7 @@ export function StarCanvas({
   const { settings: sim, layers } = useSimulation();
   const { activeSite, activeMissionId } = useObservation();
   const { registerCanvas, captureSnapshot, downloadRecord } = useSnapshots();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const scene = useScene(width, height, override);
   const [hover, setHover] = useState<{ x: number; y: number; hit: SceneHit } | null>(null);
@@ -216,6 +217,7 @@ export function StarCanvas({
       sim.showHiddenStars,
       selectedStar?.id,
       pulse,
+      (label) => constellationDisplayName(label.constellationId, label.name, locale),
     );
 
     const metricsKey = `${scene.visibleCount}:${scene.inViewCount}`;
@@ -245,6 +247,7 @@ export function StarCanvas({
     height,
     onMetricsChange,
     pulse,
+    locale,
   ]);
 
   const findHit = (px: number, py: number): SceneHit | null =>

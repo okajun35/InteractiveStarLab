@@ -18,10 +18,14 @@ function scanFile(path: string): string[] {
 }
 
 /**
- * Japanese is allowed only in the checked-in ja dictionary. Everything else —
- * docs, tool descriptions, generated guides — stays English-only.
+ * Japanese is allowed only in the checked-in ja dictionary and the Japanese
+ * constellation-name catalog. Everything else — docs, tool descriptions,
+ * generated guides — stays English-only.
  */
-const exemptSourceFiles = new Set(["src/i18n/ja.ts"]);
+const exemptSourceFiles = new Set([
+  "src/i18n/ja.ts",
+  "src/data/constellationNamesJa.ts",
+]);
 
 const binaryExtensions = new Set([
   ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".icns", ".bmp",
