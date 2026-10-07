@@ -360,6 +360,8 @@ function AppShell() {
                   type="button"
                   className={locale === option ? "app-lang-btn active" : "app-lang-btn"}
                   aria-pressed={locale === option}
+                  aria-label={option === "en" ? t("lang.englishName") : t("lang.japaneseName")}
+                  title={option === "en" ? t("lang.englishName") : t("lang.japaneseName")}
                   onClick={() => setLocale(option)}
                 >
                   {option === "en" ? t("lang.english") : t("lang.japanese")}

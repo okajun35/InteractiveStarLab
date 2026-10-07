@@ -34,8 +34,10 @@ export const en = {
   "harness.tool": "Tool",
   "harness.input": "Input JSON",
   "lang.group": "Language",
-  "lang.english": "English",
-  "lang.japanese": "Japanese",
+  "lang.english": "EN",
+  "lang.japanese": "JA",
+  "lang.englishName": "English",
+  "lang.japaneseName": "Japanese",
 
   // Sky canvas chrome
   "canvas.snapshot": "Snapshot",

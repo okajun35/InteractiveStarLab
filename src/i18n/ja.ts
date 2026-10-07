@@ -31,8 +31,10 @@ export const ja: Record<MessageKey, string> = {
   "harness.tool": "ツール",
   "harness.input": "入力 JSON",
   "lang.group": "言語",
-  "lang.english": "英語",
-  "lang.japanese": "日本語",
+  "lang.english": "EN",
+  "lang.japanese": "JA",
+  "lang.englishName": "英語",
+  "lang.japaneseName": "日本語",
 
   "canvas.snapshot": "スナップショット",
   "canvas.snapshotTitle": "空のスナップショットを PNG で保存",
