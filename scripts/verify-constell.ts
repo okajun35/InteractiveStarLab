@@ -2,7 +2,7 @@
 // Constellation line and label alpha follows star visibility:
 //   star weights: visible=1, hidden=0.5, disabled=0
 //   line factor: wA × wB (1 / 0.5 / 0.25 / 0)
-//   label factor: average weight, with a 0.2 floor
+//   label factor: average weight, with a 0.5 floor (labels stay readable)
 // Run: node scripts/run-verify.cjs verify-constell.ts
 import { horizontalStars } from "../src/astronomy/coordinates";
 import { STARS, CONSTELLATIONS } from "../src/astronomy/stars";
@@ -39,9 +39,9 @@ const disabled: SS = { state: "disabled" };
   check("K1: label all-visible = 1", labelStyleFactor([visible, visible]) === 1);
   check("K1: label mix = 0.75", labelStyleFactor([visible, hiddenLP]) === 0.75);
   check("K1: label all-hidden = 0.5", labelStyleFactor([hiddenLP, hiddenDay]) === 0.5);
-  check("K1: label all-disabled clamped to 0.2 (educational anchor kept)",
-    labelStyleFactor([disabled, disabled]) === 0.2);
-  check("K1: empty label clamped to 0.2", labelStyleFactor([]) === 0.2);
+  check("K1: label all-disabled clamped to 0.5 (stays legible as a map annotation)",
+    labelStyleFactor([disabled, disabled]) === 0.5);
+  check("K1: empty label clamped to 0.5", labelStyleFactor([]) === 0.5);
 }
 
 // ---- K2: scene integration — factors attach to lines/labels --------
@@ -107,18 +107,18 @@ const simDay = { ...simDark, daylightMode: "real" as const, lightPollution: "dar
     sDay.lines.length >= 1 && dayLineF.every((f) => Math.abs(f - 0.25) < 1e-9),
     JSON.stringify(dayLineF));
   const dayLabelF = [...new Set(sDay.labels.map((l) => l.factor))];
-  check("K2: day — every label fades to 0.5 (avg of hidden, above 0.2 floor)",
+  check("K2: day — every label fades to 0.5 (avg of hidden, at the floor)",
     sDay.labels.length >= 1 && dayLabelF.every((f) => Math.abs(f - 0.5) < 1e-9),
     JSON.stringify(dayLabelF));
 
   // Layers all off: every member disabled (weight 0) → lines vanish,
-  // labels hold the 0.2 educational anchor.
+  // labels hold the legible 0.5 annotation floor.
   const sOff = sceneFactors({ datetime: NIGHT_22_00 }, ALL_OFF, simDark, nightStars);
   check("K2: layers off — lines vanish (factor 0)",
     sOff.lines.length >= 1 && sOff.lines.every((l) => l.factor === 0),
     JSON.stringify([...new Set(sOff.lines.map((l) => l.factor))]));
-  check("K2: layers off — labels keep the 0.2 educational anchor",
-    sOff.labels.length >= 1 && sOff.labels.every((l) => l.factor === 0.2),
+  check("K2: layers off — labels keep the 0.5 annotation floor",
+    sOff.labels.length >= 1 && sOff.labels.every((l) => l.factor === 0.5),
     JSON.stringify([...new Set(sOff.labels.map((l) => l.factor))]));
 }
 
