@@ -43,24 +43,31 @@ const CONTEXT = {
   site: { name: "Tokyo", latitude: 35.6812, longitude: 139.7671, timeZone: "Asia/Tokyo" },
 };
 
-// ---- A1: allowlist is exactly the four consult tools ---------------------
+// ---- A1: allowlist is exactly the expanded consult tool set ---------------
+const EXPECTED_TOOLS = [
+  "get_observation_site", "configure_sky_view", "predict_visible_stars", "propose_plan",
+  "get_current_sky_state", "describe_current_view",
+  "get_night_ephemeris", "rank_nights",
+  "get_sky_conditions", "compare_dark_sky_sites",
+  "set_sky_view_settings", "set_sky_display_settings",
+  "open_sky_view", "open_plan_view", "open_observe_view", "open_observation_results",
+  "plan_stale", "commit_proposal",
+  "get_observation_mission", "generate_observation_guide",
+];
 {
-  check("A1: allowlist has the four planned tools",
-    JSON.stringify(CONSULT_TOOL_NAMES) === JSON.stringify([
-      "get_observation_site", "configure_sky_view", "predict_visible_stars", "propose_plan",
-    ]));
+  check("A1: allowlist has the expanded consult tools",
+    JSON.stringify(CONSULT_TOOL_NAMES) === JSON.stringify(EXPECTED_TOOLS));
   const harness = [
-    fakeTool("get_observation_site"),
+    ...EXPECTED_TOOLS.map(fakeTool),
     fakeTool("save_observation_results"),       // must be excluded
-    fakeTool("predict_visible_stars"),
-    fakeTool("commit_proposal"),                // must be excluded
-    fakeTool("configure_sky_view"),
-    fakeTool("propose_plan"),
+    fakeTool("create_observation_plan"),        // must be excluded (bypasses review)
+    fakeTool("set_observation_site"),           // must be excluded (raw lat/lon)
     fakeTool("capture_sky_snapshot"),           // must be excluded
+    fakeTool("restore_observation_mission"),    // must be excluded
   ];
   const selected = selectConsultTools(harness);
   check("A1: selection keeps only allowlisted tools",
-    selected.length === 4 &&
+    selected.length === EXPECTED_TOOLS.length &&
     selected.every((tool) => (CONSULT_TOOL_NAMES as readonly string[]).includes(tool.name)),
     JSON.stringify(selected.map((tool) => tool.name)));
   check("A1: selection follows allowlist order",
@@ -297,7 +304,7 @@ const CONTEXT = {
 {
   const fs = await import("node:fs");
   const handler = fs.readFileSync(new URL("../lambda/consult-agent.mjs", import.meta.url), "utf8");
-  check("A11: lambda enforces the four-tool allowlist",
+  check("A11: lambda enforces the consult allowlist",
     CONSULT_TOOL_NAMES.every((name) => handler.includes(`"${name}"`)));
   check("A11: lambda defaults to the cheap Nova Lite model",
     handler.includes("amazon.nova-lite-v1:0") && handler.includes("AGENT_MODEL_ID"));

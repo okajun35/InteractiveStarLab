@@ -1,18 +1,43 @@
 /**
  * Translation between the app's WebMCP tools and the Bedrock Converse tool
  * format, plus the allowlist of tools the in-app consultation agent may use.
- * The allowlist is intentionally small: the agent can look up conditions and
- * stage proposals, while plan creation itself stays with the human on the
- * existing screens.
+ * The list stays curated rather than "everything WebMCP exposes": direct
+ * Mission creation, raw-coordinate site edits, observation-record writes,
+ * restoration, and snapshot bookkeeping are left out so the agent works
+ * through the same reviewed proposal path a human uses.
  */
 import type { WebMcpTool } from "../mcp/webmcp";
 
 /** Tools the in-app consultation agent is allowed to call. */
 export const CONSULT_TOOL_NAMES = [
+  // Core consult flow
   "get_observation_site",
   "configure_sky_view",
   "predict_visible_stars",
   "propose_plan",
+  // Sky inspection
+  "get_current_sky_state",
+  "describe_current_view",
+  // Night planning
+  "get_night_ephemeris",
+  "rank_nights",
+  // Weather advisory (Open-Meteo, never a guarantee)
+  "get_sky_conditions",
+  "compare_dark_sky_sites",
+  // Sky manipulation (aim the view, toggle layers)
+  "set_sky_view_settings",
+  "set_sky_display_settings",
+  // Screen navigation
+  "open_sky_view",
+  "open_plan_view",
+  "open_observe_view",
+  "open_observation_results",
+  // Proposal lifecycle: check freshness, then commit on explicit approval
+  "plan_stale",
+  "commit_proposal",
+  // Mission follow-up
+  "get_observation_mission",
+  "generate_observation_guide",
 ] as const;
 
 export interface BedrockToolSpec {
