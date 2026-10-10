@@ -258,6 +258,8 @@ export const ja: Record<MessageKey, string> = {
   "plan.noMissionAgent": "AIエージェントに場所と時刻の計画を頼むか、手動で作成してください。",
   "plan.noMissionManual": "WebMCP は利用できません。手動の計画作成は引き続き使えます。",
   "plan.noMissionConsult": "Sky画面の「星空に相談」で相談エージェントに頼むか、手動で作成してください。",
+  "plan.pendingProposal": "確定待ちの提案があります",
+  "plan.pendingProposalNote": "上のカードで確認・確定するか、エージェントに「それでいい」と伝えるとミッションになります。",
   "plan.example": "例",
   "plan.exampleText": "今夜のシドニーで3つの星の観察計画を作って。",
   "plan.editManually": "手動で編集",

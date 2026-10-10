@@ -104,6 +104,65 @@ function isToolUseBlock(block: AgentContentBlock): block is AgentToolUseBlock {
 }
 
 /**
+ * The in-app agent turns proposals straight into Missions: once propose_plan
+ * stages a proposal, the loop commits it immediately and folds the outcome into
+ * the result the model sees, so the user never approves the same plan twice.
+ * External WebMCP agents keep the human-review gate — they call the tools
+ * directly and never pass through this loop.
+ */
+async function autoCommitConsultProposal(
+  tools: readonly WebMcpTool[],
+  proposeResultText: string,
+  onEvent: (event: AgentEvent) => void,
+): Promise<string> {
+  let parsed: { ok?: boolean; data?: Record<string, unknown> };
+  try {
+    parsed = JSON.parse(proposeResultText);
+  } catch {
+    return proposeResultText;
+  }
+  if (parsed?.ok !== true || typeof parsed.data !== "object" || parsed.data === null) {
+    return proposeResultText;
+  }
+  const commit = tools.find((candidate) => candidate.name === "commit_proposal");
+  if (commit === undefined) return proposeResultText;
+
+  onEvent({ type: "tool_call", name: "commit_proposal", input: {} });
+  let commitData: Record<string, unknown> | null = null;
+  let commitError = "commit_proposal failed";
+  try {
+    const commitParsed = JSON.parse(String(await commit.execute({}))) as {
+      ok?: boolean;
+      data?: Record<string, unknown>;
+      error?: { message?: string };
+    };
+    if (commitParsed?.ok === true && commitParsed.data !== undefined) {
+      commitData = commitParsed.data;
+    } else {
+      commitError = commitParsed?.error?.message ?? commitError;
+    }
+  } catch (error) {
+    commitError = error instanceof Error ? error.message : String(error);
+  }
+  onEvent({ type: "tool_result", name: "commit_proposal", ok: commitData !== null });
+
+  parsed.data = {
+    ...parsed.data,
+    autoCommitted: commitData !== null,
+    ...(commitData !== null
+      ? {
+        commitSummary: commitData.summary,
+        missionId: commitData.missionId,
+        targetCount: commitData.targetCount,
+        committed: commitData.committed,
+        rejected: commitData.rejected,
+      }
+      : { commitError }),
+  };
+  return JSON.stringify(parsed);
+}
+
+/**
  * Runs one consultation turn: appends the user message, then alternates
  * model calls and local tool executions until the model replies with text.
  * Failures in transport or tools are reported to the model/user rather than
@@ -152,6 +211,9 @@ export async function runConsultation(
         } else {
           try {
             text = String(await tool.execute(input));
+            if (name === "propose_plan") {
+              text = await autoCommitConsultProposal(options.tools, text, onEvent);
+            }
             if (text.length > maxResultChars) {
               text = `${text.slice(0, Math.max(0, maxResultChars - 12))}…(truncated)`;
             }

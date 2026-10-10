@@ -274,6 +274,8 @@ export const en = {
   "plan.noMissionAgent": "Ask your AI agent to create a plan for a place and time, or create one manually.",
   "plan.noMissionManual": "WebMCP unavailable. Manual planning is still available.",
   "plan.noMissionConsult": "Ask the in-app agent on the Sky screen's Ask-the-sky panel, or create one manually.",
+  "plan.pendingProposal": "A proposal awaits your review",
+  "plan.pendingProposalNote": "Confirm it in the card above — or tell the agent it looks right — and it becomes your Mission.",
   "plan.example": "Example",
   "plan.exampleText": "Create a three-star observation plan for Sydney tonight.",
   "plan.editManually": "Edit manually",

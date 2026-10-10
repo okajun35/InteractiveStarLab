@@ -1,17 +1,22 @@
 import { useWebMcp } from "../../state/webmcp";
+import { useProposals } from "../../state/proposals";
 import { agentApiUrl } from "../../agent/client";
 import { useLocale, type LocaleState } from "../../i18n";
 
 export function ObservationPlanEmptyState({ onEdit, manualOpen }: { onEdit: () => void; manualOpen: boolean }) {
   const { availability } = useWebMcp();
+  const { proposal } = useProposals();
   const { t } = useLocale();
+  const pending = proposal !== null && proposal.status === "pending";
   const unavailable = availability === "unavailable" || availability === "error";
   const consultAvailable = agentApiUrl() !== null;
-  const emptyMessage = !unavailable
-    ? t("plan.noMissionAgent")
-    : consultAvailable
-      ? t("plan.noMissionConsult")
-      : t("plan.noMissionManual");
+  const emptyMessage = pending
+    ? t("plan.pendingProposalNote")
+    : !unavailable
+      ? t("plan.noMissionAgent")
+      : consultAvailable
+        ? t("plan.noMissionConsult")
+        : t("plan.noMissionManual");
   return (
     <section className="workflow-card plan-empty-state" aria-label={t("plan.noMission")}>
       <div className="plan-empty-heading">
@@ -21,7 +26,7 @@ export function ObservationPlanEmptyState({ onEdit, manualOpen }: { onEdit: () =
         </div>
         <StatusBadge availability={availability} t={t} />
       </div>
-      <h2>{t("plan.noMission")}</h2>
+      <h2>{pending ? t("plan.pendingProposal") : t("plan.noMission")}</h2>
       <p>{emptyMessage}</p>
       <div className="plan-example">
         <span className="en">{t("plan.example")}</span>
