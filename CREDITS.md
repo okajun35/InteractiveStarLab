@@ -8,8 +8,7 @@ libraries. This file lists third-party material that ships inside the bundle.
 `src/data/dense-stars.json`, `src/data/messier.json` and
 `src/data/milkyway.json` are derived from the data files of
 [d3-celestial](https://github.com/ofrohn/d3-celestial) by Olaf Frohn, via the
-vendored catalogs of [Roque Nights](https://github.com/) (same upstream,
-BSD-3-Clause). Upstream files used: `stars.6.json` (positions, magnitudes,
+vendored catalogs of Roque Nights (same upstream, BSD-3-Clause). Upstream files used: `stars.6.json` (positions, magnitudes,
 B-V colour indices, Hipparcos numbers; sorted brightest-first, magnitude cut 6),
 `messier.json` (the 110 Messier objects, constellation derived by ray-casting
 the IAU boundaries), and `mw.json` (Milky Way isophote outlines, 5 levels,
@@ -41,3 +40,12 @@ MIT License
 
 Copyright (c) 2019-2025 Don Cross <cosinekitty@gmail.com>
 ```
+
+## Runtime services — not bundled
+
+- Weather forecasts: [Open-Meteo](https://open-meteo.com/) (free, no API
+  key) — cloud cover, jet-stream wind, and 700 hPa humidity used by the
+  sky-conditions and dark-site comparison tools.
+- Consultation agent: [Amazon Bedrock](https://aws.amazon.com/bedrock/)
+  Converse API via the Lambda proxy in `lambda/` — no model weights or
+  prompts ship in the frontend bundle beyond the tool descriptions.

@@ -1,5 +1,10 @@
 # English-Only Conversion Plan
 
+> Status: completed for the hackathon checkpoint. Typed i18n later
+> re-introduced Japanese under `src/i18n/`; the English-only scan remains
+> as the guardrail for everything outside the dictionaries and exempted
+> fixtures.
+
 ## 1. Objective
 
 Convert Interactive Star Lab from its current Japanese-first/bilingual presentation into an English-only application for the hackathon.

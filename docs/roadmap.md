@@ -1,9 +1,10 @@
 # Roadmap — Interactive Star Lab
 
-This document records the adopted feature roadmap: what is already shipped,
-what is planned next, and why each item was chosen. Ideas are benchmarked
-against Roque Nights, whose sky-rendering and agent-facing design informed
-several of the shipped layers.
+This document records the adopted feature roadmap: what shipped and why
+each item was chosen. Ideas are benchmarked against Roque Nights, whose
+sky-rendering and agent-facing design informed several of the shipped
+layers. All six planned phases and the consultation agent have landed; the
+phase notes below are kept as design rationale.
 
 ## Shipped
 
@@ -13,7 +14,32 @@ several of the shipped layers.
 | Interaction | Drag-to-pan, wheel zoom, hover hit-testing with tooltips, click selection, agent-directed animated fly-to with reticle pulse |
 | Dome mode | Stereographic whole-sky projection (default view), rotate/zoom/reset, `skyMode` in WebMCP and share URLs, flat star rendering and suppressed star-name labels at dome scale, amber annotation colour language |
 | Interoperability | `#sky=` shareable URLs (versioned base64url fragment, full viewer state, no server), `describe_current_view` WebMCP tool with recent human-action log |
-| UX fixes | Agent Activity panel is dismissible, mode toggle moved to the free corner |
+| Night ephemeris (Phase 1) | Noon-to-noon night model, twilight boundaries, moonless dark hours, polar cases, `get_night_ephemeris` and `rank_nights` tools |
+| Agent harness (Phase 2) | In-app AgentHarness executing every registered tool without a WebMCP browser, `summary`/`caveats[]`/`rejected[]` envelope additions, `sunAltitudeDeg`/`daylight` flags on predictions, confirm+undo tokens for destructive ops |
+| Human-in-the-loop (Phase 3) | `propose_plan`/`commit_proposal` ghost proposals with per-item accept/reject, `plan_stale` detection, pending-proposal empty state |
+| Export (Phase 4) | ICS/CSV export for missions and observation results |
+| Weather (Phase 5) | Open-Meteo cloud-cover/seeing/transparency tools and dark-sky site comparison |
+| i18n (Phase 6) | Typed `en`/`ja` dictionaries, `LocaleProvider` + `t()`, header toggle, English-only verify scan with dictionary exemptions |
+| Consultation agent | "Ask the sky" dock (Bedrock Converse via Lambda proxy, local tool execution), two-door status (in-app agent vs external WebMCP), auto-commit of consult proposals, description-level tool gating, user-driven Plan chip |
+
+## Consultation agent notes
+
+The in-app agent deserves a few durable decisions worth recording:
+
+- **Two doors, one engine.** The consult loop and external WebMCP clients
+  share the same tool registry. Consult-specific behaviour (auto-commit of
+  proposals, description overrides that gate navigation tools to explicit
+  asks) lives in `src/agent/`, not in the shared tools.
+- **Small models read tool descriptions, not system prompts.** Gating
+  rules that must hold ("never open Plan proactively") are written into
+  the tool description the model evaluates at selection time
+  (`CONSULT_TOOL_DESCRIPTION_OVERRIDES`).
+- **User-driven navigation.** After a Mission commits, the panel shows an
+  "Open the Plan screen" chip — the agent proposes, the human navigates.
+  Deterministic and a better demo beat than a screen changing on its own.
+- **Empty turns retry.** Bedrock occasionally returns an empty final
+  turn; the loop strips it from history and retries instead of surfacing
+  "no reply".
 
 ## Guiding rules
 
@@ -24,9 +50,10 @@ several of the shipped layers.
 - Every feature ships with a `scripts/verify-<feature>.ts` check wired into
   `npm run verify`, plus `npm run build` green.
 - UI and repo text stay English-only; i18n content lives under `src/i18n/`
-  (exempted from the English-only scan when it lands).
+  (exempted from the English-only scan along with the Lambda prompt and
+  locale test fixtures).
 
-## Phase 1 — Night ephemeris and best-night ranking (recommended next)
+## Phase 1 — Night ephemeris and best-night ranking (shipped)
 
 The most natural unanswered question in an observation-planning app is
 *when should I look?*
@@ -42,7 +69,7 @@ The most natural unanswered question in an observation-planning app is
 - Files: `src/astronomy/night.ts`, `src/mcp/nightTools.ts`,
   `scripts/verify-night.ts`. No dependencies.
 
-## Phase 2 — Agent harness and tool envelope hardening
+## Phase 2 — Agent harness and tool envelope hardening (shipped)
 
 - **AgentHarness panel**: an in-app surface that lists the registered WebMCP
   tools and can execute them without a WebMCP-capable browser. Doubles as a
@@ -54,7 +81,7 @@ The most natural unanswered question in an observation-planning app is
 - **Destructive-op tokens**: `confirm: true` plus a single-use undo token
   for irreversible mission/snapshot operations.
 
-## Phase 3 — Human-in-the-loop planning
+## Phase 3 — Human-in-the-loop planning (shipped)
 
 - **Ghost proposals**: `propose_plan` produces a draft; the human accepts or
   rejects items individually; `commit_proposal` turns the accepted subset
@@ -62,20 +89,20 @@ The most natural unanswered question in an observation-planning app is
 - **Plan staleness**: when site/time moved after mission creation, surface a
   `plan_stale` flag instead of silently showing old predictions.
 
-## Phase 4 — Export and sharing extensions
+## Phase 4 — Export and sharing extensions (shipped)
 
 - **ICS/CSV export** for missions and observation results (calendar import,
   classroom handouts).
 - Optional `lang` in share URLs once i18n exists.
 
-## Phase 5 — Site and weather comparison (conditional)
+## Phase 5 — Site and weather comparison (shipped)
 
 - Open-Meteo integration (no API key): cloud cover nowcast plus the jet
   stream → seeing and 700 hPa humidity → transparency approximations.
 - Dark-sky site comparison table. Ship only after Phases 1–2; cached
   snapshots are the offline fallback.
 
-## Phase 6 — Internationalisation (parallel track)
+## Phase 6 — Internationalisation (shipped, parallel track)
 
 - Typed message dictionaries: `src/i18n/en.ts` as the key source of truth,
   `src/i18n/ja.ts` constrained by `typeof en` so missing keys are compile
@@ -97,9 +124,21 @@ The most natural unanswered question in an observation-planning app is
 - Server-side persistence of share URLs — the fragment encoding is
   deliberately server-free; Supabase remains optional and private.
 
-## Success signals
+## Success signals (met)
 
 - An agent can answer "which night this week is best for M31?" via tools.
 - Every WebMCP tool result is explainable to a human (summary + caveats).
 - The sky opens on the dome, is shareable as a link, and reads like the
   reference renderer at a glance.
+- The consult agent turns "Tonight in Tokyo, show me 3 bright stars" into
+  a configured sky, an auto-committed Mission, and a user-driven Plan
+  transition — without proactive navigation or guide calls.
+
+## What could come next
+
+- Model tier: `AGENT_MODEL_ID` accepts any Converse-capable model if Nova
+  Lite's non-determinism (occasionally skipping `configure_sky_view`)
+  becomes a problem — the description gates already absorbed most of it.
+- `lang` in share URLs (Phase 4 leftover, unshipped).
+- Pending proposals left by an external WebMCP agent could gain an
+  in-panel approve/reject surface instead of the text-only path.

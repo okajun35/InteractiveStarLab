@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-Interactive Star Lab is a React 18, TypeScript, and Vite application. Application code lives under `src/`: `astronomy/` contains coordinate and visibility calculations, `components/` contains UI, `state/` owns React providers, `observation/` and `guides/` implement mission workflows, `mcp/` exposes WebMCP tools, and `cloud/` contains optional Supabase persistence. Static star and constellation catalogs are in `src/data/`; their source material is in `data-source/`. Verification scripts live in `scripts/`, design notes in `docs/`, and database changes in `supabase/migrations/`.
+Interactive Star Lab is a React 18, TypeScript, and Vite application. Application code lives under `src/`: `astronomy/` contains coordinate and visibility calculations, `components/` contains UI including the floating `AgentDock`, `state/` owns React providers, `observation/` and `guides/` implement mission workflows, `mcp/` exposes WebMCP tools, `proposals/` holds the staged-proposal model, `agent/` contains the consultation loop and tool selection, `i18n/` holds the typed en/ja dictionaries, `weather/` is the Open-Meteo client, and `cloud/` contains optional Supabase persistence. `lambda/` holds the Bedrock Converse proxy behind `VITE_AGENT_API_URL`. Static star and constellation catalogs are in `src/data/`; their source material is in `data-source/`. Verification scripts live in `scripts/`, design notes in `docs/`, and database changes in `supabase/migrations/`.
 
 ## Build, Test, and Development Commands
 

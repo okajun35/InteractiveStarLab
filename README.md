@@ -1,14 +1,14 @@
 # Interactive Star Lab
 
-**A WebMCP-powered stargazing guide that turns natural-language intent into an actionable observation workflow.**
+**A WebMCP-powered stargazing guide with a built-in consultation agent that turns natural-language intent into an actionable observation workflow.**
 
-Tell an Agent where and when you want to observe. Interactive Star Lab configures the sky, predicts visible stars, creates an Observation Mission, records what you actually saw, and compares the results with its predictions. The same application also works as a standalone manual sky viewer without WebMCP.
+Tell the agent where and when you want to observe — “Tonight in Tokyo, show me 3 bright stars.” Interactive Star Lab configures the sky in front of you, predicts visible stars, and stages an Observation Mission for you to confirm. The same tools are exposed through WebMCP for external agents, and the app also works as a standalone manual sky viewer.
 
-[Live Demo](https://interactive-star-lab.vercel.app) · [Demo Video](https://youtu.be/A5fB2o8e4Dk) · [Devpost Story](https://devpost.com/software/interactive-star-lab)
+[Live Demo](https://main.d35b3q1a0wz0ef.amplifyapp.com) · [Demo Video](https://youtu.be/A5fB2o8e4Dk) · [Devpost Story](https://devpost.com/software/interactive-star-lab)
 
 ![Interactive Star Lab workflow](docs/assets/workflow.png)
 
-_The diagram shows the overall agent-assisted workflow. Location lookup may be handled by the Agent; direct weather, cloud-cover, and moonlight integrations are planned future work._
+_The diagram shows the overall agent-assisted workflow. Location lookup may be handled by the Agent; weather and cloud-cover forecasts are available through the Open-Meteo tools._
 
 ## Why WebMCP?
 
@@ -18,19 +18,17 @@ Actions performed by an Agent and actions performed manually share the same Reac
 
 ## Highlights
 
-- Configure a location, local time, and open Sky with one `configure_sky_view` call.
-- Use WebMCP to query the sky, create Missions, save results, capture Snapshots, and generate Guides.
-- Explore the sky from any latitude and longitude.
-- Change observation date and time, direction, altitude, and field of view.
-- Toggle stars, star names, constellation lines, and constellation names.
-- Inspect individual stars and the Sun.
-- Simulate daylight, twilight, light pollution, and observer sensitivity.
-- Run What-if experiments and compare before/after sky views.
-- Create Observation Missions with immutable creation-time predictions.
-- Record Visible, Not Visible, or Unsure results and compare them with predictions.
-- Restore a Mission on another device with a one-time Recovery Code.
-- Save deterministic sky Snapshots and generate printable Observation Guides and PDFs.
-- Open Sky in an Agent-assisted full-canvas view with a compact Agent Activity overlay, or switch to the existing Manual controls.
+- **Ask the sky**: a floating consultation panel (Amazon Bedrock) turns requests like “Tonight in Tokyo, show me 3 bright stars” into a configured sky, picked candidates, and a Mission — the sky moves as you discuss it, and an “Open the Plan screen” chip hands the transition to you.
+- **Two agent doors, one engine**: the in-app agent and external WebMCP clients drive the same tool registry; navigation and commits stay gated so the human keeps control.
+- Whole-sky dome map plus the windowed observation view, shareable as `#sky=` URLs.
+- Milky Way contours, B-V star colors, Moon phases, planets, and 110 Messier objects.
+- Night ephemeris and `rank_nights` best-night scoring; Open-Meteo cloud/seeing forecasts with dark-site comparison.
+- Human-in-the-loop planning: `propose_plan` → `commit_proposal` proposals, stale-plan detection, confirm/undo tokens for destructive operations.
+- Observation Missions with immutable creation-time predictions; record Visible, Not Visible, or Unsure and compare against predictions.
+- ICS/CSV export, printable Observation Guides and PDFs, deterministic sky Snapshots.
+- Restore a Mission on another device with a one-time Recovery Code (optional Supabase persistence).
+- English/Japanese UI toggle.
+- Simulate daylight, twilight, light pollution, and observer sensitivity; run What-if comparisons.
 
 ## Local setup
 
@@ -78,6 +76,18 @@ For example, an Agent can configure New York City at 9 PM local time with:
 
 For a place that is not built in, replace `preset` with a `site` object containing `name`, `latitude`, `longitude`, and `timeZone`.
 
+For a human-in-the-loop variant, `propose_plan` stages a draft instead of creating a Mission directly; the human accepts or rejects items and `commit_proposal` materializes the accepted subset.
+
+## Consultation agent (optional)
+
+The “Ask the sky” tab in the floating dock posts the conversation to an AWS Lambda proxy ([`lambda/consult-agent.mjs`](lambda/consult-agent.mjs)) that calls the Amazon Bedrock Converse API. Tool calls are executed locally in the browser against the same registry WebMCP exposes, so proposals, Missions, and sky state stay consistent regardless of which door the agent came through.
+
+```bash
+VITE_AGENT_API_URL=https://your-lambda-function-url/
+```
+
+The Lambda function needs permission to call `bedrock:Converse` on the chosen model — `AGENT_MODEL_ID`, default `amazon.nova-lite-v1:0`. When `VITE_AGENT_API_URL` is unset the consult tab stays hidden and the app remains fully usable.
+
 ## Verification
 
 ```bash
@@ -106,13 +116,18 @@ npm run import:constellations
 
 ```text
 src/                 React application and domain logic
+  agent/             Consultation loop, tool selection, Lambda client
   astronomy/         Coordinates, projection, visibility, and twilight
-  components/        Sky canvas and workflow screens
+  components/        Sky canvas, workflow screens, agent dock
   data/              English star and constellation catalogs
   guides/            Observation Guide and PDF generation
+  i18n/              Typed English/Japanese message dictionaries
   mcp/               WebMCP contracts and tools
   observation/       Mission and observation workflows
+  proposals/         Proposal staging model
   state/              React providers and application state
+  weather/           Open-Meteo client and forecast interpretation
+lambda/              Bedrock Converse proxy for the consultation agent
 scripts/             Verification and catalog generation scripts
 data-source/         Checked-in source catalogs
 supabase/migrations/ Database schema and RLS migrations

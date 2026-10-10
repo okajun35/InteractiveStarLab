@@ -1,6 +1,6 @@
 # WebMCP-first Plan Workspace UX specification
 
-- Status: Ready for implementation
+- Status: Implemented (kept as design rationale; see docs/roadmap.md for what shipped)
 - Implementation owner: Luna
 - Specification date: 2026-09-01
 

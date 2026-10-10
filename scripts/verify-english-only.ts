@@ -29,6 +29,7 @@ const exemptSourceFiles = new Set([
   "src/data/constellationNamesJa.ts",
   "lambda/consult-agent.mjs",
   "scripts/verify-agent.ts",
+  "scripts/verify-agent-autocommit.ts",
 ]);
 
 const binaryExtensions = new Set([

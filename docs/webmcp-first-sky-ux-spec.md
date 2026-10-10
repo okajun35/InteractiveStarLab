@@ -1,6 +1,6 @@
 # WebMCP-first Sky Workspace UX specification
 
-- Status: Ready for implementation
+- Status: Implemented (kept as design rationale; the floating Agent Activity surface later became the AgentDock two-door dock)
 - Implementation owner: Luna
 - Specification date: 2026-09-01
 
