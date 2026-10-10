@@ -8,7 +8,10 @@
  * Runtime: Node.js 22.x (AWS SDK v3 ships in the runtime — no bundling).
  * IAM:   bedrock:InvokeModel on the configured model.
  * Env:   AGENT_MODEL_ID (default amazon.nova-lite-v1:0)
- *        ALLOWED_ORIGIN (default "*"; set the app origin for production)
+ *
+ * CORS:  configured on the Function URL, not in this code — a second
+ *        Access-Control-Allow-Origin header here makes browsers reject
+ *        the response.
  *
  * Deploy note: a Function URL works for the demo; for anything public add
  * API Gateway throttling or a WAF rule, reserved concurrency, and a Budgets
@@ -20,7 +23,6 @@ import {
 } from "@aws-sdk/client-bedrock-runtime";
 
 const MODEL_ID = process.env.AGENT_MODEL_ID ?? "amazon.nova-lite-v1:0";
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN ?? "*";
 const MAX_BODY_BYTES = 32 * 1024;
 const MAX_MESSAGES = 30;
 const MAX_OUTPUT_TOKENS = 800;
@@ -33,10 +35,10 @@ const ALLOWED_TOOLS = new Set([
 
 const client = new BedrockRuntimeClient({});
 
+// CORS is handled by the Function URL CORS configuration, NOT here: if this
+// code also emits Access-Control-Allow-Origin the response ends up with two
+// ACAO headers and browsers reject it ("Failed to fetch").
 const CORS = {
-  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-  "Access-Control-Allow-Headers": "content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
 };
 
@@ -104,7 +106,6 @@ function buildSystemPrompt(context) {
 
 export async function handler(event) {
   const method = event.requestContext?.http?.method ?? event.httpMethod ?? "POST";
-  if (method === "OPTIONS") return { statusCode: 204, headers: CORS, body: "" };
   if (method !== "POST") return reply(405, { error: { code: "method", message: "POST only" } });
 
   const rawBody = event.isBase64Encoded ? Buffer.from(event.body ?? "", "base64") : (event.body ?? "");
