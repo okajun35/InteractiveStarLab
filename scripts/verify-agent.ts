@@ -111,6 +111,10 @@ const EXPECTED_TOOLS = [
     text === "こちらがおすすめです\n\n続きの文章", JSON.stringify(text));
   check("A3: all-thinking response yields empty text",
     extractAssistantText([{ text: "<thinking>only</thinking>" }]) === "");
+  check("A3: <response> wrapper tags are stripped, inner text kept",
+    extractAssistantText([{ text: "<thinking>plan</thinking> <response>ミッションを作成しました</response>" }])
+      === "ミッションを作成しました",
+    extractAssistantText([{ text: "<response>ミッションを作成しました</response>" }]));
 }
 
 // ---- A4: happy path — tool_use round then end_turn -----------------------

@@ -92,11 +92,14 @@ export const MAX_HISTORY_MESSAGES = 10;
 /** Small models sometimes end a turn with zero visible text; retry this many times. */
 export const MAX_EMPTY_TURN_RETRIES = 2;
 
-/** Display text only: Nova emits <thinking> blocks that users must not see. */
+/** Display text only: Nova emits <thinking> blocks and <response> wrappers users must not see. */
 export function extractAssistantText(content: AgentContentBlock[]): string {
   return content
     .filter((block): block is AgentTextBlock => "text" in block)
-    .map((block) => block.text.replace(/<thinking>[\s\S]*?<\/thinking>/g, "").trim())
+    .map((block) => block.text
+      .replace(/<thinking>[\s\S]*?(<\/thinking>|$)/g, "")
+      .replace(/<\/?response>/g, "")
+      .trim())
     .filter((text) => text.length > 0)
     .join("\n\n");
 }
@@ -157,6 +160,9 @@ async function autoCommitConsultProposal(
     autoCommitted: commitData !== null,
     ...(commitData !== null
       ? {
+        hint:
+          "The Mission already exists — tell the user it was created and is ready on the " +
+          "Plan screen. Do not open Plan yourself and do not call commit_proposal again.",
         commitSummary: commitData.summary,
         missionId: commitData.missionId,
         targetCount: commitData.targetCount,

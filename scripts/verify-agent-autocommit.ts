@@ -129,6 +129,11 @@ function firstToolResultText(result: Awaited<ReturnType<typeof runConsultation>>
     `nextAction=${String(merged.data?.nextAction)}`,
   );
   check(
+    "C1: the merged result tells the model to report, not navigate",
+    typeof merged.data?.hint === "string" && /Mission/i.test(String(merged.data.hint)),
+    String(merged.data?.hint),
+  );
+  check(
     "C1: static — the loop owns the auto-commit behaviour",
     loopSrc.includes("propose_plan") && loopSrc.includes("commit_proposal") && loopSrc.includes("autoCommitted"),
   );
@@ -198,6 +203,14 @@ function firstToolResultText(result: Awaited<ReturnType<typeof runConsultation>>
   check(
     "C4: the prompt says proposals become Missions immediately",
     /propose_plan[^]*?(immediately|auto)/s.test(lambdaSrc) || lambdaSrc.includes("immediately"),
+  );
+  check(
+    "C4: the prompt says the Mission already exists after propose_plan",
+    lambdaSrc.includes("autoCommitted"),
+  );
+  check(
+    "C4: the prompt gates guide generation on an explicit ask",
+    lambdaSrc.includes("explicitly asks for a guide"),
   );
 }
 
