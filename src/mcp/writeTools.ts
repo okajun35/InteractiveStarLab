@@ -18,6 +18,7 @@ export interface PlanToolState {
   getObservationSite: () => ObservationSite;
   createObservationPlan: (input: CreateObservationPlanInput) => ObservationMission | Promise<ObservationMission>;
   getActiveMissionId?: () => string | null;
+  getPendingProposal?: () => boolean;
   openPlan?: () => void;
   openObserve: () => void;
   isCloudEnabled?: () => boolean;
@@ -119,7 +120,20 @@ function openPlanViewTool(state: PlanToolState): WebMcpTool {
       const object = assertObject(input);
       assertOnlyKeys(object, []);
       state.openPlan?.();
-      return { view: "plan" as const, activeMissionId: state.getActiveMissionId?.() ?? null };
+      const activeMissionId = state.getActiveMissionId?.() ?? null;
+      const pendingProposal = state.getPendingProposal?.() === true;
+      return {
+        view: "plan" as const,
+        activeMissionId,
+        pendingProposal,
+        ...(activeMissionId === null && !pendingProposal
+          ? {
+            hint:
+              "Plan is empty: no pending proposal and no Mission. If the user asked for a plan, " +
+              "stage one with propose_plan first, then open this view again.",
+          }
+          : {}),
+      };
     }),
   };
 }

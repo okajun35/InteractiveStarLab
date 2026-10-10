@@ -30,6 +30,10 @@ export interface PredictVisibleStarsResult {
   dateTime: string;
   maxMagnitude: number;
   stars: PredictedStarToolResult[];
+  /** Geometric altitude of the Sun's centre at `dateTime`, in degrees. */
+  sunAltitudeDeg: number;
+  /** True while the Sun is above the nautical-twilight limit (-12°): daylight or bright twilight. */
+  daylight: boolean;
   /** One quotable sentence about the prediction. */
   summary: string;
   /** Scope limits an agent should relay, e.g. that weather is not included. */

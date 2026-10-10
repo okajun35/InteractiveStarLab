@@ -248,6 +248,8 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
         {
           getObservationSite: () => siteRef.current,
           getActiveMissionId: () => activeMissionIdRef.current,
+          getPendingProposal: () =>
+            proposalRef.current !== null && proposalRef.current.status === "pending",
           createObservationPlan: async (input) => {
             const planned = createObservationPlanFromStarIds(input);
             const mission = await createMissionAndPersistRef.current({
@@ -326,6 +328,7 @@ export function WebMcpProvider({ children }: { children: React.ReactNode }) {
           setShowHiddenStars: (value) => setShowHiddenStarsRef.current(value),
           openSky: () => setViewRef.current("sky"),
           openObserve: () => setViewRef.current("observe"),
+          getActiveMissionId: () => activeMissionIdRef.current,
           reportSkyMutation: (activity) => reportSkyMutationRef.current(activity),
         },
         { signal: controller.signal },

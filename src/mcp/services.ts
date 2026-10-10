@@ -1,6 +1,8 @@
 import { CONSTELLATIONS, STARS, STAR_BY_ID } from "../astronomy/stars";
 import { buildSkyScene, type SkyScene } from "../astronomy/visibility";
 import { horizontalStars } from "../astronomy/coordinates";
+import { sunAltitudeDeg } from "../astronomy/night";
+import { Observer } from "astronomy-engine";
 import { buildObservationCandidates } from "../observation/candidates";
 import { compareObservationRecord } from "../observation/comparison";
 import {
@@ -121,11 +123,19 @@ export function predictVisibleStars(
     }
   }
 
+  const sunAlt = sunAltitudeDeg(
+    date,
+    new Observer(input.site.latitude, input.site.longitude, 0),
+  );
+  const daylight = sunAlt > -12;
+
   return {
     site: { ...input.site },
     dateTime: date.toISOString(),
     maxMagnitude: input.maxMagnitude,
     stars,
+    sunAltitudeDeg: Math.round(sunAlt * 100) / 100,
+    daylight,
     summary:
       `${stars.length} of ${candidates.length} candidate star(s) above the horizon at ` +
       `${input.site.name} are predicted visible (magnitude <= ${input.maxMagnitude}); ` +
@@ -133,6 +143,12 @@ export function predictVisibleStars(
     caveats: [
       "Geometric prediction only: weather, horizon obstacles, and real sky brightness are not included.",
       "predictedVisible is computed at this date and site; it does not update stored Mission predictions.",
+      ...(daylight
+        ? [
+          `Sun altitude is ${sunAlt.toFixed(1)}°: daylight or bright twilight, so geometric ` +
+          "candidates may not be visually observable. Prefer a time after nautical twilight.",
+        ]
+        : []),
     ],
     rejected,
     rejectedCounts,

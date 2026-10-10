@@ -35,6 +35,7 @@ export interface SkyControlToolState {
   setShowHiddenStars: (value: boolean) => void;
   openSky: () => void;
   openObserve: () => void;
+  getActiveMissionId?: () => string | null;
   reportSkyMutation?: (report: { toolName: string; changes: SkyFieldChange[] }) => void;
 }
 
@@ -173,7 +174,18 @@ function openObserveViewTool(state: SkyControlToolState): WebMcpTool {
       const object = assertObject(input);
       assertOnlyKeys(object, []);
       state.openObserve();
-      return { view: "observe" as const };
+      const activeMissionId = state.getActiveMissionId?.() ?? null;
+      return {
+        view: "observe" as const,
+        activeMissionId,
+        ...(activeMissionId === null
+          ? {
+            hint:
+              "Observe has no active Mission yet. Stage a proposal with propose_plan, get human " +
+              "approval, then commit_proposal before opening this view again.",
+          }
+          : {}),
+      };
     }),
   };
 }

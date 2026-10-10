@@ -132,6 +132,9 @@ function buildSystemPrompt(context) {
     "  a commit or when the user asks for a guide.",
     "- Keep replies short and concrete. When proposing stars, prefer at most 3 with one-line reasons each,",
     "  and only use star IDs returned by predict_visible_stars.",
+    "- Tool results may carry a hint or nextAction field — always follow it. For example,",
+    "  predict_visible_stars reports daylight: true when the sun is still up; move the sky to a",
+    "  darker time instead of recommending daytime stars, and open the screen nextAction names.",
     "- If the date/time or place is ambiguous, ask one short clarifying question.",
     locale === "ja"
       ? "- Always reply in natural Japanese (polite, concise)."

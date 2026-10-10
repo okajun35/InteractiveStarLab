@@ -18,13 +18,17 @@ function scanFile(path: string): string[] {
 }
 
 /**
- * Japanese is allowed only in the checked-in ja dictionary and the Japanese
- * constellation-name catalog. Everything else — docs, tool descriptions,
- * generated guides — stays English-only.
+ * Japanese is allowed only where it is functional rather than user-facing copy:
+ * the ja dictionary, the Japanese constellation-name catalog, the consult-agent
+ * prompt (Japanese phrase examples teach the model relative-time and approval
+ * expressions), and the agent locale test fixtures. Everything else — docs,
+ * tool descriptions, generated guides — stays English-only.
  */
 const exemptSourceFiles = new Set([
   "src/i18n/ja.ts",
   "src/data/constellationNamesJa.ts",
+  "lambda/consult-agent.mjs",
+  "scripts/verify-agent.ts",
 ]);
 
 const binaryExtensions = new Set([

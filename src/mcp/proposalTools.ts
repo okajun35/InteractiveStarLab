@@ -107,6 +107,7 @@ function proposePlanTool(state: ProposalToolState): WebMcpTool {
           `Staged a proposal with ${proposal.items.length} item(s) for ${proposal.siteSnapshot.name}. ` +
           `It is not a Mission: review it on the Plan screen, then commit_proposal to materialize it.`,
         proposal,
+        nextAction: "open_plan_view" as const,
       };
     }),
   };
@@ -159,6 +160,7 @@ function commitProposalTool(state: ProposalToolState): WebMcpTool {
         summary:
           `Committed ${starIds.length} item(s) of proposal ${proposal.id} as Mission ${mission.id}.`,
         missionId: mission.id,
+        nextAction: "open_plan_view" as const,
         targetCount: mission.targets.length,
         committed: starIds,
         rejected: proposal.items
