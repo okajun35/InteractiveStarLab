@@ -83,11 +83,11 @@ function predictVisibleStarsTool(state: ReadToolState): WebMcpTool {
     inputSchema: {
       type: "object",
       properties: {
-        dateTime: { type: "string", description: "ISO 8601 observation date and time" },
+        dateTime: { type: "string", description: "ISO 8601 observation date and time; a value without an offset is interpreted in the site's timeZone. Omit to predict for the currently configured view — preferred right after configure_sky_view." },
         maxMagnitude: { type: "integer", minimum: 1, maximum: 4, description: "Faintest magnitude to include" },
         limit: { type: "integer", minimum: 1, maximum: 20, description: "Maximum number of stars to return" },
       },
-      required: ["dateTime", "maxMagnitude"],
+      required: ["maxMagnitude"],
       additionalProperties: false,
     },
     annotations: { readOnlyHint: true, untrustedContentHint: true },
@@ -95,9 +95,12 @@ function predictVisibleStarsTool(state: ReadToolState): WebMcpTool {
       const object = assertObject(input);
       assertOnlyKeys(object, ["dateTime", "maxMagnitude", "limit"]);
       const limit = optionalInteger(object, "limit");
+      const dateTime = typeof object.dateTime === "string" && object.dateTime.trim() !== ""
+        ? object.dateTime
+        : state.getObservationSettings().datetime.toISOString();
       return predictVisibleStars({
         site: { ...state.getObservationSite() },
-        dateTime: requiredString(object, "dateTime"),
+        dateTime,
         maxMagnitude: requiredNumber(object, "maxMagnitude"),
         ...(limit === undefined ? {} : { limit }),
       });

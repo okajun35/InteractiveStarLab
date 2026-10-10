@@ -356,6 +356,38 @@ const EXPECTED_TOOLS = [
     phantom.reply === null && phantom.error === null);
 }
 
+// ---- A13: repeated identical tool calls get a corrective hint -------------
+// A small model stuck on a rejected/misunderstood result retried the exact
+// same call until rounds_exceeded. The loop now appends a repeatWarning to
+// the result so the model can read why retrying is pointless.
+{
+  const seen: string[] = [];
+  const responses: AgentResponse[] = [
+    { stopReason: "tool_use", content: [{ toolUse: { toolUseId: "t1", name: "predict_visible_stars", input: { dateTime: "x" } } }] },
+    { stopReason: "tool_use", content: [{ toolUse: { toolUseId: "t2", name: "predict_visible_stars", input: { dateTime: "x" } } }] },
+    { stopReason: "end_turn", content: [{ text: "done" }] },
+  ];
+  const callApi = async (req: { messages: AgentMessage[] }): Promise<AgentResponse> => {
+    const last = req.messages[req.messages.length - 1];
+    if (last.role === "user" && Array.isArray(last.content)) {
+      for (const block of last.content as Array<{ toolResult?: { content?: Array<{ text?: string }> } }>) {
+        if (block.toolResult?.content?.[0]?.text !== undefined) {
+          seen.push(block.toolResult.content[0].text);
+        }
+      }
+    }
+    return responses.shift()!;
+  };
+  await runConsultation([], "test", {
+    tools: [fakeTool("predict_visible_stars")],
+    context: CONTEXT,
+    callApi,
+  });
+  check("A13: the second identical call carries a repeat warning",
+    seen.length === 2 && !seen[0].includes("repeatWarning") && seen[1].includes("repeatWarning"),
+    JSON.stringify(seen).slice(0, 200));
+}
+
 // ---- A11: Lambda handler source guards ------------------------------------
 {
   const fs = await import("node:fs");

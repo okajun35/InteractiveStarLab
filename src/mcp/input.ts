@@ -1,4 +1,5 @@
 import { toolFailure, toolSuccess } from "./contracts";
+import { localDateTimeToInstant } from "../astronomy/timezones";
 
 export class ToolExecutionError extends Error {
   readonly code: string;
@@ -59,6 +60,30 @@ export function requiredStringArray(
     throw new Error(`${key} must be an array of non-empty strings`);
   }
   return [...(input[key] as string[])];
+}
+
+/**
+ * Parses an agent-supplied dateTime. A value without an offset is local wall
+ * time read in the site's timeZone — agents routinely mean "9 PM in Tokyo",
+ * not the instant their string happens to parse to in the browser's zone.
+ * A value with an explicit offset is an unambiguous instant and is honored.
+ */
+export function parseFlexibleDateTime(value: string, timeZone?: string): Date {
+  if (typeof value !== "string" || value.trim() === "") {
+    throw new RangeError("dateTime must be an ISO string");
+  }
+  const trimmed = value.trim();
+  if (
+    timeZone !== undefined &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d+)?$/.test(trimmed)
+  ) {
+    return localDateTimeToInstant(trimmed, timeZone);
+  }
+  const date = new Date(trimmed);
+  if (Number.isNaN(date.getTime())) {
+    throw new RangeError("dateTime is invalid");
+  }
+  return date;
 }
 
 export function safeExecute<T>(operation: () => T): string {

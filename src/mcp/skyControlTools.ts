@@ -61,7 +61,7 @@ function configureSkyViewTool(state: SkyControlToolState): WebMcpTool {
           required: ["name", "latitude", "longitude", "timeZone"],
           additionalProperties: false,
         },
-        localDateTime: { type: "string", description: "Local time as YYYY-MM-DDTHH:mm or YYYY-MM-DDTHH:mm:ss" },
+        localDateTime: { type: "string", description: "Local wall-clock time as YYYY-MM-DDTHH:mm[:ss]; fractional seconds and an offset suffix are ignored" },
         azimuth: { type: "number", minimum: 0, maximum: 359.999999 },
         altitude: { type: "number", minimum: 0, maximum: 90 },
         fieldOfView: { type: "number", minimum: 20, maximum: 140 },

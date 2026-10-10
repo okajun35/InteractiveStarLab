@@ -55,7 +55,7 @@ function createObservationPlanTool(state: PlanToolState): WebMcpTool {
     inputSchema: {
       type: "object",
       properties: {
-        dateTime: { type: "string", description: "ISO 8601 observation date and time" },
+        dateTime: { type: "string", description: "ISO 8601 observation date and time; a value without an offset is interpreted in the site's timeZone" },
         maxMagnitude: { type: "integer", minimum: 1, maximum: 4, description: "Faintest magnitude allowed for targets" },
         starIds: {
           type: "array",

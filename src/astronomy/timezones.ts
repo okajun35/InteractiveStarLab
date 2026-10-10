@@ -63,7 +63,11 @@ function localWallAsUtc(date: Date, timeZone: string): number {
 
 /** Converts a local wall-clock value (without an offset) into an instant. */
 export function localDateTimeToInstant(value: string, timeZone: string): Date {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value);
+  // Agents often append seconds, fractions, or an offset (for example
+  // "2026-10-10T21:00:00.000Z") to a wall-clock value. The contract is local
+  // wall time in the site's zone, so the wall part is what is interpreted.
+  const wall = value.trim().replace(/(\.\d+)?(Z|[+-]\d{2}:?\d{2})?\s*$/, "");
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(wall);
   if (match === null) throw new RangeError("localDateTime must be YYYY-MM-DDTHH:mm or YYYY-MM-DDTHH:mm:ss");
   const [, yearText, monthText, dayText, hourText, minuteText, secondText = "0"] = match;
   const year = Number(yearText);

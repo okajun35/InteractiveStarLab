@@ -15,6 +15,7 @@ import {
 import {
   assertObject,
   assertOnlyKeys,
+  parseFlexibleDateTime,
   requiredNumber,
   requiredString,
   requiredStringArray,
@@ -36,19 +37,16 @@ export interface ProposalToolState {
 
 let proposalCounter = 0;
 
-function parseIsoDateTime(value: string): Date {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) throw new RangeError("dateTime is invalid");
-  return date;
-}
-
-function assertProposalInputs(object: Record<string, unknown>): {
+function assertProposalInputs(
+  object: Record<string, unknown>,
+  timeZone?: string,
+): {
   dateTime: string;
   maxMagnitude: number;
   starIds: string[];
 } {
   const dateTime = requiredString(object, "dateTime");
-  parseIsoDateTime(dateTime);
+  parseFlexibleDateTime(dateTime, timeZone);
   const maxMagnitude = requiredNumber(object, "maxMagnitude");
   if (!Number.isInteger(maxMagnitude) || maxMagnitude < 1 || maxMagnitude > 4) {
     throw new RangeError("maxMagnitude must be an integer from 1 to 4");
@@ -63,7 +61,7 @@ function assertProposalInputs(object: Record<string, unknown>): {
   for (const starId of starIds) {
     if (!STAR_BY_ID.has(starId)) throw new Error(`star not found: ${starId}`);
   }
-  return { dateTime: parseIsoDateTime(dateTime).toISOString(), maxMagnitude, starIds };
+  return { dateTime: parseFlexibleDateTime(dateTime, timeZone).toISOString(), maxMagnitude, starIds };
 }
 
 function proposePlanTool(state: ProposalToolState): WebMcpTool {
@@ -75,7 +73,7 @@ function proposePlanTool(state: ProposalToolState): WebMcpTool {
     inputSchema: {
       type: "object",
       properties: {
-        dateTime: { type: "string", description: "ISO 8601 observation date and time" },
+        dateTime: { type: "string", description: "ISO 8601 observation date and time; a value without an offset is interpreted in the site's timeZone" },
         maxMagnitude: { type: "integer", minimum: 1, maximum: 4, description: "Faintest magnitude allowed for targets" },
         starIds: {
           type: "array",
@@ -92,7 +90,7 @@ function proposePlanTool(state: ProposalToolState): WebMcpTool {
     execute: (input) => safeExecute(() => {
       const object = assertObject(input);
       assertOnlyKeys(object, ["dateTime", "maxMagnitude", "starIds"]);
-      const args = assertProposalInputs(object);
+      const args = assertProposalInputs(object, state.getObservationSite().timeZone);
       proposalCounter += 1;
       const proposal = createPlanProposal(
         {

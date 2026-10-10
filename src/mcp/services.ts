@@ -4,6 +4,7 @@ import { horizontalStars } from "../astronomy/coordinates";
 import { sunAltitudeDeg } from "../astronomy/night";
 import { Observer } from "astronomy-engine";
 import { buildObservationCandidates } from "../observation/candidates";
+import { parseFlexibleDateTime } from "./input";
 import { compareObservationRecord } from "../observation/comparison";
 import {
   createObservationMission,
@@ -52,15 +53,8 @@ export function assertSite(site: ObservationSite): void {
   }
 }
 
-function parseDateTime(value: string): Date {
-  if (typeof value !== "string" || value.trim() === "") {
-    throw new RangeError("dateTime must be an ISO string");
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    throw new RangeError("dateTime is invalid");
-  }
-  return date;
+function parseDateTime(value: string, timeZone?: string): Date {
+  return parseFlexibleDateTime(value, timeZone);
 }
 
 function assertMaxMagnitude(value: number): void {
@@ -71,7 +65,7 @@ function assertMaxMagnitude(value: number): void {
 
 function calculateCandidates(input: PredictVisibleStarsInput) {
   assertSite(input.site);
-  const date = parseDateTime(input.dateTime);
+  const date = parseDateTime(input.dateTime, input.site.timeZone);
   assertMaxMagnitude(input.maxMagnitude);
   const observation: ObservationSettings = {
     latitude: input.site.latitude,
@@ -146,7 +140,8 @@ export function predictVisibleStars(
       ...(daylight
         ? [
           `Sun altitude is ${sunAlt.toFixed(1)}°: daylight or bright twilight, so geometric ` +
-          "candidates may not be visually observable. Prefer a time after nautical twilight.",
+          "candidates may not be visually observable. Prefer a time after nautical twilight. " +
+          "An offset-less dateTime is interpreted in the site's timeZone.",
         ]
         : []),
     ],

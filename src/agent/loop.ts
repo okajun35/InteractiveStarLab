@@ -175,6 +175,26 @@ async function autoCommitConsultProposal(
 }
 
 /**
+ * Small models retry an identical call when they cannot read why it failed,
+ * looping until the round cap. The warning lives inside the result payload
+ * where the model actually evaluates it.
+ */
+function appendRepeatWarning(text: string, count: number): string {
+  const warning =
+    `call ${count} with identical input — the result will not change. ` +
+    "Read the result or error, fix the arguments, or answer the user instead of retrying.";
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return JSON.stringify({ ...(parsed as Record<string, unknown>), repeatWarning: warning });
+    }
+  } catch {
+    // Non-JSON results get a plain-text suffix instead.
+  }
+  return `${text} repeatWarning: ${warning}`;
+}
+
+/**
  * Runs one consultation turn: appends the user message, then alternates
  * model calls and local tool executions until the model replies with text.
  * Failures in transport or tools are reported to the model/user rather than
@@ -194,6 +214,7 @@ export async function runConsultation(
     { role: "user", content: [{ text: userText }] },
   ];
   let emptyTurnRetries = 0;
+  const callCounts = new Map<string, number>();
 
   for (let round = 1; round <= maxRounds; round += 1) {
     onEvent({ type: "round", round });
@@ -235,6 +256,12 @@ export async function runConsultation(
             text = JSON.stringify({ error: error instanceof Error ? error.message : String(error) });
             status = "error";
           }
+        }
+        const signature = `${name} ${JSON.stringify(input)}`;
+        const repeat = (callCounts.get(signature) ?? 0) + 1;
+        callCounts.set(signature, repeat);
+        if (repeat > 1) {
+          text = appendRepeatWarning(text, repeat);
         }
         onEvent({ type: "tool_result", name, ok: status === "success" });
         results.push({

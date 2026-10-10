@@ -161,6 +161,119 @@ const night = "2026-08-29T11:00:00.000Z";
   check("MCP-G4: local wall clock conversion honors the selected time zone", localDateTimeToInstant("2026-09-03T21:00", "America/New_York").toISOString() === "2026-09-04T01:00:00.000Z");
 }
 
+// MCP-T: timezone-aware dateTime parsing stops agent retry loops. A small
+// model wrote Tokyo "21:00 tonight" as "…T21:00:00.000Z": configure_sky_view
+// rejected it outright and predict_visible_stars read it as 06:00 JST, so
+// daylight caveats baited endless retries (observed: configure+predict x6
+// until rounds_exceeded). Offset-less values are now read in the site's
+// timeZone, explicit offsets stay honored instants, and configure tolerates
+// stray seconds, fractions, and offset suffixes on its wall-clock input.
+{
+  const tokyo: ObservationSite = {
+    id: "tokyo",
+    name: "Tokyo",
+    latitude: 35.6812,
+    longitude: 139.7671,
+    timeZone: "Asia/Tokyo",
+  };
+  const wall = predictVisibleStars({ site: tokyo, dateTime: "2026-10-10T21:00", maxMagnitude: 2 });
+  check(
+    "MCP-T1: offset-less dateTime is read in the site timeZone",
+    wall.dateTime === "2026-10-10T12:00:00.000Z" && wall.daylight === false,
+    `${wall.dateTime} daylight=${wall.daylight}`,
+  );
+  const instant = predictVisibleStars({ site: tokyo, dateTime: "2026-10-10T21:00:00.000Z", maxMagnitude: 2 });
+  check(
+    "MCP-T2: an explicit offset stays an honored instant",
+    instant.dateTime === "2026-10-10T21:00:00.000Z" && instant.daylight === true,
+    `${instant.dateTime} daylight=${instant.daylight}`,
+  );
+
+  const registered: WebMcpTool[] = [];
+  const modelContext: WebMcpModelContext = {
+    async registerTool(tool) {
+      registered.push(tool);
+    },
+  };
+  let curSite: ObservationSite = { ...tokyo };
+  let curObs: ObservationSettings = {
+    latitude: tokyo.latitude,
+    longitude: tokyo.longitude,
+    datetime: new Date(night),
+    azimuth: 180,
+    altitude: 30,
+    fieldOfView: 80,
+  };
+  await registerSkyControlTools(modelContext, {
+    getObservationSite: () => curSite,
+    getObservationSettings: () => curObs,
+    updateObservationSite: (patch) => {
+      curSite = { ...curSite, ...patch };
+    },
+    updateObservationSettings: (patch) => {
+      curObs = { ...curObs, ...patch };
+    },
+    openSky: () => undefined,
+    openObserve: () => undefined,
+  });
+  const configureTool = registered.find((tool) => tool.name === "configure_sky_view")!;
+  const zoned = JSON.parse(String(await configureTool.execute({
+    preset: "tokyo",
+    localDateTime: "2026-10-10T21:00:00.000Z",
+  })));
+  check(
+    "MCP-T3: configure accepts a Z-suffixed wall time as local",
+    zoned.ok === true && zoned.data.dateTime === "2026-10-10T12:00:00.000Z",
+    JSON.stringify(zoned).slice(0, 160),
+  );
+  const offset = JSON.parse(String(await configureTool.execute({
+    preset: "tokyo",
+    localDateTime: "2026-10-10T21:00:30+09:00",
+  })));
+  check(
+    "MCP-T3: configure accepts an offset-suffixed wall time as local",
+    offset.ok === true && offset.data.dateTime === "2026-10-10T12:00:30.000Z",
+    JSON.stringify(offset).slice(0, 160),
+  );
+  const stillBad = JSON.parse(String(await configureTool.execute({
+    preset: "tokyo",
+    localDateTime: "tomorrow night",
+  })));
+  check("MCP-T4: configure still rejects non-ISO input", stillBad.ok === false);
+
+  // Omitting dateTime predicts for the configured view — the escape hatch
+  // that keeps a model from arguing with its own clock formatting.
+  const readTools: WebMcpTool[] = [];
+  const readContext: WebMcpModelContext = {
+    async registerTool(tool) {
+      readTools.push(tool);
+    },
+  };
+  await registerReadTools(readContext, {
+    getObservationSite: () => curSite,
+    getObservationSettings: () => curObs,
+    getSimulationSettings: () => ({
+      daylightMode: "real",
+      lightPollution: "dark-sky",
+      limitingMagnitude: 5.5,
+      showHiddenStars: false,
+    }),
+    getLayers: () => ({ first: true, second: true, third: false, fourth: false, faint: false }),
+    getDisplayOptions: () => ({ stars: true, starNames: true, constellationLines: true, constellationNames: true }),
+    getSkyMode: () => "window",
+    getSelection: () => null,
+    getSkyActions: () => [],
+    getSceneMetrics: () => null,
+  });
+  const predictTool = readTools.find((tool) => tool.name === "predict_visible_stars")!;
+  const defaulted = JSON.parse(String(await predictTool.execute({ maxMagnitude: 2 })));
+  check(
+    "MCP-T5: omitted dateTime falls back to the configured view",
+    defaulted.ok === true && defaulted.data.dateTime === curObs.datetime.toISOString(),
+    defaulted.data?.dateTime,
+  );
+}
+
 // MCP-I: result saving validates every target and calls one atomic persistence action.
 {
   const mission = createObservationPlanFromStarIds(
@@ -511,9 +624,9 @@ console.log("\nAll WebMCP domain checks passed.");
   ]));
   check("MCP-B1: passes an AbortSignal to registration", receivedSignal === controller.signal);
   check("MCP-B1: read tools are annotated read-only", registered.every((tool) => tool.annotations?.readOnlyHint === true));
-  check("MCP-B1: predict schema requires dateTime and maxMagnitude", (() => {
+  check("MCP-B1: predict schema requires maxMagnitude; dateTime is optional (defaults to the configured view)", (() => {
     const predict = registered.find((tool) => tool.name === "predict_visible_stars")!;
-    return predict.inputSchema.required?.includes("dateTime") === true && predict.inputSchema.required?.includes("maxMagnitude") === true;
+    return predict.inputSchema.required?.includes("dateTime") !== true && predict.inputSchema.required?.includes("maxMagnitude") === true;
   })());
 
   const siteTool = registered.find((tool) => tool.name === "get_observation_site")!;
