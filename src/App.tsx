@@ -31,6 +31,7 @@ import { AuthProvider } from "./state/auth";
 import { AgentActivityProvider, useAgentActivity } from "./state/agentActivity";
 import type { SkySceneMetrics } from "./sky/contextModel";
 import { SkySidebar } from "./components/SkySidebar";
+import { AgentDock } from "./components/AgentDock";
 import { ProposalProvider } from "./state/proposals";
 import { LocaleProvider, useLocale } from "./i18n";
 
@@ -216,7 +217,7 @@ function SkyWorkspace({
                 <p>Adjust the observation conditions directly.</p>
               </div>
               <button type="button" onClick={() => onPresentationChange("agent")}>
-                Agent-assisted
+                Context panel
               </button>
             </div>
             <ObservationPanel />
@@ -403,6 +404,8 @@ function AppShell() {
       ) : (
         <SkyWorkspace presentation={skyPresentation} onPresentationChange={setSkyPresentation} />
       )}
+
+      <AgentDock />
     </div>
   );
 }

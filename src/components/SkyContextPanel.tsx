@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useStarViewer } from "../state/context";
 import { useSimulation } from "../state/simulation";
 import { useObservation } from "../state/observation";
-import { useWebMcp } from "../state/webmcp";
 import { useAgentActivity } from "../state/agentActivity";
-import { agentApiUrl } from "../agent/client";
 import {
   buildSkyContextModel,
   buildCurrentSkyRows,
@@ -24,7 +22,6 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
   const { settings: observation, options, skyMode } = useStarViewer();
   const { settings: simulation, layers, compare } = useSimulation();
   const { activeSite } = useObservation();
-  const { availability } = useWebMcp();
   const { skyActivity } = useAgentActivity();
   const { t, locale } = useLocale();
   const [now, setNow] = useState(() => Date.now());
@@ -68,13 +65,7 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
     <section className={compact ? "sky-context-panel sky-context-panel-compact" : "sky-context-panel"} aria-labelledby="live-context-title">
       <div className="sky-context-status-row">
         <h2 id="live-context-title">{compact ? t("ctx.titleCompact") : t("ctx.title")}</h2>
-        <StatusBadge availability={availability} t={t} />
       </div>
-      {availability === "unavailable" || availability === "error" ? (
-        <p className="sky-fallback-note">
-          {t(agentApiUrl() !== null ? "ctx.manualNoteAgent" : "ctx.manualNote")}
-        </p>
-      ) : null}
       {skyActivity !== null && (
         <div className="sky-activity-summary" aria-label={t("ctx.activityAria")}>
           <strong>{t("ctx.updatedVia")} · {relativeActivityTime(skyActivity.updatedAt, now, t, locale)}</strong>
@@ -106,20 +97,6 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
         </div>
       )}
     </section>
-  );
-}
-
-function StatusBadge({ availability, t }: { availability: ReturnType<typeof useWebMcp>["availability"]; t: LocaleState["t"] }) {
-  const label = availability === "unknown"
-    ? t("webmcp.checking")
-    : availability === "ready"
-      ? t("webmcp.ready")
-      : t("webmcp.unavailable");
-  return (
-    <span className={`sky-status-badge sky-status-${availability}`}>
-      <span className="sky-status-dot" aria-hidden="true" />
-      {label}
-    </span>
   );
 }
 

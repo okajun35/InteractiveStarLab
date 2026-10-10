@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { SkyContextPanel } from "./SkyContextPanel";
-import { AgentHarness } from "./AgentHarness";
-import { ConsultPanel } from "./ConsultPanel";
 import { useLocale } from "../i18n";
 import type { SkySceneMetrics } from "../sky/contextModel";
 
@@ -20,20 +18,20 @@ export function SkySidebar({
       <button
         type="button"
         className="sky-agent-reopen"
-        aria-label={t("agent.reopen")}
+        aria-label={t("ctx.reopen")}
         onClick={() => setOpen(true)}
       >
-        {t("agent.panel.eyebrow")}
+        {t("ctx.eyebrow")}
       </button>
     );
   }
 
   return (
-    <aside className="sky-sidebar sky-agent-window" aria-label={t("agent.panel.title")}>
+    <aside className="sky-sidebar sky-agent-window" aria-label={t("ctx.title")}>
       <div className="sky-agent-window-header">
         <div>
-          <span className="sky-agent-eyebrow">{t("agent.panel.eyebrow")}</span>
-          <h2>{t("agent.panel.title")}</h2>
+          <span className="sky-agent-eyebrow">{t("ctx.eyebrow")}</span>
+          <h2>{t("ctx.title")}</h2>
         </div>
         <div className="sky-agent-window-actions">
           <button type="button" onClick={onOpenManual}>
@@ -42,7 +40,7 @@ export function SkySidebar({
           <button
             type="button"
             className="sky-agent-close"
-            aria-label={t("agent.close")}
+            aria-label={t("ctx.close")}
             onClick={() => setOpen(false)}
           >
             ×
@@ -50,8 +48,6 @@ export function SkySidebar({
         </div>
       </div>
       <SkyContextPanel metrics={metrics} compact />
-      <ConsultPanel />
-      <AgentHarness />
       <button
         type="button"
         className="sky-agent-manual-link"
