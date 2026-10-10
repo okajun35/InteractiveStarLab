@@ -42,6 +42,7 @@ export const en = {
   "consult.placeholder": "e.g. Tonight in Tokyo, show me 3 bright stars",
   "consult.send": "Send",
   "consult.working": "Thinking…",
+  "consult.openPlan": "Open the Plan screen",
   "consult.runningTool": "Running {name}…",
   "consult.notConfigured": "The assistant is not configured for this deployment.",
   "consult.error": "Could not reach the assistant — try again.",

@@ -48,6 +48,25 @@ export interface BedrockToolSpec {
   };
 }
 
+/**
+ * Description overrides applied only on the consult surface. Small models pick
+ * tools by reading the description at selection time, so the human-approval and
+ * explicit-ask gates live here where the model actually evaluates them — the
+ * system prompt alone was ignored.
+ */
+const CONSULT_TOOL_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  open_plan_view:
+    "Opens the Plan screen for the human. Call ONLY when the user explicitly asks to open or see the plan screen. Never call proactively after proposing or committing a plan.",
+  open_observe_view:
+    "Opens the Observe screen for the human. Call ONLY when the user explicitly asks to start observing or open the observe screen. Never call proactively.",
+  open_observation_results:
+    "Opens the Results screen. Call ONLY when the user explicitly asks to see saved observation results. Never call proactively.",
+  commit_proposal:
+    "Commits a pending proposal into a Mission. In this app propose_plan already commits automatically, so call this ONLY to materialize a proposal that is still pending — never right after propose_plan succeeded.",
+  generate_observation_guide:
+    "Builds a printable observation guide PDF for an existing Mission. Call ONLY when the user explicitly asks for a guide.",
+};
+
 /** Keep only the allowlisted tools, in allowlist order. */
 export function selectConsultTools(tools: readonly WebMcpTool[]): WebMcpTool[] {
   const byName = new Map(tools.map((tool) => [tool.name, tool]));
@@ -62,7 +81,7 @@ export function toToolSpec(tool: WebMcpTool): BedrockToolSpec {
   return {
     toolSpec: {
       name: tool.name,
-      description: tool.description,
+      description: CONSULT_TOOL_DESCRIPTION_OVERRIDES[tool.name] ?? tool.description,
       inputSchema: { json: tool.inputSchema as unknown as Record<string, unknown> },
     },
   };

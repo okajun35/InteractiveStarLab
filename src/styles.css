@@ -1201,6 +1201,24 @@ button[aria-label="Close"] {
   font-size: 0.68rem;
 }
 
+.consult-open-plan {
+  display: block;
+  width: 100%;
+  margin: 2px 0 6px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 180, 84, 0.5);
+  border-radius: 6px;
+  background: rgba(255, 180, 84, 0.12);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.consult-open-plan:hover {
+  background: rgba(255, 180, 84, 0.22);
+}
+
 .consult-form {
   display: flex;
   gap: 4px;

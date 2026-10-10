@@ -39,6 +39,7 @@ export const ja: Record<MessageKey, string> = {
   "consult.placeholder": "例: 今夜東京で明るい星を3つ見たい",
   "consult.send": "送信",
   "consult.working": "考え中…",
+  "consult.openPlan": "プラン画面を開く",
   "consult.runningTool": "{name} を実行中…",
   "consult.notConfigured": "このデプロイでは相談機能が設定されていません。",
   "consult.error": "相談サービスに接続できませんでした。もう一度お試しください。",

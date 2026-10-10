@@ -214,6 +214,37 @@ function firstToolResultText(result: Awaited<ReturnType<typeof runConsultation>>
   );
 }
 
+// ---- C6: navigation is user-driven — gated tool descriptions + a chip ------
+// A weak model kept calling open_plan_view unprompted despite prompt rules and
+// stripped nextAction. Two deterministic guards: the consult toolSpec override
+// states the explicit-ask gate in the tool's own description (which the model
+// reads at selection time), and the panel surfaces a one-click "open Plan"
+// chip after the auto-commit so the human drives the transition.
+{
+  const { CONSULT_TOOL_NAMES } = await import("../src/agent/toolspec");
+  check(
+    "C6: open_plan_view stays allowlisted for explicit asks",
+    (CONSULT_TOOL_NAMES as readonly string[]).includes("open_plan_view"),
+  );
+  const { toToolSpec } = await import("../src/agent/toolspec");
+  const gated = toToolSpec(fakeTool("open_plan_view", {}));
+  check(
+    "C6: the consult spec gates open_plan_view on an explicit ask",
+    /explicit/i.test(gated.toolSpec.description) || /only when/i.test(gated.toolSpec.description),
+    gated.toolSpec.description.slice(0, 140),
+  );
+  const consultSrc = read("src/components/ConsultPanel.tsx");
+  check(
+    "C6: the panel shows an open-Plan chip after commit_proposal",
+    consultSrc.includes("commit_proposal") && consultSrc.includes("useNavigation"),
+  );
+  check(
+    "C6: chip copy exists in both locales",
+    typeof enDict["consult.openPlan"] === "string" &&
+      typeof jaDict["consult.openPlan"] === "string",
+  );
+}
+
 // ---- C5: pending-proposal empty-state copy ----------------------------------
 {
   check(

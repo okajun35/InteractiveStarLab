@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useWebMcp } from "../state/webmcp";
+import { useNavigation } from "../state/navigation";
 import { useObservation } from "../state/observation";
 import { useLocale } from "../i18n";
 import { selectConsultTools } from "../agent/toolspec";
@@ -21,10 +22,12 @@ interface LogEntry {
 export function ConsultPanel() {
   const { harnessTools } = useWebMcp();
   const { activeSite } = useObservation();
+  const { setView } = useNavigation();
   const { t, locale } = useLocale();
   const [input, setInput] = useState("");
   const [log, setLog] = useState<LogEntry[]>([]);
   const [busy, setBusy] = useState(false);
+  const [planReady, setPlanReady] = useState(false);
   const historyRef = useRef<AgentMessage[]>([]);
 
   const tools = useMemo(() => selectConsultTools(harnessTools), [harnessTools]);
@@ -68,6 +71,9 @@ export function ConsultPanel() {
         if (event.type === "tool_call") {
           push({ kind: "status", text: t("consult.runningTool", { name: event.name }) });
         }
+        if (event.type === "tool_result" && event.name === "commit_proposal" && event.ok) {
+          setPlanReady(true);
+        }
       },
     });
     historyRef.current = outcome.messages;
@@ -100,6 +106,18 @@ export function ConsultPanel() {
               ))}
               {busy && <p className="consult-entry consult-entry-status">{t("consult.working")}</p>}
             </div>
+            {planReady && (
+              <button
+                type="button"
+                className="consult-open-plan"
+                onClick={() => {
+                  setView("plan");
+                  setPlanReady(false);
+                }}
+              >
+                {t("consult.openPlan")}
+              </button>
+            )}
             <form
               className="consult-form"
               onSubmit={(event) => {
