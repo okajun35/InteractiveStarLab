@@ -146,8 +146,12 @@ async function autoCommitConsultProposal(
   }
   onEvent({ type: "tool_result", name: "commit_proposal", ok: commitData !== null });
 
+  // nextAction reads as a command to small models — they open Plan unprompted.
+  // The in-app agent only navigates when the user asks, so it is stripped here;
+  // the field still exists in the raw tool result for external agents.
+  const { nextAction: _nextAction, ...rest } = parsed.data;
   parsed.data = {
-    ...parsed.data,
+    ...rest,
     autoCommitted: commitData !== null,
     ...(commitData !== null
       ? {

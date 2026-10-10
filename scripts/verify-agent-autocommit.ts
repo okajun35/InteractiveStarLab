@@ -124,6 +124,11 @@ function firstToolResultText(result: Awaited<ReturnType<typeof runConsultation>>
     resultText.slice(0, 200),
   );
   check(
+    "C1: the merged result does not command navigation",
+    merged.data?.nextAction === undefined,
+    `nextAction=${String(merged.data?.nextAction)}`,
+  );
+  check(
     "C1: static — the loop owns the auto-commit behaviour",
     loopSrc.includes("propose_plan") && loopSrc.includes("commit_proposal") && loopSrc.includes("autoCommitted"),
   );
