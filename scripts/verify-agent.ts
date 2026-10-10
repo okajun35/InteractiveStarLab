@@ -300,6 +300,58 @@ const EXPECTED_TOOLS = [
   });
 }
 
+// ---- A11b: an empty assistant turn is retried, not shown as "no reply" ----
+// Small models sometimes end a turn with zero visible text (a bare end_turn
+// after tool results, or stopReason tool_use with no toolUse blocks). The loop
+// drops the empty turn — it would otherwise persist into the transcript and
+// poison the next request — and gives the model one more shot.
+{
+  const responses: AgentResponse[] = [
+    {
+      stopReason: "tool_use",
+      content: [{ toolUse: { toolUseId: "t1", name: "predict_visible_stars", input: {} } }],
+    },
+    { stopReason: "end_turn", content: [] },
+    { stopReason: "end_turn", content: [{ text: "3つに絞りました" }] },
+  ];
+  let apiCalls = 0;
+  const callApi = async (): Promise<AgentResponse> => {
+    apiCalls += 1;
+    return responses.shift()!;
+  };
+  const outcome = await runConsultation([], "3つ見たい", {
+    tools: [fakeTool("predict_visible_stars")],
+    context: CONTEXT,
+    callApi,
+  });
+  check("A11b: an empty turn is retried and the retry's reply is returned",
+    apiCalls === 3 && outcome.reply === "3つに絞りました",
+    `calls=${apiCalls} reply=${String(outcome.reply)}`);
+  check("A11b: the empty assistant turn is not kept in the transcript",
+    outcome.messages.every((m) => !(m.role === "assistant" && m.content.length === 0)),
+    `messages=${outcome.messages.length}`);
+
+  // Still-empty retry: give up cleanly, again without keeping the empty turn.
+  const silentApi = async (): Promise<AgentResponse> => ({ stopReason: "end_turn", content: [] });
+  const silent = await runConsultation([], "hi", {
+    tools: [],
+    context: CONTEXT,
+    callApi: silentApi,
+  });
+  check("A11b: persistent silence reports no reply and keeps no empty turn",
+    silent.reply === null && silent.messages.every((m) => m.content.length > 0));
+
+  // Degenerate tool_use: stopReason says tool_use but no blocks arrived.
+  const phantomApi = async (): Promise<AgentResponse> => ({ stopReason: "tool_use", content: [] });
+  const phantom = await runConsultation([], "hi", {
+    tools: [],
+    context: CONTEXT,
+    callApi: phantomApi,
+  });
+  check("A11b: phantom tool_use is treated as an empty turn, not a hang",
+    phantom.reply === null && phantom.error === null);
+}
+
 // ---- A11: Lambda handler source guards ------------------------------------
 {
   const fs = await import("node:fs");

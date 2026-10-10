@@ -89,6 +89,8 @@ export interface ConsultOptions {
 export const DEFAULT_MAX_ROUNDS = 6;
 export const DEFAULT_MAX_TOOL_RESULT_CHARS = 8000;
 export const MAX_HISTORY_MESSAGES = 10;
+/** Small models sometimes end a turn with zero visible text; retry this many times. */
+export const MAX_EMPTY_TURN_RETRIES = 2;
 
 /** Display text only: Nova emits <thinking> blocks that users must not see. */
 export function extractAssistantText(content: AgentContentBlock[]): string {
@@ -185,6 +187,7 @@ export async function runConsultation(
     ...history.slice(-MAX_HISTORY_MESSAGES),
     { role: "user", content: [{ text: userText }] },
   ];
+  let emptyTurnRetries = 0;
 
   for (let round = 1; round <= maxRounds; round += 1) {
     onEvent({ type: "round", round });
@@ -237,6 +240,15 @@ export async function runConsultation(
     }
 
     const reply = extractAssistantText(content);
+    if (reply.length === 0) {
+      // An empty assistant turn persisted into the transcript would poison the
+      // next request — drop it, then give the model another shot within the cap.
+      messages.pop();
+      if (emptyTurnRetries < MAX_EMPTY_TURN_RETRIES) {
+        emptyTurnRetries += 1;
+        continue;
+      }
+    }
     if (reply.length > 0) onEvent({ type: "text", text: reply });
     onEvent({ type: "done" });
     return { messages, reply: reply.length > 0 ? reply : null, error: null };
