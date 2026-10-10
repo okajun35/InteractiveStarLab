@@ -388,6 +388,130 @@ const EXPECTED_TOOLS = [
     JSON.stringify(seen).slice(0, 200));
 }
 
+// ---- A14: end-to-end regression for the reported configure+predict loop ---
+// "Three bright stars in Tokyo tonight" looped six rounds: the model passed
+// "…T21:00:00.000Z" (local wall time with a Z). Old code rejected configure
+// on format and read predict's instant as 06:00 JST, so daylight caveats
+// baited endless retries. This wires the REAL tools and replays that exact
+// model behavior: the loop must now converge, and each self-correction the
+// model needs must be readable inside the tool results.
+{
+  const { registerSkyControlTools } = await import("../src/mcp/skyControlTools");
+  const { registerReadTools } = await import("../src/mcp/registerTools");
+  const registered: WebMcpTool[] = [];
+  const modelContext = {
+    async registerTool(tool: WebMcpTool) {
+      registered.push(tool);
+    },
+  };
+  let site = {
+    id: "tokyo", name: "Tokyo",
+    latitude: 35.6812, longitude: 139.7671, timeZone: "Asia/Tokyo",
+  };
+  let observation = {
+    latitude: 35.6812, longitude: 139.7671,
+    datetime: new Date("2026-08-29T11:00:00.000Z"),
+    azimuth: 180, altitude: 30, fieldOfView: 80,
+  };
+  await registerSkyControlTools(modelContext, {
+    getObservationSite: () => site,
+    getObservationSettings: () => observation,
+    updateObservationSite: (patch: Record<string, unknown>) => {
+      site = { ...site, ...patch };
+    },
+    updateObservationSettings: (patch: Record<string, unknown>) => {
+      observation = { ...observation, ...patch };
+    },
+    openSky: () => undefined,
+    openObserve: () => undefined,
+  });
+  await registerReadTools(modelContext, {
+    getObservationSite: () => site,
+    getObservationSettings: () => observation,
+    getSimulationSettings: () => ({
+      daylightMode: "real", lightPollution: "dark-sky",
+      limitingMagnitude: 5.5, showHiddenStars: false,
+    }),
+    getLayers: () => ({ first: true, second: true, third: false, fourth: false, faint: false }),
+    getDisplayOptions: () => ({ stars: true, starNames: true, constellationLines: true, constellationNames: true }),
+    getSkyMode: () => "window",
+    getSelection: () => null,
+    getSkyActions: () => [],
+    getSceneMetrics: () => null,
+  });
+
+  const toolResults: string[] = [];
+  const scripted: AgentResponse[] = [
+    // Round 1 — the observed bad input: local 21:00 with a Z suffix.
+    {
+      stopReason: "tool_use",
+      content: [
+        { toolUse: { toolUseId: "c1", name: "configure_sky_view", input: { preset: "tokyo", localDateTime: "2026-10-10T21:00:00.000Z" } } },
+        { toolUse: { toolUseId: "p1", name: "predict_visible_stars", input: { dateTime: "2026-10-10T21:00:00.000Z", maxMagnitude: 2 } } },
+      ],
+    },
+    // Round 2 — the model retries the identical call (as it did six times).
+    {
+      stopReason: "tool_use",
+      content: [
+        { toolUse: { toolUseId: "p2", name: "predict_visible_stars", input: { dateTime: "2026-10-10T21:00:00.000Z", maxMagnitude: 2 } } },
+      ],
+    },
+    // Round 3 — the escape hatch: omit dateTime, predict the configured view.
+    {
+      stopReason: "tool_use",
+      content: [
+        { toolUse: { toolUseId: "p3", name: "predict_visible_stars", input: { maxMagnitude: 2 } } },
+      ],
+    },
+    { stopReason: "end_turn", content: [{ text: "Vega, Capella, and Altair are up tonight." }] },
+  ];
+  const outcome = await runConsultation([], "Three bright stars in Tokyo tonight", {
+    tools: registered,
+    context: CONTEXT,
+    callApi: async (req: { messages: AgentMessage[] }) => {
+      const last = req.messages[req.messages.length - 1];
+      if (last.role === "user" && Array.isArray(last.content)) {
+        for (const block of last.content as Array<{ toolResult?: { content?: Array<{ text?: string }> } }>) {
+          if (block.toolResult?.content?.[0]?.text !== undefined) {
+            toolResults.push(block.toolResult.content[0].text);
+          }
+        }
+      }
+      return scripted.shift()!;
+    },
+  });
+
+  const [configured, predictZ, predictRetry, predictDefault] =
+    toolResults.map((text) => JSON.parse(text) as { ok: boolean; data?: Record<string, unknown> });
+  check(
+    "A14: Z-suffixed wall time configures as local 21:00 JST",
+    configured.ok === true && configured.data?.dateTime === "2026-10-10T12:00:00.000Z",
+    JSON.stringify(configured).slice(0, 160),
+  );
+  check(
+    "A14: Z-suffixed predict stays an honored instant and explains the fix",
+    predictZ.data?.daylight === true &&
+      (predictZ.data?.caveats as string[]).join(" ").includes("timeZone"),
+    JSON.stringify(predictZ).slice(0, 200),
+  );
+  check(
+    "A14: the identical retry carries a repeatWarning",
+    JSON.stringify(predictRetry).includes("repeatWarning"),
+  );
+  check(
+    "A14: omitting dateTime predicts the configured night view",
+    predictDefault.data?.daylight === false &&
+      (predictDefault.data?.stars as unknown[]).length > 0,
+    JSON.stringify(predictDefault).slice(0, 200),
+  );
+  check(
+    "A14: the turn converges with a reply instead of rounds_exceeded",
+    outcome.error === null && outcome.reply === "Vega, Capella, and Altair are up tonight.",
+    `error=${String(outcome.error)} reply=${String(outcome.reply)}`,
+  );
+}
+
 // ---- A11: Lambda handler source guards ------------------------------------
 {
   const fs = await import("node:fs");
