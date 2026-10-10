@@ -4,6 +4,7 @@ import { useSimulation } from "../state/simulation";
 import { useObservation } from "../state/observation";
 import { useWebMcp } from "../state/webmcp";
 import { useAgentActivity } from "../state/agentActivity";
+import { agentApiUrl } from "../agent/client";
 import {
   buildSkyContextModel,
   buildCurrentSkyRows,
@@ -70,7 +71,9 @@ export function SkyContextPanel({ metrics, compact = false }: { metrics: SkyScen
         <StatusBadge availability={availability} t={t} />
       </div>
       {availability === "unavailable" || availability === "error" ? (
-        <p className="sky-fallback-note">{t("ctx.manualNote")}</p>
+        <p className="sky-fallback-note">
+          {t(agentApiUrl() !== null ? "ctx.manualNoteAgent" : "ctx.manualNote")}
+        </p>
       ) : null}
       {skyActivity !== null && (
         <div className="sky-activity-summary" aria-label={t("ctx.activityAria")}>
