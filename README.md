@@ -6,6 +6,10 @@ Tell the agent where and when you want to observe — “Tonight in Tokyo, show 
 
 [Live Demo](https://main.d35b3q1a0wz0ef.amplifyapp.com) · [Demo Video](https://youtu.be/A5fB2o8e4Dk) · [Devpost Story](https://devpost.com/software/interactive-star-lab)
 
+![Interactive Star Lab — all-sky dome view configured by the agent for Tokyo at 21:00](docs/assets/app-screenshot.png)
+
+_The all-sky dome after “Tonight in Tokyo, show me 3 bright stars”: the agent configured the site and 21:00 local time (see “Updated by agent” in the sidebar) while the Milky Way, planets, and constellations render live. The “Ask the sky” dock sits bottom-right._
+
 ![Interactive Star Lab workflow](docs/assets/workflow.png)
 
 _The diagram shows the overall agent-assisted workflow. Location lookup may be handled by the Agent; weather and cloud-cover forecasts are available through the Open-Meteo tools._
